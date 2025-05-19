@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DropLoaderApp.Views.HomeTabView">
+
+
+    <!--HomeTab Box-->
+    <Border 
+        WidthRequest="640" 
+        HeightRequest="350" 
+        Style="{StaticResource BorderStyle}"
+        Padding="20">
+
+        <VerticalStackLayout VerticalOptions="Start" Spacing="20">
+            <Label Style="{StaticResource TitleLabelStyle}"
+                   Text="Welcome to DropLoader"/>
+            <Label Style="{StaticResource CaptionLabelStyle}"
+                   Text="DropLoader is the Easiest Way for downloading videos and audio from popular platforms: TikTok, YouTube, Pinterest, SoundCloud and Spotify. Just send the link and you will receive the desired file without watermarks and unnecessary noise"
+                   FontAttributes="None"/>
+            <Label Style="{StaticResource CaptionLabelStyle}"
+                   FontAttributes="None">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="If you find some bugs, write to our "/>
+                        <Span Text="Support"
+                              TextColor="{AppThemeBinding Light={StaticResource Primary},
+                                                                  Dark={StaticResource PrimaryDark}}"
+                              TextDecorations="Underline">
+
+                              <Span.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="SupportHyperlink_Clicked"/>
+                              </Span.GestureRecognizers>
+                        </Span>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+
+            <Label Style="{StaticResource CaptionLabelStyle}"
+                   Text="Supported platforms: YouTube, TikTok, Pinterest, SoundCloud, Spotify"
+                   FontSize="16" FontAttributes="None"/>
+        </VerticalStackLayout>
+
+    </Border>
+</ContentView>
+
