@@ -83,20 +83,16 @@
 	  <None Remove="ViewModels\" />
 	  <None Remove="Downloaders\" />
 	  <None Remove="Resources\AppIcon\appicon %28копия%29.svg" />
-	  <None Remove="DownloaderConfig\" />
-	  <None Remove="DownloaderConfig\config.json" />
 	  <None Remove="Downloaders\DownloadingConfig\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Views\" />
 	  <Folder Include="ViewModels\" />
 	  <Folder Include="Downloaders\" />
-	  <Folder Include="DownloaderConfig\" />
 	  <Folder Include="Downloaders\DownloadingConfig\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <BundleResource Include="Resources\Images\logo.jpg" />
-	  <BundleResource Include="DownloaderConfig\config.json" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Remove="Models\TabsModel.cs" />
