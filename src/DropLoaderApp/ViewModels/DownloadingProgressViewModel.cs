@@ -6,6 +6,7 @@ namespace DropLoaderApp.ViewModels
 	public class DownloadingProgressViewModel : INotifyPropertyChanged
 	{
         private float _progress = 0.0f;
+        private string _fileName = "";
 
         public float DownloadingProgress
         {
@@ -15,6 +16,19 @@ namespace DropLoaderApp.ViewModels
                 if (_progress != value)
                 {
                     _progress = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string DownloadingFileName
+        {
+            get => _fileName;
+            set
+            {
+                if (_fileName != value)
+                {
+                    _fileName = value;
                     OnPropertyChanged();
                 }
             }
