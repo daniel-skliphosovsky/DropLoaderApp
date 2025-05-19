@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DropLoaderApp.Views.BannerView">
+
+    <!--Banner Box-->
+    <Border 
+        WidthRequest="640" 
+        HeightRequest="74" 
+        Style="{StaticResource BorderStyle}"
+        Padding="10">
+    
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/> 
+                <ColumnDefinition Width="*"/>    
+                <ColumnDefinition Width="Auto"/> 
+            </Grid.ColumnDefinitions>
+
+            <!--Left Side-->
+            <HorizontalStackLayout Grid.Column="0" Spacing="10" VerticalOptions="Center">
+                <Grid>
+                    <Rectangle WidthRequest="40" HeightRequest="40" BackgroundColor="Black" RadiusX="10" RadiusY="10"/>
+                    <Image Source="logo.jpg" WidthRequest="32" HeightRequest="32"/>
+                </Grid>
+                <Label Text="DropLoader"
+                       Style="{StaticResource TitleLabelStyle}"/>
+            </HorizontalStackLayout>
+
+            <!--Right Side-->
+            <HorizontalStackLayout Grid.Column="2" Spacing="2" VerticalOptions="Center">
+                <Button Text="Home"
+                        Style="{StaticResource NavigationButtonStyle}"
+                        Clicked="HomeTab"/>
+                <Button Text="Downloading"
+                        Style="{StaticResource NavigationButtonStyle}"
+                        Clicked="DownloadingTab"/>
+                <Button Text="☽ "
+                        Style="{StaticResource NavigationButtonStyle}"
+                        Clicked="ChangeAppTheme"/>
+
+            </HorizontalStackLayout>
+        </Grid>
+    </Border>
+
+</ContentView>
+
