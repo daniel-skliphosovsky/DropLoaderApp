@@ -6,7 +6,7 @@ namespace DropLoaderApp.Downloaders
 	{
 		private Popup popup = new Views.DownloadingPopup();
 
-		private async void DownloadingStarted()
+        private async void DownloadingStarted()
 		{
 			await Shell.Current.ShowPopupAsync(popup);
 		}
@@ -23,6 +23,14 @@ namespace DropLoaderApp.Downloaders
 			await Shell.Current.DisplayAlert("Downloading Error", error, "OK");
             await popup.CloseAsync();
         }
+
+		private async void AddDownloadingFileName(string name)
+		{
+			if (popup.BindingContext is ViewModels.DownloadingProgressViewModel downloadingViewModel)
+			{
+				downloadingViewModel.DownloadingFileName = name;
+			}
+		}
     }
 }
 

@@ -31,6 +31,7 @@ namespace DropLoaderApp.Downloaders
 
                     foreach (Track track in playlist.Tracks)
                     {
+                        AddDownloadingFileName(track.Title);
                         await soundCloud.DownloadAsync(track, Path.Combine(DownloadPath, playlist.Title, MakeSafeFiletitle(track.Title) + ".mp3"), progress);
                     }
                     
@@ -44,6 +45,7 @@ namespace DropLoaderApp.Downloaders
                         throw new Exception("Track not found");
                     }
 
+                    AddDownloadingFileName(track.Title);
                     await soundCloud.DownloadAsync(track, Path.Combine(DownloadPath, MakeSafeFiletitle(track.Title) + ".mp3"), progress);
                 }
 

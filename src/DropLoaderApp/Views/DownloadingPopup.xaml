@@ -4,13 +4,15 @@
              xmlns:mct="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
              x:Class="DropLoaderApp.Views.DownloadingPopup"
              CanBeDismissedByTappingOutsideOfPopup="False"
-             Size="400, 150"
+             Size="400, 200"
              Color="{AppThemeBinding Light={StaticResource AppBackgroundLightThemeColor},
                                           Dark={StaticResource AppBackgroundDarkThemeColor}}">
 
     <VerticalStackLayout Padding="20" Spacing="25">
         <Label Style="{StaticResource TitleLabelStyle}"
                Text="Downloading started please wait"/>
+        <Label Style="{StaticResource CaptionLabelStyle}"
+               Text="{Binding DownloadingFileName}"/>
         <ProgressBar Progress="{Binding DownloadingProgress}"
                      ProgressColor="{AppThemeBinding Light={StaticResource Primary},
                                                      Dark={StaticResource PrimaryDark}}"
