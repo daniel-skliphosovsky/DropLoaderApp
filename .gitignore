@@ -405,4 +405,4 @@ ASALocalRun/
 .localhistory/% 
 
 # Cryptographer
-/src/DropLoaderApp/Downloaders/DownloadingConfig/Cryptographer.cs
+/src/DropLoaderApp/Properties/CryptographerLib.dll
