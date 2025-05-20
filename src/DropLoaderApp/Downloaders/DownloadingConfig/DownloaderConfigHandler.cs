@@ -1,5 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using CryptographerLib;
+
 namespace DropLoaderApp.Downloaders
 {
 	public class DownloaderConfigHandler

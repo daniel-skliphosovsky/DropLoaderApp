@@ -98,4 +98,9 @@
 	  <Compile Remove="Models\TabsModel.cs" />
 	  <Compile Remove="ViewModels\TabsViewModel.cs" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Reference Include="CryptographerLib">
+	    <HintPath>Properties\CryptographerLib.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
 </Project>
