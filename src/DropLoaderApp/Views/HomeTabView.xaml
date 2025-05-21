@@ -15,7 +15,7 @@
             <Label Style="{StaticResource TitleLabelStyle}"
                    Text="Welcome to DropLoader"/>
             <Label Style="{StaticResource CaptionLabelStyle}"
-                   Text="DropLoader is the Easiest Way for downloading videos and audio from popular platforms: TikTok, YouTube, Pinterest, SoundCloud and Spotify. Just send the link and you will receive the desired file without watermarks and unnecessary noise"
+                   Text="DropLoader is the easiest way for downloading video and audio from popular platforms: TikTok, YouTube, Pinterest, SoundCloud and Spotify. Just insert the link and you will receive the desired file without watermarks and unnecessary noise"
                    FontAttributes="None"/>
             <Label Style="{StaticResource CaptionLabelStyle}"
                    FontAttributes="None">
