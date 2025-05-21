@@ -406,3 +406,6 @@ ASALocalRun/
 
 # Cryptographer
 /src/DropLoaderApp/Properties/CryptographerLib.dll
+
+# DownloadingSettings
+/src/DropLoaderApp/Properties/DownloadingSettings.dll
