@@ -100,5 +100,8 @@
 	  <Reference Include="CryptographerLib">
 	    <HintPath>Properties\CryptographerLib.dll</HintPath>
 	  </Reference>
+	  <Reference Include="DownloadersConfig">
+	    <HintPath>Properties\DownloadersConfig.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 </Project>
