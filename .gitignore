@@ -408,4 +408,4 @@ ASALocalRun/
 /src/DropLoaderApp/Properties/CryptographerLib.dll
 
 # DownloadingSettings
-/src/DropLoaderApp/Properties/DownloadingConfig.dll
+/src/DropLoaderApp/Properties/DownloadersConfig.dll
