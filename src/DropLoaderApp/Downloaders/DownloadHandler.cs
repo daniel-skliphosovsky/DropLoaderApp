@@ -30,7 +30,7 @@
 			switch (GetLinkPlatform())
 			{
 				case LinkPlatform.SoundCloud:
-					await DownloadFromSoundcloud();
+					await SmartDownload();
 					break;
 				case LinkPlatform.Unknown:
 				default:

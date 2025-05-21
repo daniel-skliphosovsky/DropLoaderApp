@@ -83,11 +83,13 @@
 	  <None Remove="ViewModels\" />
 	  <None Remove="Downloaders\" />
 	  <None Remove="Resources\AppIcon\appicon %28копия%29.svg" />
+	  <None Remove="Downloaders\Soundcloud\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Views\" />
 	  <Folder Include="ViewModels\" />
 	  <Folder Include="Downloaders\" />
+	  <Folder Include="Downloaders\Soundcloud\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <BundleResource Include="Resources\Images\logo.jpg" />
