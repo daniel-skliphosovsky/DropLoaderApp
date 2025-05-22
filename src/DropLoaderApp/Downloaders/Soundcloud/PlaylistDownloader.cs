@@ -31,10 +31,16 @@ namespace DropLoaderApp.Downloaders
 
                 foreach (Track track in playlist.Tracks)
                 {
-                    AddDownloadingFileName(track.Title);
-                    await soundCloud.DownloadAsync(track, Path.Combine(DownloadPath, playlist.Title, MakeSafeFiletitle(track.Title) + ".mp3"), progress);
+                    try
+                    {
+                        AddDownloadingFileName(track.Title);
+                        await soundCloud.DownloadAsync(track, Path.Combine(DownloadPath, playlist.Title, MakeSafeFiletitle(track.Title) + ".mp3"), progress);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
                 }
-
                 DownloadingFinished();
             }
             catch (Exception exception)
