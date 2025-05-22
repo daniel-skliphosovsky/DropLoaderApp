@@ -14,16 +14,16 @@
 
 		private string MakeSafeFiletitle(string fileTitle)
 		{
-            return string.Join("_", fileTitle.Split(Path.GetInvalidFileNameChars()));
-        }
+			return string.Join("_", fileTitle.Split(Path.GetInvalidFileNameChars()));
+		}
 
-        private LinkPlatform GetLinkPlatform()
-        {
-            string link = DownloadLink.ToLower();
+		private LinkPlatform GetLinkPlatform()
+		{
+			string link = DownloadLink.ToLower();
 			if (link.Contains("soundcloud.com"))
 				return LinkPlatform.SoundCloud;
 			else return LinkPlatform.Unknown;
-        }
+		}
 
         public async Task TryDownload()
 		{
@@ -35,9 +35,9 @@
 				case LinkPlatform.Unknown:
 				default:
 					DownloadingError("Link is incorrect");
-                    break;
+					break;
 			}
-		}
-	}
+        }
+    }
 }
 

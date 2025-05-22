@@ -4,7 +4,7 @@
     {
         private async Task SmartDownload()
         {
-            if (DownloadLink.ToLower().Contains("/sets/"))
+            if (DownloadLink.ToLower().Contains("/sets/") && !DownloadLink.Contains("?in="))
             {
                 await DownloaPlaylistFromSoundcloud();
             }
@@ -15,4 +15,3 @@
         }
     }
 }
-

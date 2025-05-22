@@ -13,8 +13,7 @@ namespace DropLoaderApp.Downloaders
 
         private async void DownloadingFinished()
 		{
-            await Shell.Current.DisplayAlert("Downloading finished", "Successfully downloaded!\n" +
-                                                 $"Path: {DownloadPath}\n", "OK");
+            await Shell.Current.DisplayAlert("Downloading finished", "Successfully downloaded!\n", "OK");
             await popup.CloseAsync();
 		}
 
@@ -24,7 +23,7 @@ namespace DropLoaderApp.Downloaders
             await popup.CloseAsync();
         }
 
-		private async void AddDownloadingFileName(string name)
+        private async void AddDownloadingFileName(string name)
 		{
 			if (popup.BindingContext is ViewModels.DownloadingProgressViewModel downloadingViewModel)
 			{
