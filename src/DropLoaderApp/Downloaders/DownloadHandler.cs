@@ -9,6 +9,7 @@
 		private enum LinkPlatform
 		{
 			SoundCloud,
+			TikTok,
 			Unknown
 		}
 
@@ -22,7 +23,9 @@
 			string link = DownloadLink.ToLower();
 			if (link.Contains("soundcloud.com"))
 				return LinkPlatform.SoundCloud;
-			else return LinkPlatform.Unknown;
+            if (link.Contains("tiktok.com"))
+                return LinkPlatform.TikTok;
+            else return LinkPlatform.Unknown;
 		}
 
         public async Task TryDownload()
@@ -30,7 +33,10 @@
 			switch (GetLinkPlatform())
 			{
 				case LinkPlatform.SoundCloud:
-					await SmartDownload();
+					await SmartDownloadFromSoundcloud();
+					break;
+				case LinkPlatform.TikTok:
+					await SmartDownloadFromTikTok();
 					break;
 				case LinkPlatform.Unknown:
 				default:

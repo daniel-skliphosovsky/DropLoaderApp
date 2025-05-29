@@ -84,12 +84,14 @@
 	  <None Remove="Downloaders\" />
 	  <None Remove="Resources\AppIcon\appicon %28копия%29.svg" />
 	  <None Remove="Downloaders\Soundcloud\" />
+	  <None Remove="Downloaders\Tiktok\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Views\" />
 	  <Folder Include="ViewModels\" />
 	  <Folder Include="Downloaders\" />
 	  <Folder Include="Downloaders\Soundcloud\" />
+	  <Folder Include="Downloaders\Tiktok\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <BundleResource Include="Resources\Images\logo.jpg" />
@@ -104,6 +106,9 @@
 	  </Reference>
 	  <Reference Include="DownloadersConfig">
 	    <HintPath>Properties\DownloadersConfig.dll</HintPath>
+	  </Reference>
+	  <Reference Include="TikTokExplode">
+	    <HintPath>Properties\TikTokExplode.dll</HintPath>
 	  </Reference>
 	</ItemGroup>
 </Project>
