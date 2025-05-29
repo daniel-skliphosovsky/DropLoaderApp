@@ -2,7 +2,7 @@
 {
     public partial class DownloadHandler
     {
-        private async Task SmartDownload()
+        private async Task SmartDownloadFromSoundcloud()
         {
             if (DownloadLink.ToLower().Contains("/sets/") && !DownloadLink.Contains("?in="))
             {
