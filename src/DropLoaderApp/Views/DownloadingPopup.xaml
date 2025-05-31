@@ -4,7 +4,7 @@
              xmlns:mct="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
              x:Class="DropLoaderApp.Views.DownloadingPopup"
              CanBeDismissedByTappingOutsideOfPopup="False"
-             Size="400, 200"
+             Size="400, 275"
              Color="{AppThemeBinding Light={StaticResource AppBackgroundLightThemeColor},
                                           Dark={StaticResource AppBackgroundDarkThemeColor}}">
 
@@ -18,6 +18,10 @@
                                                      Dark={StaticResource PrimaryDark}}"
                      Background="{AppThemeBinding Light={StaticResource EntryLightThemeColor},
                                                   Dark={StaticResource EntryDarkThemeColor}}"/>
+        <Button Text="Cancel" 
+                Command="{Binding CancelDownloadCommand}"
+                HorizontalOptions="Fill"           
+                Style="{StaticResource DownloadButtonStyle}"/>
     </VerticalStackLayout>
 
 </mct:Popup>

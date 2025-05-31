@@ -5,7 +5,7 @@ namespace DropLoaderApp.Downloaders
 {
     public partial class DownloadHandler
     {
-        private async Task DownloadVideoFromTikTok()
+        private async Task DownloadVideoFromTikTok(CancellationToken cancellationToken)
         {
             try
             {
@@ -23,12 +23,22 @@ namespace DropLoaderApp.Downloaders
 
                 Video video = await TikTok.Publications.Videos.GetAsync(DownloadLink);
 
-                await TikTok.DownloadVideoAsync(video, DownloadPath, progress: progress);
+                await TikTok.DownloadVideoAsync(video, DownloadPath, progress: progress, cancellationToken: cancellationToken);
                 
                 DownloadingFinished();
             }
+            catch (OperationCanceledException)
+            {
+                DownloadingCanceled();
+            }
             catch (Exception exception)
             {
+                if (exception.Message.Contains("timed out"))
+                {
+                    DownloadingCanceled();
+                    return;
+                }
+
                 DownloadingError(exception.Message);
             }
         }

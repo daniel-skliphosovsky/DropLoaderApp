@@ -5,8 +5,21 @@ namespace DropLoaderApp.ViewModels
 {
 	public class DownloadingProgressViewModel : INotifyPropertyChanged
 	{
+        public DownloadingProgressViewModel()
+        {
+            CancelDownloadCommand = new Command(CancelDownload);
+            CancellationTokenSource = new CancellationTokenSource();
+        }
+
         private float _progress = 0.0f;
         private string _fileName = "";
+
+        private void CancelDownload()
+        {
+            CancellationTokenSource.Cancel();
+        }
+
+        public CancellationTokenSource CancellationTokenSource { get; }
 
         public float DownloadingProgress
         {
@@ -33,6 +46,8 @@ namespace DropLoaderApp.ViewModels
                 }
             }
         }
+
+        public Command CancelDownloadCommand { get; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 

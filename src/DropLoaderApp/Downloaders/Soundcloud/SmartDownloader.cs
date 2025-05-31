@@ -2,15 +2,15 @@
 {
     public partial class DownloadHandler
     {
-        private async Task SmartDownloadFromSoundcloud()
+        private async Task SmartDownloadFromSoundcloud(CancellationToken cancellationToken)
         {
             if (DownloadLink.ToLower().Contains("/sets/") && !DownloadLink.Contains("?in="))
             {
-                await DownloaPlaylistFromSoundcloud();
+                await DownloaPlaylistFromSoundcloud(cancellationToken);
             }
             else
             {
-                await DownloadTrackFromSoundcloud();
+                await DownloadTrackFromSoundcloud(cancellationToken);
             }
         }
     }

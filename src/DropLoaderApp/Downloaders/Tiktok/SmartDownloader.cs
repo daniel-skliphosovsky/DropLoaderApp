@@ -4,15 +4,15 @@ namespace DropLoaderApp.Downloaders
 {
     public partial class DownloadHandler
     {
-        private async Task SmartDownloadFromTikTok()
+        private async Task SmartDownloadFromTikTok(CancellationToken cancellationToken)
         {
             switch (await PublicationClient.GetPublicationType(DownloadLink))
             {
                 case PublicationClient.PublicationType.Images:
-                    await DownloadImagesFromTikTok();
+                    await DownloadImagesFromTikTok(cancellationToken);
                     break;
                 case PublicationClient.PublicationType.Video:
-                    await DownloadVideoFromTikTok();
+                    await DownloadVideoFromTikTok(cancellationToken);
                     break;
                 case PublicationClient.PublicationType.Unknown:
                 default:

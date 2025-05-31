@@ -5,7 +5,7 @@ namespace DropLoaderApp.Downloaders
 {
     public partial class DownloadHandler
     {
-        private async Task DownloadTrackFromSoundcloud()
+        private async Task DownloadTrackFromSoundcloud(CancellationToken cancellationToken)
         {
             try
             {
@@ -23,19 +23,28 @@ namespace DropLoaderApp.Downloaders
 
                 Track? track = await soundCloud.Tracks.GetAsync(DownloadLink);
 
-                if (track == null)
+                if (track is null)
                 {
                    throw new Exception("Track not found");
                 }
 
                 AddDownloadingFileName(track.Title);
-                await soundCloud.DownloadAsync(track, Path.Combine(DownloadPath, MakeSafeFiletitle(track.Title) + ".mp3"), progress);
+                await soundCloud.DownloadAsync(track, Path.Combine(DownloadPath, MakeSafeFiletitle(track.Title) + ".mp3"), progress, cancellationToken: cancellationToken);
 
 
                 DownloadingFinished();
             }
+            catch (OperationCanceledException)
+            {
+                DownloadingCanceled();
+            }
             catch (Exception exception)
             {
+                if (exception.Message.Contains("timed out"))
+                {
+                    DownloadingCanceled();
+                    return;
+                }
                 DownloadingError(exception.Message);
             }
         }
