@@ -5,7 +5,7 @@ namespace DropLoaderApp.Downloaders
 {
     public partial class DownloadHandler
     {
-        private async Task DownloadImagesFromTikTok()
+        private async Task DownloadImagesFromTikTok(CancellationToken cancellationToken)
         {
             try
             {
@@ -23,12 +23,22 @@ namespace DropLoaderApp.Downloaders
 
                 List<TikTokExplode.Publications.Images.Image> images = await TikTok.Publications.Images.GetAsync(DownloadLink);
 
-                await TikTok.DownloadImagesAsync(images, DownloadPath, progress: progress);
+                await TikTok.DownloadImagesAsync(images, DownloadPath, progress: progress, cancellationToken: cancellationToken);
                 
                 DownloadingFinished();
             }
+            catch (OperationCanceledException)
+            {
+                DownloadingCanceled();
+            }
             catch (Exception exception)
             {
+                if (exception.Message.Contains("timed out"))
+                {
+                    DownloadingCanceled();
+                    return;
+                }
+
                 DownloadingError(exception.Message);
             }
         }

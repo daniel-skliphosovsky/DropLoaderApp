@@ -75,6 +75,7 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="9.1.0" />
 		<PackageReference Include="SoundCloudExplode" Version="1.6.5" />
+		<PackageReference Include="YoutubeExplode" Version="6.5.4" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -85,6 +86,7 @@
 	  <None Remove="Resources\AppIcon\appicon %28копия%29.svg" />
 	  <None Remove="Downloaders\Soundcloud\" />
 	  <None Remove="Downloaders\Tiktok\" />
+	  <None Remove="Downloaders\YouTube\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Views\" />
@@ -92,6 +94,7 @@
 	  <Folder Include="Downloaders\" />
 	  <Folder Include="Downloaders\Soundcloud\" />
 	  <Folder Include="Downloaders\Tiktok\" />
+	  <Folder Include="Downloaders\YouTube\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <BundleResource Include="Resources\Images\logo.jpg" />

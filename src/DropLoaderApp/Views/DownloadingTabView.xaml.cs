@@ -8,7 +8,6 @@ public partial class DownloadingTabView : ContentView
     public DownloadingTabView()
     {
         InitializeComponent();
-
     }
     async void FolderPickButton_Clicked(System.Object sender, System.EventArgs e)
     {

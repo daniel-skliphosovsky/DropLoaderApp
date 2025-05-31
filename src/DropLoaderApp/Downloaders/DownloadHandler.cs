@@ -10,6 +10,7 @@
 		{
 			SoundCloud,
 			TikTok,
+			YouTube,
 			Unknown
 		}
 
@@ -25,20 +26,30 @@
 				return LinkPlatform.SoundCloud;
             if (link.Contains("tiktok.com"))
                 return LinkPlatform.TikTok;
+            if (link.Contains("youtube.com") || link.Contains("youtu.be"))
+                return LinkPlatform.YouTube;
             else return LinkPlatform.Unknown;
 		}
 
         public async Task TryDownload()
 		{
-			switch (GetLinkPlatform())
+			CancellationToken cancellationToken = default;
+            if (popup.BindingContext is ViewModels.DownloadingProgressViewModel downloadingViewModel)
+            {
+				cancellationToken = downloadingViewModel.CancellationTokenSource.Token;
+            }
+            switch (GetLinkPlatform())
 			{
 				case LinkPlatform.SoundCloud:
-					await SmartDownloadFromSoundcloud();
+					await SmartDownloadFromSoundcloud(cancellationToken);
 					break;
 				case LinkPlatform.TikTok:
-					await SmartDownloadFromTikTok();
+					await SmartDownloadFromTikTok(cancellationToken);
 					break;
-				case LinkPlatform.Unknown:
+                case LinkPlatform.YouTube:
+                    await DownloadVideoFromYoutube(cancellationToken);
+                    break;
+                case LinkPlatform.Unknown:
 				default:
 					DownloadingError("Link is incorrect");
 					break;

@@ -11,9 +11,9 @@ namespace DropLoaderApp.Downloaders
 			await Shell.Current.ShowPopupAsync(popup);
 		}
 
-        private async void DownloadingFinished()
+        private async void DownloadingFinished(string message = null)
 		{
-            await Shell.Current.DisplayAlert("Downloading finished", "Successfully downloaded!\n", "OK");
+            await Shell.Current.DisplayAlert("Downloading finished", $"Successfully downloaded!\n{message}", "OK");
             await popup.CloseAsync();
 		}
 
@@ -23,11 +23,20 @@ namespace DropLoaderApp.Downloaders
             await popup.CloseAsync();
         }
 
+        private async void DownloadingCanceled()
+        {
+            await Shell.Current.DisplayAlert("Downloading Canceled", "Downloading was canceled", "OK");
+            await popup.CloseAsync();
+        }
+
         private async void AddDownloadingFileName(string name)
 		{
 			if (popup.BindingContext is ViewModels.DownloadingProgressViewModel downloadingViewModel)
 			{
-				downloadingViewModel.DownloadingFileName = name;
+                string trimmedName = name.Length > 50
+                    ? name.Substring(0, 47) + "..."
+                    : name;
+                downloadingViewModel.DownloadingFileName = trimmedName;
 			}
 		}
     }
