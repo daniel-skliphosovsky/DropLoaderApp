@@ -38,13 +38,16 @@ namespace DropLoaderApp.Downloaders
             {
                 DownloadingCanceled();
             }
+            catch (Exception exception) when (exception.Message.Contains("timed out"))
+            {
+                DownloadingCanceled();
+            }
+            catch (Exception exception) when (exception.Message.Contains("Forbidden"))
+            {
+                DownloadingError("This track is not available. Try inserting another link");
+            }
             catch (Exception exception)
             {
-                if (exception.Message.Contains("timed out"))
-                {
-                    DownloadingCanceled();
-                    return;
-                }
                 DownloadingError(exception.Message);
             }
         }
