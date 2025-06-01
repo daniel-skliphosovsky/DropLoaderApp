@@ -32,7 +32,7 @@ namespace DropLoaderApp.Downloaders
                 StreamManifest streamManifest = await youtube.Videos.Streams.GetManifestAsync(DownloadLink, cancellationToken);
 
                 IVideoStreamInfo streamMuxed = streamManifest
-                    .GetVideoOnlyStreams()
+                    .GetMuxedStreams()
                     .Where(s => s.Container == Container.Mp4)
                     .TryGetWithHighestVideoQuality();
 
@@ -81,9 +81,9 @@ namespace DropLoaderApp.Downloaders
             {
                 DownloadingCanceled();
             }
-            catch (Exception ex) when (ex.Message.Contains("country"))
+            catch (Exception ex) when (ex.Message.Contains("<Module>"))
             {
-                DownloadingError("This video is not available in your country");
+                DownloadingError("This video is not available in your country. Try use VPN or change your region in system preference");
             }
             catch (Exception ex)
             {
