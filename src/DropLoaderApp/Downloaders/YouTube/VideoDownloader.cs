@@ -31,31 +31,44 @@ namespace DropLoaderApp.Downloaders
 
                 StreamManifest streamManifest = await youtube.Videos.Streams.GetManifestAsync(DownloadLink, cancellationToken);
 
-                IVideoStreamInfo? streamVideo= streamManifest
-                    .GetVideoStreams()
+                IVideoStreamInfo streamMuxed = streamManifest
+                    .GetVideoOnlyStreams()
                     .Where(s => s.Container == Container.Mp4)
                     .TryGetWithHighestVideoQuality();
 
-                if (streamVideo is null)
-                { output += "Video track not found"; }
-                else
+                if (!(streamMuxed is null))
                 {
-                    AddDownloadingFileName(video.Title + " (video track)");
-                    await youtube.Videos.Streams.DownloadAsync(streamVideo, Path.Combine(DownloadPath, MakeSafeFiletitle(video.Title) + ".mp4"), progress, cancellationToken);
+                    AddDownloadingFileName(video.Title + " (video & audio tracks)");
+                    await youtube.Videos.Streams.DownloadAsync(streamMuxed, Path.Combine(DownloadPath, MakeSafeFiletitle(video.Title) + ".mp4"), progress, cancellationToken);
                 }
-
-
-                IStreamInfo? streamAudio = streamManifest
-                    .GetAudioStreams()
-                    .Where(s => s.Container == Container.Mp3)
-                    .TryGetWithHighestBitrate();
-
-                if (streamAudio is null)
-                { output += "Audio track not found"; }
                 else
                 {
-                    AddDownloadingFileName(video.Title + " (audio track)");
-                    await youtube.Videos.Streams.DownloadAsync(streamAudio, Path.Combine(DownloadPath, MakeSafeFiletitle(video.Title) + ".mp3"), progress, cancellationToken);
+                    IVideoStreamInfo? streamVideo = streamManifest
+                        .GetVideoStreams()
+                        .Where(s => s.Container == Container.Mp4)
+                        .TryGetWithHighestVideoQuality();
+
+                    if (streamVideo is null)
+                    { output += "Video track not found"; }
+                    else
+                    {
+                        AddDownloadingFileName(video.Title + " (video track)\n");
+                        await youtube.Videos.Streams.DownloadAsync(streamVideo, Path.Combine(DownloadPath, MakeSafeFiletitle(video.Title) + ".mp4"), progress, cancellationToken);
+                    }
+
+
+                    IStreamInfo? streamAudio = streamManifest
+                        .GetAudioStreams()
+                        .Where(s => s.Container == Container.Mp3)
+                        .TryGetWithHighestBitrate();
+
+                    if (streamAudio is null)
+                    { output += "Audio track not found"; }
+                    else
+                    {
+                        AddDownloadingFileName(video.Title + " (audio track)\n");
+                        await youtube.Videos.Streams.DownloadAsync(streamAudio, Path.Combine(DownloadPath, MakeSafeFiletitle(video.Title) + ".mp3"), progress, cancellationToken);
+                    }
                 }
 
                 DownloadingFinished(output);
@@ -64,15 +77,17 @@ namespace DropLoaderApp.Downloaders
             {
                 DownloadingCanceled();
             }
-            catch (Exception exception)
+            catch (Exception ex) when (ex.Message.Contains("timed out"))
             {
-                if (exception.Message.Contains("timed out"))
-                {
-                    DownloadingCanceled();
-                    return;
-                }
-
-                DownloadingError(exception.Message);
+                DownloadingCanceled();
+            }
+            catch (Exception ex) when (ex.Message.Contains("country"))
+            {
+                DownloadingError("This video is not available in your country");
+            }
+            catch (Exception ex)
+            {
+                DownloadingError(ex.Message);
             }
         }
     }

@@ -29,6 +29,8 @@ namespace DropLoaderApp.Downloaders
                     throw new Exception("Playlist not found");
                 }
 
+                string output = "";
+
                 foreach (Track track in playlist.Tracks)
                 {
                     try
@@ -43,22 +45,23 @@ namespace DropLoaderApp.Downloaders
                     }
                     catch
                     {
+                        output += $"{track.Title} not availible. Can't download\n";
                         continue;
                     }
                 }
-                DownloadingFinished();
+
+                DownloadingFinished(output);
             }
             catch (OperationCanceledException)
             {
                 DownloadingCanceled();
             }
+            catch (Exception exception) when (exception.Message.Contains("timed out"))
+            {
+                DownloadingCanceled();
+            }
             catch (Exception exception)
             {
-                if (exception.Message.Contains("timed out"))
-                {
-                    DownloadingCanceled();
-                    return;
-                }
                 DownloadingError(exception.Message);
             }
         }

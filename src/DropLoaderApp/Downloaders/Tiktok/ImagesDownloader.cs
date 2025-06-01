@@ -31,15 +31,13 @@ namespace DropLoaderApp.Downloaders
             {
                 DownloadingCanceled();
             }
-            catch (Exception exception)
+            catch (Exception ex) when (ex.Message.Contains("timed out"))
             {
-                if (exception.Message.Contains("timed out"))
-                {
-                    DownloadingCanceled();
-                    return;
-                }
-
-                DownloadingError(exception.Message);
+                DownloadingCanceled();
+            }
+            catch (Exception ex)
+            {
+                DownloadingError(ex.Message);
             }
         }
     }
