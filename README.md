@@ -46,7 +46,7 @@ An application that helps you to download media from popular platforms
     <td><img src="images/MacOS/ErrorType_IncorrectLink.png" width="300" alt="Incorrect Link Error"></td>
   </tr>
   <tr>
-    <td align="center">Empty Fiels</td>
+    <td align="center">Empty Fields</td>
     <td align="center">Incorrect Links</td>
   </tr>
 </table>
