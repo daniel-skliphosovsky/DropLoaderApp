@@ -29,7 +29,7 @@ An application that helps you to download media from popular platforms
   </tr>
 </table>
 
-#### Possible downloading finishes
+#### Possible downloading completions
 <table>
   <tr>
     <td><img src="images/MacOS/DownloadingCanceled.png" width="300" alt="Downloading Canceled"></td>
