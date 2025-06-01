@@ -3,8 +3,6 @@ An application that helps you to download media from popular platforms
 
 # Screenshots
 
-### MacOS
-
 #### Downloading Page
 <table>
   <tr>
@@ -62,7 +60,7 @@ An application that helps you to download media from popular platforms
 
 # Possible Problems
 
-**Soundcloud**: Some tracks may be unavailable and you may get a 403 Firbidden error -> Solution: try to find another link to this track
+**Soundcloud**: Some tracks may be unavailable and you may get a "This track is not available" error -> Solution: try to find another link to this track
 
 **TikTok**: If the publication you provided a link to is private (or does not exist) then the program will download another random video (This is related to TikTok API). Therefore, sometimes after downloading you may find a completely different video / photo. 
 Also, don't be alarmed if the download doesn't start. This is also related to TikTok API -> Solution: just wait a bit (usually up to 10 seconds) and the download will start
@@ -71,34 +69,27 @@ Also, don't be alarmed if the download doesn't start. This is also related to Ti
 
 # Install
 
-###  Guide for MacOS
+### Getting Started
 
-1. **Download DropLoader-MacOS.pkg**  
-   [📥 DropLoader-MacOS.pkg](https://github.com/daniel-skliphosovsky/DropLoaderApp/releases/download/v1.0.0/DropLoader-MacOS.pkg)
+1. **Go to Releases**  
+   Download the latest version from our GitHub releases page:
 
-2. **Try open .pkg file by double clicking in finder**
+   [![Latest Release](https://img.shields.io/badge/Download_Latest_Release-0066CC?style=for-the-badge&logo=github)](https://github.com/daniel-skliphosovsky/DropLoaderApp/releases)
 
-*You will most likely get a message that the developer's trustworthiness could not be ensured. Please do the following:*
+2. **Find the latest release**  
+   Look for the most recent version at the top of the releases page
 
-```
-1. Go to  > System Settings > Privacy & Security
-2. Under "Security", click "Open Anyway"
-3. Authenticate with your password
-```
+3. **Follow platform-specific instructions**  
+   Complete installation guides for both MacOS and Windows are available in the release description
 
-3. **Complete Installation**
+### Platform Support
 
-Follow the graphical installer prompts. Successful installation will show:
+| Platform | Installation Method |
+|----------|---------------------|
+| Windows  | `.exe` (standard installer) |
+| MacOS    | `.pkg` (macOS installer package) |
 
-- ✅ Checkmark confirmation
-- 🔔 Completion sound
 
-4.  **Launching DropLoader**
 
-After installation, you can find DropLoader in:
-
-- Your Applications folder
-- Spotlight Search (press ⌘+Space and type "DropLoader")
-- Launchpad
 
 
