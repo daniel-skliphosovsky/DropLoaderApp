@@ -69,6 +69,35 @@ Also, don't be alarmed if the download doesn't start. This is also related to Ti
 
 **YouTube**: Due to changes in YouTube policy, the program is not always able to get the audio track of the video
 
+# Installation Guide for MacOS
+
+1. **Download DropLoader-MacOS.pkg**  
+   [📥 DropLoader-MacOS.pkg](https://github.com/daniel-skliphosovsky/DropLoaderApp/releases/download/v1.0.0/DropLoader-MacOS.pkg)
+
+2. **Try open .pkg file by double clicking in finder**
+
+*You will most likely get a message that the developer's trustworthiness could not be ensured. Please do the following:*
+
+```
+1. Go to  > System Settings > Privacy & Security
+2. Under "Security", click "Open Anyway"
+3. Authenticate with your password
+```
+
+3. **Complete Installation**
+
+Follow the graphical installer prompts. Successful installation will show:
+
+- ✅ Checkmark confirmation
+- 🔔 Completion sound
+
+4.  **Launching DropLoader**
+
+After installation, you can find DropLoader in:
+
+- Your Applications folder
+- Spotlight Search (press ⌘+Space and type "DropLoader")
+- Launchpad
 
 # Technologies
 .NET MAUI
