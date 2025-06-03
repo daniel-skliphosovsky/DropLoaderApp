@@ -13,6 +13,10 @@ An application that helps you to download media from popular platforms
     <td align="center">Light Theme</td>
     <td align="center">Dark Theme</td>
   </tr>
+  <tr>
+    <td><img src="images/Windows/DownloadingPage_LightTheme.jpg" width="300" alt="Light Theme Page"></td>
+    <td><img src="images/Windows/DownloadingPage_DarkTheme.jpg" width="300" alt="Dark Theme Page"></td>
+  </tr>
 </table>
 
 #### Downloading Process
@@ -24,6 +28,10 @@ An application that helps you to download media from popular platforms
   <tr>
     <td align="center">Light Theme</td>
     <td align="center">Dark Theme</td>
+  </tr>
+  <tr>
+    <td><img src="images/Windows/DownloadingContext_LightTheme.jpg" width="300" alt="Light Theme Context"></td>
+    <td><img src="images/Windows/DownloadingContext_DarkTheme.jpg" width="300" alt="Dark Theme Context"></td>
   </tr>
 </table>
 
@@ -37,6 +45,10 @@ An application that helps you to download media from popular platforms
     <td align="center">Downloading Canceled</td>
     <td align="center">Downloading Finished</td>
   </tr>
+  <tr>
+    <td><img src="images/Windows/DownloadingCanceled.jpg" width="300" alt="Downloading Canceled"></td>
+    <td><img src="images/Windows/DownloadingFinished.jpg" width="300" alt="Downloading Finished"></td>
+  </tr>
 </table>
 
 #### Possible Errors
@@ -48,6 +60,10 @@ An application that helps you to download media from popular platforms
   <tr>
     <td align="center">Empty Fields</td>
     <td align="center">Incorrect Links</td>
+  </tr>
+  <tr>
+    <td><img src="images/Windows/ErrorType_EmptyFields.jpg" width="300" alt="Empty Fields Error"></td>
+    <td><img src="images/Windows/ErrorType_IncorrectLink.jpg" width="300" alt="Incorrect Link Error"></td>
   </tr>
 </table>
 
