@@ -21,7 +21,7 @@
 		<Nullable>enable</Nullable>
 
 		<!-- Display name -->
-		<ApplicationTitle>DropLoaderApp</ApplicationTitle>
+		<ApplicationTitle>DropLoader</ApplicationTitle>
 
 		<!-- App Identifier -->
 		<ApplicationId>com.companyname.droploaderapp</ApplicationId>
