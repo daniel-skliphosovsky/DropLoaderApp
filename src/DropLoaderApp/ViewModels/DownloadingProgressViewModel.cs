@@ -41,7 +41,7 @@ namespace DropLoaderApp.ViewModels
             {
                 if (_fileName != value)
                 {
-                    _fileName = value;
+                    _fileName = value.Trim();
                     OnPropertyChanged();
                 }
             }

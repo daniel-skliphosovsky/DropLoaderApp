@@ -11,7 +11,9 @@ public partial class BannerView : ContentView
 
     private void ChangeAppTheme(System.Object sender, System.EventArgs e)
     {
-        Application.Current.UserAppTheme = AppInfo.RequestedTheme == AppTheme.Dark ? AppTheme.Light : AppTheme.Dark;
+        if (Application.Current.UserAppTheme == AppTheme.Unspecified)
+            Application.Current.UserAppTheme = AppInfo.RequestedTheme == AppTheme.Dark ? AppTheme.Light : AppTheme.Dark;
+        else Application.Current.UserAppTheme = Application.Current.UserAppTheme == AppTheme.Dark ? AppTheme.Light : AppTheme.Dark;
     }
 
     void HomeTab(System.Object sender, System.EventArgs e)

@@ -12,8 +12,11 @@ public partial class DownloadingTabView : ContentView
     async void FolderPickButton_Clicked(System.Object sender, System.EventArgs e)
     {
         FolderPickerResult folder = await FolderPicker.Default.PickAsync(default);
-        PathEntry.Placeholder = folder.Folder.Path;
-        DownloadHandler.DownloadPath = folder.Folder.Path;
+        if (folder.Folder != null)
+        {
+            PathEntry.Placeholder = folder.Folder.Path;
+            DownloadHandler.DownloadPath = folder.Folder.Path;
+        }
     }
 
     void LinkEntry_TextChanged(System.Object sender, Microsoft.Maui.Controls.TextChangedEventArgs e)
