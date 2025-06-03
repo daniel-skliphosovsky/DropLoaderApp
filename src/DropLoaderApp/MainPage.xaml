@@ -6,8 +6,15 @@
              Background="{AppThemeBinding Light={StaticResource AppBackgroundLightThemeColor},
                                           Dark={StaticResource AppBackgroundDarkThemeColor}}">
 
-    <VerticalStackLayout Spacing="50" VerticalOptions="Start">
-        
+    <VerticalStackLayout Spacing="50">
+        <VerticalStackLayout.VerticalOptions>
+            <OnPlatform x:TypeArguments="LayoutOptions">
+                <On Platform="MacCatalyst" Value="Start" />
+                <On Platform="WinUI" Value="Center" />
+                <On Platform="Default" Value="Start" />
+            </OnPlatform>
+        </VerticalStackLayout.VerticalOptions>
+
         <v:BannerView/>
 
         <Grid>
