@@ -104,9 +104,3 @@ Also, don't be alarmed if the download doesn't start. This is also related to Ti
 |----------|---------------------|
 | Windows  | `.exe` (standard installer) |
 | MacOS    | `.pkg` (macOS installer package) |
-
-
-
-
-
-
