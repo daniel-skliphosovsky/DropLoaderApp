@@ -81,7 +81,7 @@ An application that helps you to download media from popular platforms
 **TikTok**: If the publication you provided a link to is private (or does not exist) then the program will download another random video (This is related to TikTok API). Therefore, sometimes after downloading you may find a completely different video / photo. 
 Also, don't be alarmed if the download doesn't start. This is also related to TikTok API -> Solution: just wait a bit (usually up to 10 seconds) and the download will start
 
-**YouTube**: Due to changes in YouTube policy, the program is not always able to get the audio track of the video
+**YouTube**: Due to changes in YouTube policy, audio track can be in .webm extension
 
 # Install
 
