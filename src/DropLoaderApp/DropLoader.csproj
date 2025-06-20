@@ -110,5 +110,8 @@
 	  <Reference Include="TikTokExplode">
 	    <HintPath>Properties\TikTokExplode.dll</HintPath>
 	  </Reference>
+	  <Reference Include="DownloadConfig">
+	    <HintPath>Properties\DownloadConfig.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 </Project>
