@@ -33,19 +33,17 @@ namespace DropLoaderApp.Downloaders
 
                 IVideoStreamInfo streamMuxed = streamManifest
                     .GetMuxedStreams()
-                    .Where(s => s.Container == Container.Mp4)
                     .TryGetWithHighestVideoQuality();
 
                 if (!(streamMuxed is null))
                 {
                     AddDownloadingFileName(video.Title + " (video & audio tracks)");
-                    await youtube.Videos.Streams.DownloadAsync(streamMuxed, Path.Combine(DownloadPath, MakeSafeFiletitle(video.Title) + ".mp4"), progress, cancellationToken);
+                    await youtube.Videos.Streams.DownloadAsync(streamMuxed, Path.Combine(DownloadPath, MakeSafeFiletitle(video.Title) + $".{streamMuxed.Container.Name}"), progress, cancellationToken);
                 }
                 else
                 {
                     IVideoStreamInfo? streamVideo = streamManifest
                         .GetVideoStreams()
-                        .Where(s => s.Container == Container.Mp4)
                         .TryGetWithHighestVideoQuality();
 
                     if (streamVideo is null)
@@ -53,13 +51,12 @@ namespace DropLoaderApp.Downloaders
                     else
                     {
                         AddDownloadingFileName(video.Title + " (video track)\n");
-                        await youtube.Videos.Streams.DownloadAsync(streamVideo, Path.Combine(DownloadPath, MakeSafeFiletitle(video.Title) + ".mp4"), progress, cancellationToken);
+                        await youtube.Videos.Streams.DownloadAsync(streamVideo, Path.Combine(DownloadPath, MakeSafeFiletitle(video.Title) + "_video" + $".{streamVideo.Container.Name}"), progress, cancellationToken);
                     }
 
 
                     IStreamInfo? streamAudio = streamManifest
                         .GetAudioStreams()
-                        .Where(s => s.Container == Container.Mp3)
                         .TryGetWithHighestBitrate();
 
                     if (streamAudio is null)
@@ -67,7 +64,7 @@ namespace DropLoaderApp.Downloaders
                     else
                     {
                         AddDownloadingFileName(video.Title + " (audio track)\n");
-                        await youtube.Videos.Streams.DownloadAsync(streamAudio, Path.Combine(DownloadPath, MakeSafeFiletitle(video.Title) + ".mp3"), progress, cancellationToken);
+                        await youtube.Videos.Streams.DownloadAsync(streamAudio, Path.Combine(DownloadPath, MakeSafeFiletitle(video.Title) + "_audio" + $".{streamAudio.Container.Name}"), progress, cancellationToken);
                     }
                 }
 
