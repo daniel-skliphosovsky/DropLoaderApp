@@ -1,106 +1,91 @@
-# DropLoaderApp
-An application that helps you to download media from popular platforms
+<h1 align="center">DropLoaderApp</h1>
+<p align="center">Cross-platform media downloader for TikTok, YouTube, and SoundCloud. Built with .NET MAUI.</p>
+<p align="center">
+  <a href="https://github.com/daniel-skliphosovsky/DropLoaderApp/actions/workflows/ci.yml"><img src="https://github.com/daniel-skliphosovsky/DropLoaderApp/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/daniel-skliphosovsky/DropLoaderApp/releases"><img src="https://img.shields.io/github/v/release/daniel-skliphosovsky/DropLoaderApp" alt="Release"></a>
+  <a href="https://github.com/daniel-skliphosovsky/DropLoaderApp/blob/main/LICENSE"><img src="https://img.shields.io/github/license/daniel-skliphosovsky/DropLoaderApp" alt="MIT License"></a>
+</p>
 
-# Screenshots
+## Screenshots
 
-#### Downloading Page
 <table>
   <tr>
-    <td><img src="images/MacOS/DownloadingPage_LightTheme.png" width="300" alt="Light Theme Page"></td>
-    <td><img src="images/MacOS/DownloadingPage_DarkTheme.png" width="300" alt="Dark Theme Page"></td>
+    <td>MacOS Light</td>
+    <td>MacOS Dark</td>
   </tr>
   <tr>
-    <td align="center">Light Theme</td>
-    <td align="center">Dark Theme</td>
+    <td><img src="images/MacOS/DownloadingPage_LightTheme.png" alt="MacOS Light" width="300"></td>
+    <td><img src="images/MacOS/DownloadingPage_DarkTheme.png" alt="MacOS Dark" width="300"></td>
   </tr>
   <tr>
-    <td><img src="images/Windows/DownloadingPage_LightTheme.jpg" width="300" alt="Light Theme Page"></td>
-    <td><img src="images/Windows/DownloadingPage_DarkTheme.jpg" width="300" alt="Dark Theme Page"></td>
+    <td>Windows Light</td>
+    <td>Windows Dark</td>
+  </tr>
+  <tr>
+    <td><img src="images/Windows/DownloadingPage_LightTheme.jpg" alt="Windows Light" width="300"></td>
+    <td><img src="images/Windows/DownloadingPage_DarkTheme.jpg" alt="Windows Dark" width="300"></td>
   </tr>
 </table>
 
-#### Downloading Process
-<table>
-  <tr>
-    <td><img src="images/MacOS/DownloadingContext_LightTheme.png" width="300" alt="Light Theme Context"></td>
-    <td><img src="images/MacOS/DownloadingContext_DarkTheme.png" width="300" alt="Dark Theme Context"></td>
-  </tr>
-  <tr>
-    <td align="center">Light Theme</td>
-    <td align="center">Dark Theme</td>
-  </tr>
-  <tr>
-    <td><img src="images/Windows/DownloadingContext_LightTheme.jpg" width="300" alt="Light Theme Context"></td>
-    <td><img src="images/Windows/DownloadingContext_DarkTheme.jpg" width="300" alt="Dark Theme Context"></td>
-  </tr>
-</table>
+## Features
 
-#### Possible downloading completions
-<table>
-  <tr>
-    <td><img src="images/MacOS/DownloadingCanceled.png" width="300" alt="Downloading Canceled"></td>
-    <td><img src="images/MacOS/DownloadingFinished.png" width="300" alt="Downloading Finished"></td>
-  </tr>
-  <tr>
-    <td align="center">Downloading Canceled</td>
-    <td align="center">Downloading Finished</td>
-  </tr>
-  <tr>
-    <td><img src="images/Windows/DownloadingCanceled.jpg" width="300" alt="Downloading Canceled"></td>
-    <td><img src="images/Windows/DownloadingFinished.jpg" width="300" alt="Downloading Finished"></td>
-  </tr>
-</table>
+- Download TikTok videos and image galleries
+- Download YouTube videos (best available quality)
+- Download SoundCloud tracks
+- Light and Dark theme with automatic switching
+- Progress tracking with cancel support
+- Auto-detect platform from URL
+- Material Design 3 UI
+- Fixed window size (680x480)
 
-#### Possible Errors
-<table>
-  <tr>
-    <td><img src="images/MacOS/ErrorType_EmptyFields.png" width="300" alt="Empty Fields Error"></td>
-    <td><img src="images/MacOS/ErrorType_IncorrectLink.png" width="300" alt="Incorrect Link Error"></td>
-  </tr>
-  <tr>
-    <td align="center">Empty Fields</td>
-    <td align="center">Incorrect Links</td>
-  </tr>
-  <tr>
-    <td><img src="images/Windows/ErrorType_EmptyFields.jpg" width="300" alt="Empty Fields Error"></td>
-    <td><img src="images/Windows/ErrorType_IncorrectLink.jpg" width="300" alt="Incorrect Link Error"></td>
-  </tr>
-</table>
+## Usage
 
-# Usage
-1. Open App
-2. Go to «Downloading» Tab
-3. Insert media link 
-4. Select the path where the file will be saved
-5. Click the «Download» Button to start downloading
+1. Paste a URL from TikTok, YouTube, or SoundCloud
+2. Select output folder
+3. Click Download
+4. Track progress and cancel if needed
 
-# Possible Problems
+## Installation
 
-**Soundcloud**: Some tracks may be unavailable and you may get a "This track is not available" error -> Solution: try to find another link to this track
+### Windows
+Download `DropLoaderApp.App.exe` from the latest Release.
 
-**TikTok**: If the publication you provided a link to is private (or does not exist) then the program will download another random video (This is related to TikTok API). Therefore, sometimes after downloading you may find a completely different video / photo. 
-Also, don't be alarmed if the download doesn't start. This is also related to TikTok API -> Solution: just wait a bit (usually up to 10 seconds) and the download will start
+### macOS
+Download `DropLoaderApp.pkg` from the latest Release and install.
 
-**YouTube**: Due to changes in YouTube policy, audio track can be in .webm extension
+## Platform Support
 
-# Install
+| Platform | URL Examples | Supported |
+|----------|--------------|-----------|
+| TikTok | `tiktok.com/@user/video/123`, `vm.tiktok.com/ABC` | Yes |
+| YouTube | `youtube.com/watch?v=123`, `youtu.be/123` | Yes |
+| SoundCloud | `soundcloud.com/user/track`, `soundcloud.com/user/sets/playlist` | Yes |
 
-### Getting Started
+## Possible Problems
 
-1. **Go to Releases**  
-   Download the latest version from our GitHub releases page:
+- **TikTok**: Rate limiting may cause empty responses. Wait a few minutes and try again.
+- **YouTube**: YouTube may change their streaming policies. Videos may not always be available.
+- **SoundCloud**: Some tracks may have restricted access or require authentication.
+- **Download path**: Ensure the output folder exists and is writable.
 
-   [![Latest Release](https://img.shields.io/badge/Download_Latest_Release-0066CC?style=for-the-badge&logo=github)](https://github.com/daniel-skliphosovsky/DropLoaderApp/releases)
+## Build from Source
 
-2. **Find the latest release**  
-   Look for the most recent version at the top of the releases page
+```bash
+git clone https://github.com/daniel-skliphosovsky/DropLoaderApp.git
+cd DropLoaderApp
+dotnet restore src/DropLoaderApp.sln
+dotnet build src/DropLoaderApp.sln -c Release
+dotnet test src/DropLoaderApp.sln
+```
 
-3. **Follow platform-specific instructions**  
-   Complete installation guides for both MacOS and Windows are available in the release description
+## Dependencies
 
-### Platform Support
+- TikTokExplode (custom library, Clean Architecture)
+- YoutubeExplode 6.5.4
+- SoundCloudExplode 1.6.5
+- CommunityToolkit.Mvvm
+- CommunityToolkit.Maui
 
-| Platform | Installation Method |
-|----------|---------------------|
-| Windows  | `.exe` (standard installer) |
-| MacOS    | `.pkg` (macOS installer package) |
+## License
+
+MIT
