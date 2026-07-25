@@ -4,9 +4,9 @@ namespace DropLoaderApp.Views;
 
 public partial class MainPage : ContentPage
 {
-    public MainPage(MainViewModel mainVm, DownloadViewModel downloadVm)
+    public MainPage(MainViewModel viewModel)
     {
         InitializeComponent();
-        BindingContext = mainVm;
+        BindingContext = viewModel;
     }
 }
