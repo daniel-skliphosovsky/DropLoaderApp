@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TikTokExplode.Infrastructure</name>
+    </assembly>
+    <members>
+        <member name="M:TikTokExplode.Infrastructure.Download.FileDownloadService.DownloadFileAsync(System.String,System.String,System.IProgress{System.Int64},System.Threading.CancellationToken)">
+            <summary>
+            Downloads a file from the specified URL to the given destination path.
+            </summary>
+            <param name="url">Direct download URL.</param>
+            <param name="destinationPath">Full file path where the file will be saved.</param>
+            <param name="progress">Progress reporter (bytes downloaded).</param>
+            <param name="ct">Cancellation token.</param>
+        </member>
+        <member name="M:TikTokExplode.Infrastructure.Http.HeadersProvider.ApplyHeaders(System.Net.Http.Headers.HttpRequestHeaders)">
+            <summary>
+            Applies randomized user-agent and standard HTTP headers to the given request headers.
+            </summary>
+            <param name="headers">The request headers to apply values to.</param>
+        </member>
+        <member name="M:TikTokExplode.Infrastructure.Url.UrlHandler.GetFullUrlAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Follows redirects to resolve a short TikTok URL to its full form.
+            </summary>
+            <param name="url">The TikTok URL to resolve.</param>
+            <param name="ct">Cancellation token.</param>
+            <returns>The resolved full URL.</returns>
+            <exception cref="T:TikTokExplode.Domain.Exceptions.ApiException">Thrown when URL resolution fails.</exception>
+        </member>
+    </members>
+</doc>
