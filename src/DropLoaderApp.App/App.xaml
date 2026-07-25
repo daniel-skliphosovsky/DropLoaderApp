@@ -5,13 +5,15 @@
              x:Class="DropLoaderApp.App">
     <Application.Resources>
         <ResourceDictionary>
-            <Color x:Key="Primary">#6750A4</Color>
-            <Color x:Key="PrimaryDark">#D0BCFF</Color>
-            <Color x:Key="BackgroundLight">#FFFBFE</Color>
-            <Color x:Key="BackgroundDark">#121212</Color>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
 
             <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
             <converters:BoolToStringConverter x:Key="BoolToStringConverter" />
+            <converters:IntToThemeConverter x:Key="IntToThemeConverter" />
+            <converters:StringNotEmptyConverter x:Key="StringNotEmptyConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

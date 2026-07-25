@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui;
+using DropLoaderApp.Converters;
 using DropLoaderApp.Services.Dialogs;
 using DropLoaderApp.Services.Downloaders;
 using DropLoaderApp.Services.Interfaces;
@@ -23,6 +24,12 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
+        // Converters
+        builder.Services.AddSingleton<InverseBoolConverter>();
+        builder.Services.AddSingleton<BoolToStringConverter>();
+        builder.Services.AddSingleton<IntToThemeConverter>();
+        builder.Services.AddSingleton<StringNotEmptyConverter>();
+
         // Services
         builder.Services.AddSingleton<IDialogService, DialogService>();
         builder.Services.AddSingleton<IFolderPickerService, FolderPickerService>();
@@ -35,7 +42,6 @@ public static class MauiProgram
 
         // ViewModels
         builder.Services.AddTransient<MainViewModel>();
-        builder.Services.AddTransient<DownloadViewModel>();
 
         // Pages
         builder.Services.AddTransient<MainPage>();
