@@ -29,7 +29,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../../TikTokExplode/src/TikTokExplode/TikTokExplode.csproj" />
+    <Reference Include="TikTokExplode">
+      <HintPath>..\..\lib\TikTokExplode.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <!-- Images -->
@@ -46,5 +48,9 @@
   <ItemGroup>
     <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
+
+  <Target Name="BuildTikTokExplode" BeforeTargets="BeforeBuild">
+    <Exec Command="dotnet publish $(SolutionDir)../TikTokExplode/src/TikTokExplode/TikTokExplode.csproj --configuration Release --output $(SolutionDir)lib" />
+  </Target>
 
 </Project>

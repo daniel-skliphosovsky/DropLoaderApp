@@ -7,7 +7,7 @@ on:
 jobs:
   build-windows:
     runs-on: windows-latest
-
+    
     steps:
       - uses: actions/checkout@v4
         with:
@@ -16,25 +16,27 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: '8.0.x'
 
       - name: Install MAUI workload
         run: dotnet workload install maui
 
+      - name: Build TikTokExplode DLL
+        run: |
+          dotnet publish ../TikTokExplode/src/TikTokExplode/TikTokExplode.csproj --configuration Release --output ./lib
+
       - name: Restore
         run: dotnet restore src/DropLoaderApp.sln
 
-      - name: Publish Windows (self-contained exe)
-        shell: pwsh
+      - name: Publish Windows
         run: |
           dotnet publish src/DropLoaderApp.App/DropLoaderApp.App.csproj `
-            -f net10.0-windows10.0.19041.0 `
+            -f net8.0-windows10.0.19041.0 `
             -r win-x64 `
             --self-contained true `
             -p:PublishSingleFile=true `
             -p:PublishTrimmed=true `
             -p:TrimMode=partial `
-            -p:IncludeNativeLibrariesForSelfExtract=true `
             -c Release `
             -o ./publish/win-x64
 
@@ -43,46 +45,39 @@ jobs:
         with:
           name: DropLoaderApp-Windows
           path: ./publish/win-x64/DropLoaderApp.App.exe
-          retention-days: 30
 
   build-macos:
-    runs-on: macos-13
-
+    needs: build-windows
+    runs-on: macos-latest
+    
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Cache MAUI workload
-        uses: actions/cache@v4
-        id: cache-maui
-        with:
-          path: /usr/local/share/dotnet/packs
-          key: ${{ runner.os }}-maui-${{ hashFiles('**/DropLoaderApp.App.csproj') }}
-          restore-keys: |
-            ${{ runner.os }}-maui-
-
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: '8.0.x'
 
       - name: Install MAUI workload
-        if: steps.cache-maui.outputs.cache-hit != 'true'
         run: dotnet workload install maui
+
+      - name: Build TikTokExplode DLL
+        run: |
+          dotnet publish ../TikTokExplode/src/TikTokExplode/TikTokExplode.csproj --configuration Release --output ./lib
 
       - name: Restore
         run: dotnet restore src/DropLoaderApp.sln
 
-      - name: Publish macOS (.pkg)
-        shell: bash
+      - name: Publish macOS
         run: |
-          dotnet publish src/DropLoaderApp.App/DropLoaderApp.App.csproj \
-            -f net10.0-maccatalyst \
-            -r maccatalyst-x64 \
-            --self-contained true \
-            -p:CreatePackage=true \
-            -c Release \
+          dotnet publish src/DropLoaderApp.App/DropLoaderApp.App.csproj `
+            -f net8.0-maccatalyst `
+            -r maccatalyst-x64 `
+            --self-contained true `
+            -p:CreatePackage=true `
+            -c Release `
             -o ./publish/maccatalyst-x64
 
       - name: Upload macOS artifact
@@ -90,4 +85,3 @@ jobs:
         with:
           name: DropLoaderApp-macOS
           path: ./publish/maccatalyst-x64/*.pkg
-          retention-days: 30
