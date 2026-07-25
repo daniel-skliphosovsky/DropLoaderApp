@@ -8,6 +8,7 @@
     <SingleProject>true</SingleProject>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <ApplicationTitle>DropLoader</ApplicationTitle>
     <ApplicationId>com.danielskliphosovsky.droploader</ApplicationId>
     <ApplicationDisplayVersion>2.0</ApplicationDisplayVersion>
