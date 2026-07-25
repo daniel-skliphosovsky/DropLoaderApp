@@ -413,5 +413,3 @@ ASALocalRun/
 # DownloadingSettings
 /src/DropLoaderApp/Properties/DownloadConfig.dll
 
-# TikTokExplode local DLL build output
-lib/

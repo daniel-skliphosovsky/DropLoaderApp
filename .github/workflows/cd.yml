@@ -21,10 +21,6 @@ jobs:
       - name: Install MAUI workload
         run: dotnet workload install maui
 
-      - name: Build TikTokExplode DLL
-        run: |
-          dotnet publish ../TikTokExplode/src/TikTokExplode/TikTokExplode.csproj --configuration Release --output ./lib
-
       - name: Restore
         run: dotnet restore src/DropLoaderApp.sln
 
@@ -62,10 +58,6 @@ jobs:
 
       - name: Install MAUI workload
         run: dotnet workload install maui
-
-      - name: Build TikTokExplode DLL
-        run: |
-          dotnet publish ../TikTokExplode/src/TikTokExplode/TikTokExplode.csproj --configuration Release --output ./lib
 
       - name: Restore
         run: dotnet restore src/DropLoaderApp.sln

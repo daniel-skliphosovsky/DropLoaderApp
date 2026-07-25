@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TikTokExplode</name>
+    </assembly>
+    <members>
+        <member name="T:TikTokExplode.Extensions.ServiceCollectionExtensions">
+            <summary>
+            Extension methods for registering TikTokExplode services in DI container.
+            </summary>
+        </member>
+        <member name="M:TikTokExplode.Extensions.ServiceCollectionExtensions.AddTikTokExplode(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{TikTokExplode.Infrastructure.Configuration.TikTokApiOptions})">
+            <summary>
+            Adds TikTokExplode services to the specified IServiceCollection.
+            </summary>
+            <param name="services">The IServiceCollection to add services to.</param>
+            <param name="configureOptions">Optional action to configure TikTokApiOptions.</param>
+            <returns>The IServiceCollection so that additional calls can be chained.</returns>
+        </member>
+        <member name="T:TikTokExplode.TikTokClient">
+            <summary>
+            Main facade for interacting with TikTok content.
+            Provides unified access to publication metadata and media downloading.
+            </summary>
+        </member>
+        <member name="M:TikTokExplode.TikTokClient.GetPublicationAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Gets full publication metadata (author, video/images, soundtrack, stats) for a TikTok URL.
+            </summary>
+            <param name="url">TikTok video or image post URL.</param>
+            <param name="ct">Cancellation token.</param>
+            <returns>Complete publication with all related entities.</returns>
+            <exception cref="T:TikTokExplode.Domain.Exceptions.ValidationException">Thrown when URL is not a valid TikTok URL.</exception>
+            <exception cref="T:TikTokExplode.Domain.Exceptions.ApiException">Thrown when TikTok API returns an error.</exception>
+        </member>
+        <member name="M:TikTokExplode.TikTokClient.GetVideoAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Gets video metadata for a TikTok URL.
+            </summary>
+        </member>
+        <member name="M:TikTokExplode.TikTokClient.GetImagesAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Gets image metadata for a TikTok URL.
+            </summary>
+        </member>
+        <member name="M:TikTokExplode.TikTokClient.DownloadVideoAsync(System.String,System.String,System.IProgress{System.Int64},System.Threading.CancellationToken)">
+            <summary>
+            Downloads a video from a direct video URL to the specified path.
+            </summary>
+            <param name="videoUrl">Direct video download URL (from Video.PlayUrl).</param>
+            <param name="destinationPath">Full file path where the video will be saved.</param>
+            <param name="progress">Progress reporter (bytes downloaded).</param>
+            <param name="ct">Cancellation token.</param>
+        </member>
+        <member name="M:TikTokExplode.TikTokClient.DownloadImageAsync(System.String,System.String,System.IProgress{System.Int64},System.Threading.CancellationToken)">
+            <summary>
+            Downloads an image from a direct image URL to the specified path.
+            </summary>
+            <param name="imageUrl">Direct image download URL.</param>
+            <param name="destinationPath">Full file path where the image will be saved.</param>
+            <param name="progress">Progress reporter (bytes downloaded).</param>
+            <param name="ct">Cancellation token.</param>
+        </member>
+        <member name="M:TikTokExplode.TikTokClient.DownloadImagesAsync(System.Collections.Generic.IReadOnlyList{TikTokExplode.Domain.Entities.Image},System.String,System.IProgress{System.Int64},System.Threading.CancellationToken)">
+            <summary>
+            Downloads multiple images from their URLs to the specified directory.
+            </summary>
+            <param name="images">List of image metadata to download.</param>
+            <param name="destinationDirectory">Directory where images will be saved.</param>
+            <param name="progress">Progress reporter (bytes downloaded).</param>
+            <param name="ct">Cancellation token.</param>
+        </member>
+    </members>
+</doc>
