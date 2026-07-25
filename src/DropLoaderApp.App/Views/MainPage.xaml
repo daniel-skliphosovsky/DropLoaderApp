@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DropLoaderApp.ViewModels"
+             x:Class="DropLoaderApp.Views.MainPage"
+             x:DataType="vm:MainViewModel"
+             BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundLight}, Dark={StaticResource BackgroundDark}}"
+             Shell.NavBarIsVisible="False"
+             WidthRequest="680"
+             HeightRequest="480">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style TargetType="Button" x:Key="PrimaryButton">
+                <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="CornerRadius" Value="8" />
+                <Setter Property="HeightRequest" Value="44" />
+            </Style>
+            <Style TargetType="Entry" x:Key="InputEntry">
+                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=White, Dark=#2D2D2D}" />
+                <Setter Property="TextColor" Value="{AppThemeBinding Light=Black, Dark=White}" />
+                <Setter Property="PlaceholderColor" Value="Gray" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="20">
+        <!-- Banner with logo -->
+        <HorizontalStackLayout Grid.Row="0" Spacing="12" HorizontalOptions="Center" Padding="0,10">
+            <Image Source="logo.jpg" HeightRequest="40" WidthRequest="40" />
+            <Label Text="DropLoader" FontSize="28" FontAttributes="Bold"
+                   VerticalOptions="Center" TextColor="{AppThemeBinding Light=Black, Dark=White}" />
+        </HorizontalStackLayout>
+
+        <!-- Main content -->
+        <VerticalStackLayout Grid.Row="1" VerticalOptions="Center" Spacing="16">
+
+            <!-- URL Entry -->
+            <VerticalStackLayout Spacing="4">
+                <Label Text="URL" FontSize="13" TextColor="Gray" />
+                <Entry Text="{Binding Url}" Placeholder="Paste TikTok, YouTube or SoundCloud URL"
+                       Style="{StaticResource InputEntry}" />
+            </VerticalStackLayout>
+
+            <!-- Platform indicator -->
+            <Label Text="{Binding PlatformName}" FontSize="12"
+                   TextColor="{AppThemeBinding Light=Gray, Dark=#AAAAAA}" />
+
+            <!-- Output path -->
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Save to" FontSize="13" TextColor="Gray" />
+                    <Entry Text="{Binding OutputPath}" IsReadOnly="True" Style="{StaticResource InputEntry}" />
+                </VerticalStackLayout>
+                <Button Grid.Column="1" Text="..." Command="{Binding PickFolderCommand}"
+                        WidthRequest="44" HeightRequest="44" VerticalOptions="End" />
+            </Grid>
+
+            <!-- Download button -->
+            <Button Text="{Binding IsDownloading, Converter={StaticResource BoolToStringConverter}, ConverterParameter=Downloading...,Default=Download}"
+                    Command="{Binding DownloadCommand}"
+                    IsEnabled="{Binding IsDownloading, Converter={StaticResource InverseBoolConverter}}"
+                    Style="{StaticResource PrimaryButton}" />
+
+            <!-- Progress -->
+            <VerticalStackLayout Spacing="4" IsVisible="{Binding IsDownloading}">
+                <ProgressBar Progress="{Binding Progress}" ProgressColor="{StaticResource Primary}" />
+                <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
+                    <Label Text="{Binding Status}" FontSize="12" TextColor="Gray" />
+                    <Button Text="Cancel" Command="{Binding CancelDownloadCommand}"
+                            BackgroundColor="Transparent" TextColor="Red" FontSize="12"
+                            Padding="8,0" HeightRequest="30" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+
+        <!-- Footer -->
+        <Label Grid.Row="2" Text="DropLoader v2.0"
+               FontSize="11" TextColor="Gray" HorizontalOptions="Center" Padding="0,10" />
+    </Grid>
+</ContentPage>
