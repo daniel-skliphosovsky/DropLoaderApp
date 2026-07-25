@@ -1,0 +1,33 @@
+name: CI - DropLoaderApp
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install MAUI workload
+        run: dotnet workload install maui
+
+      - name: Restore
+        run: dotnet restore src/DropLoaderApp.sln
+
+      - name: Build (Windows)
+        run: dotnet build src/DropLoaderApp.App/DropLoaderApp.App.csproj -f net10.0-windows10.0.19041.0 --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test tests/DropLoaderApp.Tests/DropLoaderApp.Tests.csproj --configuration Release --no-restore
