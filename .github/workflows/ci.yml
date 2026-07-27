@@ -28,7 +28,7 @@ jobs:
           path: release/*.exe
 
   build-macos:
-    runs-on: macos-latest
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
