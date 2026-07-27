@@ -17,6 +17,6 @@ jobs:
       - name: Install MAUI workload
         run: dotnet workload install maui
       - name: Restore
-        run: dotnet restore src/DropLoaderApp.App/DropLoaderApp.App.csproj -p:RuntimeIdentifier=win-x64
+        run: dotnet restore src/DropLoaderApp.App/DropLoaderApp.App.csproj
       - name: Build
-        run: dotnet build src/DropLoaderApp.App/DropLoaderApp.App.csproj --framework net9.0-windows10.0.19041.0 --configuration Release --no-restore -p:RuntimeIdentifier=win-x64
+        run: dotnet build src/DropLoaderApp.App/DropLoaderApp.App.csproj --framework net9.0-windows10.0.19041.0 --configuration Release
