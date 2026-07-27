@@ -50,8 +50,4 @@
     <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
-  <Target Name="BuildTikTokExplode" BeforeTargets="BeforeBuild" Condition="'$(SolutionDir)' != ''">
-    <Exec Command="dotnet publish &quot;$(MSBuildThisFileDirectory)..\..\..\TikTokExplode\src\TikTokExplode\TikTokExplode.csproj&quot; --configuration Release --output &quot;$(MSBuildThisFileDirectory)..\..\lib&quot;" />
-  </Target>
-
 </Project>
