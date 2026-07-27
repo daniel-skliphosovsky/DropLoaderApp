@@ -405,6 +405,12 @@ ASALocalRun/
 .mfractor/
 
 # Local History for Visual Studio
-.localhistory/% 
+.localhistory/%
+
+# TikTokExplode DLL (vendored)
+!/lib/
+/lib/*
+!/lib/*.dll
+!/lib/*.xml
 
 
