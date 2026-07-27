@@ -10,24 +10,23 @@ permissions:
 jobs:
   build-macos:
     name: Build macOS
-    runs-on: macos-15
+    runs-on: macos-14
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest
       - name: Install MAUI workload
         run: dotnet workload install maui
       - name: Restore
         run: dotnet restore src/DropLoaderApp.App/DropLoaderApp.App.csproj
       - name: Publish macOS
-        run: |
-          dotnet publish src/DropLoaderApp.App/DropLoaderApp.App.csproj \
-            --framework net9.0-maccatalyst \
-            --configuration Release \
-            --self-contained true \
-            --output ./publish/macos
+        run: dotnet publish src/DropLoaderApp.App/DropLoaderApp.App.csproj --framework net9.0-maccatalyst --configuration Release --self-contained true --output ./publish/macos
       - name: Zip macOS build
         run: |
           cd ./publish/macos
@@ -53,16 +52,10 @@ jobs:
       - name: Restore
         run: dotnet restore src/DropLoaderApp.App/DropLoaderApp.App.csproj
       - name: Publish Windows
-        run: |
-          dotnet publish src/DropLoaderApp.App/DropLoaderApp.App.csproj \
-            --framework net9.0-windows10.0.19041.0 \
-            --configuration Release \
-            --self-contained true \
-            --output ./publish/windows
+        run: dotnet publish src/DropLoaderApp.App/DropLoaderApp.App.csproj --framework net9.0-windows10.0.19041.0 --configuration Release --self-contained true --output ./publish/windows
       - name: Zip Windows build
-        run: |
-          cd ./publish/windows
-          powershell Compress-Archive -Path . -DestinationPath ../DropLoaderApp-windows.zip
+        shell: pwsh
+        run: Compress-Archive -Path ./publish/windows/* -DestinationPath ./publish/DropLoaderApp-windows.zip
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
