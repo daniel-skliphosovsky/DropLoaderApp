@@ -33,6 +33,12 @@
     <Reference Include="TikTokExplode">
       <HintPath>..\..\lib\TikTokExplode.dll</HintPath>
     </Reference>
+    <Reference Include="TikTokExplode.Domain">
+      <HintPath>..\..\lib\TikTokExplode.Domain.dll</HintPath>
+    </Reference>
+    <Reference Include="TikTokExplode.Infrastructure">
+      <HintPath>..\..\lib\TikTokExplode.Infrastructure.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <!-- Images -->
