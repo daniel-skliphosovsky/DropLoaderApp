@@ -261,5 +261,8 @@
         <member name="M:System.Text.RegularExpressions.Generated.Utilities.StackPush(System.Int32[]@,System.Int32@,System.Int32)">
             <summary>Pushes 1 value onto the backtracking stack.</summary>
         </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_indexOfString_http_OrdinalIgnoreCase">
+            <summary>Supports searching for the string "http".</summary>
+        </member>
     </members>
 </doc>

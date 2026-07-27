@@ -13,6 +13,110 @@
             <param name="progress">Progress reporter (bytes downloaded).</param>
             <param name="ct">Cancellation token.</param>
         </member>
+        <member name="P:TikTokExplode.Infrastructure.DTOs.TikTokApiJsonContext.Boolean">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:TikTokExplode.Infrastructure.DTOs.TikTokApiJsonContext.ListAwemeDto">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:TikTokExplode.Infrastructure.DTOs.TikTokApiJsonContext.ListImageDto">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:TikTokExplode.Infrastructure.DTOs.TikTokApiJsonContext.ListString">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:TikTokExplode.Infrastructure.DTOs.TikTokApiJsonContext.AuthorDto">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:TikTokExplode.Infrastructure.DTOs.TikTokApiJsonContext.AwemeDto">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:TikTokExplode.Infrastructure.DTOs.TikTokApiJsonContext.DisplayImageDto">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:TikTokExplode.Infrastructure.DTOs.TikTokApiJsonContext.ImageDto">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:TikTokExplode.Infrastructure.DTOs.TikTokApiJsonContext.ImagePostInfoDto">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:TikTokExplode.Infrastructure.DTOs.TikTokApiJsonContext.MusicDto">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:TikTokExplode.Infrastructure.DTOs.TikTokApiJsonContext.StatisticsDto">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:TikTokExplode.Infrastructure.DTOs.TikTokApiJsonContext.TikTokApiResponse">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:TikTokExplode.Infrastructure.DTOs.TikTokApiJsonContext.UrlListDto">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:TikTokExplode.Infrastructure.DTOs.TikTokApiJsonContext.VideoDto">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:TikTokExplode.Infrastructure.DTOs.TikTokApiJsonContext.Int32">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:TikTokExplode.Infrastructure.DTOs.TikTokApiJsonContext.Int64">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:TikTokExplode.Infrastructure.DTOs.TikTokApiJsonContext.String">
+            <summary>
+            Defines the source generated JSON serialization contract metadata for a given type.
+            </summary>
+        </member>
+        <member name="P:TikTokExplode.Infrastructure.DTOs.TikTokApiJsonContext.Default">
+            <summary>
+            The default <see cref="T:System.Text.Json.Serialization.JsonSerializerContext"/> associated with a default <see cref="T:System.Text.Json.JsonSerializerOptions"/> instance.
+            </summary>
+        </member>
+        <member name="P:TikTokExplode.Infrastructure.DTOs.TikTokApiJsonContext.GeneratedSerializerOptions">
+            <summary>
+            The source-generated options associated with this context.
+            </summary>
+        </member>
+        <member name="M:TikTokExplode.Infrastructure.DTOs.TikTokApiJsonContext.#ctor">
+            <inheritdoc/>
+        </member>
+        <member name="M:TikTokExplode.Infrastructure.DTOs.TikTokApiJsonContext.#ctor(System.Text.Json.JsonSerializerOptions)">
+            <inheritdoc/>
+        </member>
+        <member name="M:TikTokExplode.Infrastructure.DTOs.TikTokApiJsonContext.GetTypeInfo(System.Type)">
+            <inheritdoc/>
+        </member>
         <member name="M:TikTokExplode.Infrastructure.Http.HeadersProvider.ApplyHeaders(System.Net.Http.Headers.HttpRequestHeaders)">
             <summary>
             Applies randomized user-agent and standard HTTP headers to the given request headers.

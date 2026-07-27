@@ -6,94 +6,133 @@
              x:DataType="vm:MainViewModel"
              BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundLight}, Dark={StaticResource BackgroundDark}}"
              Shell.NavBarIsVisible="False"
-             Shell.FlyoutBehavior="Disabled"
-             WidthRequest="680"
-             HeightRequest="480">
+             Shell.FlyoutBehavior="Disabled">
 
-    <Grid RowDefinitions="Auto,*,Auto">
+    <Border StrokeThickness="0"
+            BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}"
+            WidthRequest="680" HeightRequest="480">
+        <Grid RowDefinitions="Auto,*,Auto" Padding="0">
 
-        <!-- Banner -->
-        <Border Grid.Row="0" Style="{StaticResource BannerBorder}">
-            <Grid ColumnDefinitions="Auto,*,Auto" HeightRequest="48">
-                <!-- Logo + Title -->
-                <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
-                    <Image Source="logo.jpg" HeightRequest="32" WidthRequest="32" />
-                    <Label Text="DropLoader" Style="{StaticResource TitleLabel}" FontSize="20" VerticalOptions="Center" />
-                </HorizontalStackLayout>
-
-                <!-- Theme toggle button -->
-                <Button Grid.Column="2"
-                        Text="{Binding SelectedTabIndex, Converter={StaticResource IntToThemeConverter}}"
-                        Command="{Binding ToggleThemeCommand}"
-                        Style="{StaticResource IconButton}"
-                        VerticalOptions="Center" />
-            </Grid>
-        </Border>
-
-        <!-- Content -->
-        <VerticalStackLayout Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Center"
-                             Spacing="16" Padding="40" MaximumWidthRequest="560">
-
-            <!-- URL section -->
-            <Border Style="{StaticResource CardBorder}">
-                <VerticalStackLayout Spacing="12">
-                    <Label Text="Download media from TikTok, YouTube, SoundCloud"
-                           Style="{StaticResource TitleLabel}" FontSize="18" />
-
-                    <VerticalStackLayout Spacing="4">
-                        <Label Text="Paste URL" Style="{StaticResource FieldLabel}" />
-                        <Entry Text="{Binding Url}" Placeholder="https://www.tiktok.com/..."
-                               Style="{StaticResource InputEntry}" />
-                    </VerticalStackLayout>
-
-                    <!-- Platform indicator -->
-                    <HorizontalStackLayout Spacing="6" IsVisible="{Binding Url, Converter={StaticResource StringNotEmptyConverter}}">
-                        <Label Text="Detected:" Style="{StaticResource CaptionLabel}" VerticalOptions="Center" />
-                        <Label Text="{Binding PlatformName}" Style="{StaticResource CaptionLabel}"
-                               FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource PrimaryLight}, Dark={StaticResource PrimaryDark}}"
-                               VerticalOptions="Center" />
+            <!-- Header -->
+            <Border Grid.Row="0" StrokeThickness="0"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundLight}, Dark={StaticResource BackgroundDark}}"
+                    Padding="20,12">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <!-- Logo + Title -->
+                    <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                        <Image Source="logo.jpg" HeightRequest="36" WidthRequest="36" />
+                        <VerticalStackLayout VerticalOptions="Center">
+                            <Label Text="DropLoader" FontSize="22" FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+                            <Label Text="Download media from anywhere" FontSize="11"
+                                   TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
+                        </VerticalStackLayout>
                     </HorizontalStackLayout>
 
-                    <!-- Save path -->
-                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <!-- Theme Toggle -->
+                    <Button Grid.Column="2" Text="{Binding SelectedTabIndex, Converter={StaticResource IntToThemeConverter}}"
+                            Command="{Binding ToggleThemeCommand}"
+                            Style="{StaticResource IconButton}"
+                            VerticalOptions="Center" />
+                </Grid>
+            </Border>
+
+            <!-- Main Content -->
+            <VerticalStackLayout Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Center"
+                                 Spacing="20" Padding="40" MaximumWidthRequest="520">
+
+                <!-- URL Input Card -->
+                <Border Style="{StaticResource CardBorder}">
+                    <VerticalStackLayout Spacing="16">
+
+                        <Label Text="Paste a link to get started"
+                               FontSize="16" FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+
+                        <!-- URL Entry -->
                         <VerticalStackLayout Spacing="4">
-                            <Label Text="Save to" Style="{StaticResource FieldLabel}" />
-                            <Entry Text="{Binding OutputPath}" IsReadOnly="True" Style="{StaticResource InputEntry}" />
+                            <Label Text="Link" Style="{StaticResource FieldLabel}" />
+                            <Border Stroke="{AppThemeBinding Light={StaticResource OutlineLight}, Dark={StaticResource OutlineDark}}"
+                                    StrokeThickness="1" StrokeShape="RoundRectangle 8"
+                                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariantLight}, Dark={StaticResource SurfaceVariantDark}}"
+                                    HeightRequest="44">
+                                <Entry Text="{Binding Url}" Placeholder="https://www.tiktok.com/..."
+                                       Style="{StaticResource InputEntry}"
+                                       BackgroundColor="Transparent" />
+                            </Border>
                         </VerticalStackLayout>
-                        <Button Grid.Column="1" Text="..."
-                                Command="{Binding PickFolderCommand}"
-                                WidthRequest="44" HeightRequest="44"
-                                BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariantLight}, Dark={StaticResource SurfaceVariantDark}}"
-                                TextColor="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}"
-                                CornerRadius="8"
-                                VerticalOptions="End" />
-                    </Grid>
 
-                    <!-- Download button -->
-                    <Button Text="{Binding IsDownloading, Converter={StaticResource BoolToStringConverter}, ConverterParameter=Downloading...}"
-                            Command="{Binding DownloadCommand}"
-                            IsEnabled="{Binding IsDownloading, Converter={StaticResource InverseBoolConverter}}"
-                            Style="{StaticResource PrimaryButton}"
-                            Margin="0,8,0,0" />
-                </VerticalStackLayout>
-            </Border>
+                        <!-- Platform badge -->
+                        <Border IsVisible="{Binding Url, Converter={StaticResource StringNotEmptyConverter}}"
+                                StrokeThickness="0"
+                                BackgroundColor="{AppThemeBinding Light=#F0EEFF, Dark=#2A2540}"
+                                StrokeShape="RoundRectangle 6" Padding="10,6" HeightRequest="32"
+                                HorizontalOptions="Start">
+                            <HorizontalStackLayout Spacing="6">
+                                <Label Text="Platform:" FontSize="11"
+                                       TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}"
+                                       VerticalOptions="Center" />
+                                <Label Text="{Binding PlatformName}" FontSize="11" FontAttributes="Bold"
+                                       TextColor="{AppThemeBinding Light={StaticResource PrimaryLight}, Dark={StaticResource PrimaryDark}}"
+                                       VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </Border>
 
-            <!-- Progress section (visible during download) -->
-            <Border Style="{StaticResource CardBorder}" IsVisible="{Binding IsDownloading}">
-                <VerticalStackLayout Spacing="10">
-                    <ProgressBar Progress="{Binding Progress}" />
-                    <Label Text="{Binding Status}" Style="{StaticResource CaptionLabel}" HorizontalOptions="Center" />
-                    <Button Text="Cancel" Command="{Binding CancelDownloadCommand}"
-                            BackgroundColor="Transparent"
-                            TextColor="{AppThemeBinding Light={StaticResource ErrorLight}, Dark={StaticResource ErrorDark}}"
-                            FontSize="13" HeightRequest="32" />
-                </VerticalStackLayout>
-            </Border>
+                        <!-- Save path with picker -->
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="Save to" Style="{StaticResource FieldLabel}" />
+                                <Border Stroke="{AppThemeBinding Light={StaticResource OutlineLight}, Dark={StaticResource OutlineDark}}"
+                                        StrokeThickness="1" StrokeShape="RoundRectangle 8"
+                                        BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariantLight}, Dark={StaticResource SurfaceVariantDark}}"
+                                        HeightRequest="44">
+                                    <Entry Text="{Binding OutputPath}" IsReadOnly="True"
+                                           Style="{StaticResource InputEntry}"
+                                           BackgroundColor="Transparent" />
+                                </Border>
+                            </VerticalStackLayout>
+                            <Button Grid.Column="1" Text="Browse"
+                                    Command="{Binding PickFolderCommand}"
+                                    WidthRequest="80" HeightRequest="44"
+                                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariantLight}, Dark={StaticResource SurfaceVariantDark}}"
+                                    TextColor="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}"
+                                    CornerRadius="8" FontSize="13" VerticalOptions="End" />
+                        </Grid>
 
-        </VerticalStackLayout>
+                        <!-- Download Button -->
+                        <Button Text="{Binding IsDownloading, Converter={StaticResource BoolToStringConverter}, ConverterParameter=CANCEL}"
+                                Command="{Binding DownloadCommand}"
+                                IsEnabled="{Binding IsDownloading, Converter={StaticResource InverseBoolConverter}}"
+                                Style="{StaticResource PrimaryButton}" />
 
-        <!-- Footer -->
-        <Label Grid.Row="2" Text="DropLoader v2.0 | daniel-skliphosovsky"
-               Style="{StaticResource CaptionLabel}" HorizontalOptions="Center" Padding="0,8" />
-    </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Progress section -->
+                <Border Style="{StaticResource CardBorder}"
+                        IsVisible="{Binding IsDownloading}" Padding="16">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Downloading..." FontSize="14" FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+                        <ProgressBar Progress="{Binding Progress}"
+                                     ProgressColor="{AppThemeBinding Light={StaticResource PrimaryLight}, Dark={StaticResource PrimaryDark}}" />
+                        <HorizontalStackLayout HorizontalOptions="Center" Spacing="8">
+                            <Label Text="{Binding Status}" Style="{StaticResource CaptionLabel}" />
+                            <Label Text="{Binding Progress, StringFormat='{0:P0}'}" Style="{StaticResource CaptionLabel}" />
+                        </HorizontalStackLayout>
+                        <Button Text="Cancel" Command="{Binding CancelDownloadCommand}"
+                                BackgroundColor="{AppThemeBinding Light=#FFF0F0, Dark=#402020}"
+                                TextColor="{AppThemeBinding Light={StaticResource ErrorLight}, Dark={StaticResource ErrorDark}}"
+                                FontSize="13" HeightRequest="36" CornerRadius="8" />
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+
+            <!-- Footer -->
+            <Label Grid.Row="2" Text="DropLoader v2.0 | daniel-skliphosovsky"
+                   Style="{StaticResource CaptionLabel}" HorizontalOptions="Center" Padding="0,10,0,8"
+                   FontSize="10" />
+        </Grid>
+    </Border>
 </ContentPage>

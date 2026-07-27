@@ -1,17 +1,15 @@
-name: CI - DropLoaderApp
+name: CI
 
 on:
   push:
     branches: [main, develop]
+    tags: ['v*']
   pull_request:
     branches: [main]
-  release:
-    types: [published]
 
 jobs:
-  build-and-test:
-    runs-on: windows-latest
-    
+  test:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -20,16 +18,106 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build tests
+        run: dotnet build tests/DropLoaderApp.Tests/DropLoaderApp.Tests.csproj --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test tests/DropLoaderApp.Tests/DropLoaderApp.Tests.csproj --configuration Release --no-build
+
+  build-windows:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: windows-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
 
       - name: Install MAUI workload
         run: dotnet workload install maui
 
-      - name: Restore
-        run: dotnet restore src/DropLoaderApp.sln
+      - name: Build Windows
+        run: >
+          dotnet publish src/DropLoaderApp.App/DropLoaderApp.App.csproj
+          --configuration Release
+          --framework net10.0-windows10.0.19041.0
+          --self-contained true
+          -p:RuntimeIdentifierOverride=win-x64
+          -p:PublishSingleFile=true
+          -p:PublishTrimmed=true
+          --output release/win-x64
 
-      - name: Build
-        run: dotnet build src/DropLoaderApp.App/DropLoaderApp.App.csproj -f net8.0-windows10.0.19041.0 --configuration Release --no-restore
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DropLoader-Windows
+          path: release/win-x64/DropLoaderApp.App.exe
 
-      - name: Test
-        run: dotnet test tests/DropLoaderApp.Tests/DropLoaderApp.Tests.csproj --configuration Release --no-restore
+  build-macos:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: macos-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install MAUI workload
+        run: dotnet workload install maui
+
+      - name: Build macOS
+        run: >
+          dotnet publish src/DropLoaderApp.App/DropLoaderApp.App.csproj
+          --configuration Release
+          --framework net10.0-maccatalyst
+          --self-contained true
+          -p:RuntimeIdentifierOverride=osx-x64
+          -p:PublishSingleFile=true
+          -p:PublishTrimmed=true
+          --output release/osx-x64
+
+      - name: Create PKG
+        run: |
+          mkdir -p pkgroot/Applications
+          cp -R release/osx-x64/DropLoaderApp.app pkgroot/Applications/
+          cd pkgroot && zip -r ../DropLoader-macOS.zip Applications/DropLoaderApp.app
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DropLoader-macOS
+          path: DropLoader-macOS.zip
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build-windows, build-macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: DropLoader-Windows
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: DropLoader-macOS
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            DropLoader-Windows/DropLoaderApp.App.exe
+            DropLoader-macOS/DropLoader-macOS.zip
+          generate_release_notes: true
+          fail_on_unmatched_files: false
