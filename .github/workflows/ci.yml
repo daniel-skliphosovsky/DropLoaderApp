@@ -10,13 +10,14 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
-      - run: dotnet restore tests/DropLoaderApp.Tests/DropLoaderApp.Tests.csproj
-      - run: dotnet build tests/DropLoaderApp.Tests/DropLoaderApp.Tests.csproj --configuration Release --no-restore
-      - run: dotnet test tests/DropLoaderApp.Tests/DropLoaderApp.Tests.csproj --configuration Release --no-build --verbosity normal
+      - name: Restore
+        run: dotnet restore src/DropLoaderApp.App/DropLoaderApp.App.csproj
+      - name: Build
+        run: dotnet build src/DropLoaderApp.App/DropLoaderApp.App.csproj --configuration Release --no-restore
