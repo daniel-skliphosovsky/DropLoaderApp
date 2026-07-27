@@ -3,67 +3,21 @@ name: CI
 on:
   push:
     branches: [main]
-    tags: ['v*']
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
-  build-windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
-      - run: dotnet workload install maui
-      - run: dotnet restore src/DropLoaderApp.sln --runtime win-x64
-      - run: dotnet build src/DropLoaderApp.App/DropLoaderApp.App.csproj --configuration Release --framework net10.0-windows10.0.19041.0 --no-restore
-      - run: dotnet test tests/DropLoaderApp.Tests/DropLoaderApp.Tests.csproj --configuration Release --no-restore
-      - if: startsWith(github.ref, 'refs/tags/v')
-        run: dotnet publish src/DropLoaderApp.App/DropLoaderApp.App.csproj --configuration Release --framework net10.0-windows10.0.19041.0 --self-contained true --output release
-      - if: startsWith(github.ref, 'refs/tags/v')
-        uses: actions/upload-artifact@v4
-        with:
-          name: DropLoader-Windows
-          path: release/*.exe
-
-  build-macos:
-    runs-on: macos-14
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
-      - name: Select Xcode
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '26.6'
-      - run: dotnet workload install maui
-      - run: dotnet restore src/DropLoaderApp.sln --runtime maccatalyst-x64
-      - run: dotnet build src/DropLoaderApp.App/DropLoaderApp.App.csproj --configuration Release --framework net10.0-maccatalyst --no-restore
-      - run: dotnet test tests/DropLoaderApp.Tests/DropLoaderApp.Tests.csproj --configuration Release --no-restore
-      - if: startsWith(github.ref, 'refs/tags/v')
-        run: dotnet publish src/DropLoaderApp.App/DropLoaderApp.App.csproj --configuration Release --framework net10.0-maccatalyst --self-contained true --output release
-      - if: startsWith(github.ref, 'refs/tags/v')
-        run: cd release && zip -r ../DropLoader-macOS.zip .
-      - if: startsWith(github.ref, 'refs/tags/v')
-        uses: actions/upload-artifact@v4
-        with:
-          name: DropLoader-macOS
-          path: DropLoader-macOS.zip
-
-  release:
-    if: startsWith(github.ref, 'refs/tags/v')
-    needs: [build-windows, build-macos]
+  test:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
-      - uses: actions/download-artifact@v4
-      - run: ls -R
-      - uses: softprops/action-gh-release@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
         with:
-          files: DropLoader-Windows/*,DropLoader-macOS/*
-          generate_release_notes: true
-          draft: false
-          fail_on_unmatched_files: false
+          dotnet-version: '9.0.x'
+          cache: true
+      - run: dotnet restore src/DropLoaderApp.sln
+      - run: dotnet build tests/DropLoaderApp.Tests/DropLoaderApp.Tests.csproj --configuration Release --no-restore
+      - run: dotnet test tests/DropLoaderApp.Tests/DropLoaderApp.Tests.csproj --configuration Release --no-build --verbosity normal

@@ -1,0 +1,92 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build-macos:
+    name: Build macOS
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - name: Install MAUI workload
+        run: dotnet workload install maui
+      - name: Restore
+        run: dotnet restore src/DropLoaderApp.App/DropLoaderApp.App.csproj
+      - name: Publish macOS
+        run: |
+          dotnet publish src/DropLoaderApp.App/DropLoaderApp.App.csproj \
+            --framework net9.0-maccatalyst \
+            --configuration Release \
+            --self-contained true \
+            --output ./publish/macos
+      - name: Zip macOS build
+        run: |
+          cd ./publish/macos
+          zip -r ../DropLoaderApp-macos.zip .
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DropLoaderApp-macos
+          path: publish/DropLoaderApp-macos.zip
+          retention-days: 7
+
+  build-windows:
+    name: Build Windows
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - name: Install MAUI workload
+        run: dotnet workload install maui
+      - name: Restore
+        run: dotnet restore src/DropLoaderApp.App/DropLoaderApp.App.csproj
+      - name: Publish Windows
+        run: |
+          dotnet publish src/DropLoaderApp.App/DropLoaderApp.App.csproj \
+            --framework net9.0-windows10.0.19041.0 \
+            --configuration Release \
+            --self-contained true \
+            --output ./publish/windows
+      - name: Zip Windows build
+        run: |
+          cd ./publish/windows
+          powershell Compress-Archive -Path . -DestinationPath ../DropLoaderApp-windows.zip
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DropLoaderApp-windows
+          path: publish/DropLoaderApp-windows.zip
+          retention-days: 7
+
+  release:
+    needs: [build-macos, build-windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: DropLoaderApp-*
+          merge-multiple: true
+      - name: Create Release
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            DropLoaderApp-macos.zip \
+            DropLoaderApp-windows.zip \
+            --generate-notes \
+            --title "${{ github.ref_name }}" \
+            --latest
+        env:
+          GH_TOKEN: ${{ github.token }}
