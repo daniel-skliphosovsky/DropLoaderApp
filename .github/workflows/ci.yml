@@ -16,7 +16,7 @@ jobs:
         with:
           dotnet-version: '10.0.x'
       - run: dotnet workload install maui
-      - run: dotnet restore src/DropLoaderApp.sln
+      - run: dotnet restore src/DropLoaderApp.sln --runtime win-x64
       - run: dotnet build src/DropLoaderApp.App/DropLoaderApp.App.csproj --configuration Release --framework net10.0-windows10.0.19041.0 --no-restore
       - run: dotnet test tests/DropLoaderApp.Tests/DropLoaderApp.Tests.csproj --configuration Release --no-restore
       - if: startsWith(github.ref, 'refs/tags/v')
@@ -39,7 +39,7 @@ jobs:
         with:
           xcode-version: '26.6'
       - run: dotnet workload install maui
-      - run: dotnet restore src/DropLoaderApp.sln
+      - run: dotnet restore src/DropLoaderApp.sln --runtime maccatalyst-x64
       - run: dotnet build src/DropLoaderApp.App/DropLoaderApp.App.csproj --configuration Release --framework net10.0-maccatalyst --no-restore
       - run: dotnet test tests/DropLoaderApp.Tests/DropLoaderApp.Tests.csproj --configuration Release --no-restore
       - if: startsWith(github.ref, 'refs/tags/v')
@@ -65,4 +65,5 @@ jobs:
         with:
           files: DropLoader-Windows/*,DropLoader-macOS/*
           generate_release_notes: true
+          draft: false
           fail_on_unmatched_files: false
