@@ -21,7 +21,7 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore src/DropLoaderApp.sln
 
       - name: Build tests
         run: dotnet build tests/DropLoaderApp.Tests/DropLoaderApp.Tests.csproj --configuration Release --no-restore
