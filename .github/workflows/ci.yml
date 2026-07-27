@@ -2,101 +2,47 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
     tags: ['v*']
   pull_request:
     branches: [main]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
-
-      - name: Restore tests
-        run: dotnet restore tests/DropLoaderApp.Tests/DropLoaderApp.Tests.csproj
-
-      - name: Build tests
-        run: dotnet build tests/DropLoaderApp.Tests/DropLoaderApp.Tests.csproj --configuration Release --no-restore
-
-      - name: Run tests
-        run: dotnet test tests/DropLoaderApp.Tests/DropLoaderApp.Tests.csproj --configuration Release --no-build
-
   build-windows:
-    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: windows-latest
-    needs: test
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-
-      - name: Install MAUI workload
-        run: dotnet workload install maui
-
-      - name: Restore
-        run: dotnet restore src/DropLoaderApp.sln
-
-      - name: Build Windows
-        shell: pwsh
-        run: |
-          dotnet publish src/DropLoaderApp.App/DropLoaderApp.App.csproj `
-            --configuration Release `
-            --framework net10.0-windows10.0.19041.0 `
-            --self-contained true `
-            --output release/win-x64
-
-      - name: Upload Windows artifact
+      - run: dotnet workload install maui
+      - run: dotnet restore src/DropLoaderApp.sln
+      - run: dotnet build src/DropLoaderApp.App/DropLoaderApp.App.csproj --configuration Release --framework net10.0-windows10.0.19041.0 --no-restore
+      - run: dotnet test tests/DropLoaderApp.Tests/DropLoaderApp.Tests.csproj --configuration Release --no-restore
+      - if: startsWith(github.ref, 'refs/tags/v')
+        run: dotnet publish src/DropLoaderApp.App/DropLoaderApp.App.csproj --configuration Release --framework net10.0-windows10.0.19041.0 --self-contained true --output release
+      - if: startsWith(github.ref, 'refs/tags/v')
         uses: actions/upload-artifact@v4
         with:
           name: DropLoader-Windows
-          path: release/win-x64/*.exe
+          path: release/*.exe
 
   build-macos:
-    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: macos-latest
-    needs: test
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-
-      - name: Install MAUI workload
-        run: dotnet workload install maui
-
-      - name: Restore
-        run: dotnet restore src/DropLoaderApp.sln
-
-      - name: Build macOS
-        run: |
-          dotnet publish src/DropLoaderApp.App/DropLoaderApp.App.csproj \
-            --configuration Release \
-            --framework net10.0-maccatalyst \
-            --self-contained true \
-            --output release/osx-x64
-
-      - name: Package macOS
-        run: |
-          echo "Listing release contents..."
-          find release/osx-x64 -type f -name "*.app" -o -type d -name "*.app" 2>/dev/null || echo "No .app found"
-          ls -la release/osx-x64/
-          echo "Creating archive..."
-          cd release && zip -r ../DropLoader-macOS.zip osx-x64/
-
-      - name: Upload macOS artifact
+      - run: dotnet workload install maui
+      - run: dotnet restore src/DropLoaderApp.sln
+      - run: dotnet build src/DropLoaderApp.App/DropLoaderApp.App.csproj --configuration Release --framework net10.0-maccatalyst --no-restore
+      - run: dotnet test tests/DropLoaderApp.Tests/DropLoaderApp.Tests.csproj --configuration Release --no-restore
+      - if: startsWith(github.ref, 'refs/tags/v')
+        run: dotnet publish src/DropLoaderApp.App/DropLoaderApp.App.csproj --configuration Release --framework net10.0-maccatalyst --self-contained true --output release
+      - if: startsWith(github.ref, 'refs/tags/v')
+        run: cd release && zip -r ../DropLoader-macOS.zip .
+      - if: startsWith(github.ref, 'refs/tags/v')
         uses: actions/upload-artifact@v4
         with:
           name: DropLoader-macOS
@@ -110,24 +56,9 @@ jobs:
       contents: write
     steps:
       - uses: actions/download-artifact@v4
-        with:
-          name: DropLoader-Windows
-          path: windows-artifact
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: DropLoader-macOS
-          path: macos-artifact
-
-      - name: List artifacts
-        run: |
-          ls -la windows-artifact/
-          ls -la macos-artifact/
-
+      - run: ls -R
       - uses: softprops/action-gh-release@v2
         with:
-          files: |
-            windows-artifact/DropLoader-App*
-            macos-artifact/DropLoader-macOS*
+          files: DropLoader-Windows/*,DropLoader-macOS/*
           generate_release_notes: true
           fail_on_unmatched_files: false
