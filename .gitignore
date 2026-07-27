@@ -407,9 +407,4 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/% 
 
-# Cryptographer
-/src/DropLoaderApp/Properties/CryptographerLib.dll
-
-# DownloadingSettings
-/src/DropLoaderApp/Properties/DownloadConfig.dll
 

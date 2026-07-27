@@ -17,6 +17,27 @@
             <param name="configureOptions">Optional action to configure TikTokApiOptions.</param>
             <returns>The IServiceCollection so that additional calls can be chained.</returns>
         </member>
+        <member name="T:TikTokExplode.ITikTokClient">
+            <summary>Provides access to TikTok metadata and download functionality.</summary>
+        </member>
+        <member name="M:TikTokExplode.ITikTokClient.GetPublicationAsync(System.String,System.Threading.CancellationToken)">
+            <summary>Gets full publication metadata for a TikTok URL.</summary>
+        </member>
+        <member name="M:TikTokExplode.ITikTokClient.GetVideoAsync(System.String,System.Threading.CancellationToken)">
+            <summary>Gets video metadata for a TikTok URL.</summary>
+        </member>
+        <member name="M:TikTokExplode.ITikTokClient.GetImagesAsync(System.String,System.Threading.CancellationToken)">
+            <summary>Gets images metadata for a TikTok URL.</summary>
+        </member>
+        <member name="M:TikTokExplode.ITikTokClient.DownloadVideoAsync(System.String,System.String,System.IProgress{System.Int64},System.Threading.CancellationToken)">
+            <summary>Downloads a video from a direct video URL to a file.</summary>
+        </member>
+        <member name="M:TikTokExplode.ITikTokClient.DownloadImageAsync(System.String,System.String,System.IProgress{System.Int64},System.Threading.CancellationToken)">
+            <summary>Downloads a single image from a direct image URL to a file.</summary>
+        </member>
+        <member name="M:TikTokExplode.ITikTokClient.DownloadImagesAsync(System.Collections.Generic.IReadOnlyList{TikTokExplode.Domain.Entities.Image},System.String,System.IProgress{System.Int64},System.Threading.CancellationToken)">
+            <summary>Downloads multiple images from a publication to a directory.</summary>
+        </member>
         <member name="T:TikTokExplode.TikTokClient">
             <summary>
             Main facade for interacting with TikTok content.

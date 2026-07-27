@@ -7,6 +7,7 @@ using DropLoaderApp.Services.Pickers;
 using DropLoaderApp.ViewModels;
 using DropLoaderApp.Views;
 using Microsoft.Extensions.Logging;
+using TikTokExplode.Extensions;
 
 namespace DropLoaderApp;
 
@@ -34,6 +35,9 @@ public static class MauiProgram
         builder.Services.AddSingleton<IDialogService, DialogService>();
         builder.Services.AddSingleton<IFolderPickerService, FolderPickerService>();
         builder.Services.AddSingleton<DownloaderFactory>();
+
+        // TikTok — registers ITikTokClient and all infrastructure
+        builder.Services.AddTikTokExplode();
 
         // Downloaders
         builder.Services.AddTransient<IDownloader, TikTokDownloader>();

@@ -1,38 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <?xaml-comp compile="true" ?>
-<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- Modern Flat Design Colors -->
 
     <!-- Light Theme -->
-    <Color x:Key="PrimaryLight">#6750A4</Color>
-    <Color x:Key="PrimaryVariantLight">#4F378B</Color>
-    <Color x:Key="SecondaryLight">#625B71</Color>
-    <Color x:Key="BackgroundLight">#FFFBFE</Color>
-    <Color x:Key="SurfaceLight">#F4EFF4</Color>
-    <Color x:Key="SurfaceVariantLight">#E7E0EC</Color>
-    <Color x:Key="ErrorLight">#B3261E</Color>
+    <Color x:Key="BackgroundLight">#F5F5F5</Color>
+    <Color x:Key="SurfaceLight">#FFFFFF</Color>
+    <Color x:Key="SurfaceVariantLight">#E8E8E8</Color>
+    <Color x:Key="PrimaryLight">#6C5CE7</Color>
+    <Color x:Key="PrimaryVariantLight">#5A4BD1</Color>
+    <Color x:Key="SecondaryLight">#00CEC9</Color>
+    <Color x:Key="OnSurfaceLight">#1A1A2E</Color>
+    <Color x:Key="OnSurfaceVariantLight">#555555</Color>
     <Color x:Key="OnPrimaryLight">#FFFFFF</Color>
-    <Color x:Key="OnSecondaryLight">#FFFFFF</Color>
-    <Color x:Key="OnBackgroundLight">#1C1B1F</Color>
-    <Color x:Key="OnSurfaceLight">#1C1B1F</Color>
-    <Color x:Key="OnSurfaceVariantLight">#49454F</Color>
-    <Color x:Key="BorderLight">#CAC4D0</Color>
-    <Color x:Key="EntryBackgroundLight">#FFFFFF</Color>
+    <Color x:Key="OutlineLight">#D0D0D0</Color>
+    <Color x:Key="ErrorLight">#E74C3C</Color>
+    <Color x:Key="SuccessLight">#2ECC71</Color>
 
     <!-- Dark Theme -->
-    <Color x:Key="PrimaryDark">#D0BCFF</Color>
-    <Color x:Key="PrimaryVariantDark">#EADDFF</Color>
-    <Color x:Key="SecondaryDark">#CCC2DC</Color>
-    <Color x:Key="BackgroundDark">#1C1B1F</Color>
-    <Color x:Key="SurfaceDark">#2B2930</Color>
-    <Color x:Key="SurfaceVariantDark">#49454F</Color>
-    <Color x:Key="ErrorDark">#F2B8B5</Color>
-    <Color x:Key="OnPrimaryDark">#381E72</Color>
-    <Color x:Key="OnSecondaryDark">#332D41</Color>
-    <Color x:Key="OnBackgroundDark">#E6E1E5</Color>
-    <Color x:Key="OnSurfaceDark">#E6E1E5</Color>
-    <Color x:Key="OnSurfaceVariantDark">#CAC4D0</Color>
-    <Color x:Key="BorderDark">#938F99</Color>
-    <Color x:Key="EntryBackgroundDark">#2B2930</Color>
+    <Color x:Key="BackgroundDark">#0F0F1A</Color>
+    <Color x:Key="SurfaceDark">#1A1A2E</Color>
+    <Color x:Key="SurfaceVariantDark">#252540</Color>
+    <Color x:Key="PrimaryDark">#A29BFE</Color>
+    <Color x:Key="PrimaryVariantDark">#6C5CE7</Color>
+    <Color x:Key="SecondaryDark">#00CEC9</Color>
+    <Color x:Key="OnSurfaceDark">#EEEEEE</Color>
+    <Color x:Key="OnSurfaceVariantDark">#AAAAAA</Color>
+    <Color x:Key="OnPrimaryDark">#1A1A2E</Color>
+    <Color x:Key="OutlineDark">#333355</Color>
+    <Color x:Key="ErrorDark">#FF6B6B</Color>
+    <Color x:Key="SuccessDark">#2ECC71</Color>
 
 </ResourceDictionary>
