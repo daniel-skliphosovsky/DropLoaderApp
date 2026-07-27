@@ -54,7 +54,6 @@ jobs:
             --configuration Release `
             --framework net10.0-windows10.0.19041.0 `
             --self-contained true `
-            --runtime win-x64 `
             --output release/win-x64
 
       - name: Upload Windows artifact
@@ -87,16 +86,14 @@ jobs:
             --configuration Release \
             --framework net10.0-maccatalyst \
             --self-contained true \
-            --runtime osx-x64 \
             --output release/osx-x64
 
       - name: Package macOS
         run: |
-          mkdir -p pkgroot/Applications
-          cp -R release/osx-x64/DropLoaderApp.app pkgroot/Applications/ 2>/dev/null || true
-          cd pkgroot && zip -r ../DropLoader-macOS.zip Applications/DropLoaderApp.app 2>/dev/null || true
-          # Fallback: just zip the release output
+          echo "Listing release contents..."
+          find release/osx-x64 -type f -name "*.app" -o -type d -name "*.app" 2>/dev/null || echo "No .app found"
           ls -la release/osx-x64/
+          echo "Creating archive..."
           cd release && zip -r ../DropLoader-macOS.zip osx-x64/
 
       - name: Upload macOS artifact
