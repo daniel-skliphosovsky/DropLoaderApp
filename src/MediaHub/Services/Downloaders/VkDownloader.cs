@@ -34,6 +34,12 @@ public sealed class VkDownloader : ScrapeDownloader
     private const string ApiEndpoint = "https://vk.com/al_video.php";
     private const string VideoIdPattern = @"\/video(?<oid>-?\d+)_(?<vid>\d+)";
 
+    static VkDownloader()
+    {
+        // VK answers in windows-1251 regardless of the Accept-Charset header.
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+    }
+
     public VkDownloader(HttpClient http) : base(http) { }
 
     public override string PlatformName => "VK";
@@ -73,41 +79,53 @@ public sealed class VkDownloader : ScrapeDownloader
         response.EnsureSuccessStatusCode();
 
         byte[] bytes = await response.Content.ReadAsByteArrayAsync(ct);
-        // VK answers in windows-1251 regardless of the Accept-Charset header.
-        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         string payload = Encoding.GetEncoding("windows-1251").GetString(bytes);
 
-        // The payload is a JSON array: [0, [title, videoBoxHtml, jsTemplates, infoHtml, opts]].
-        // Flatten all parts (the trailing opts object included) so the extractors
-        // can parse one string; the first payload entry is the video title.
-        using var document = JsonDocument.Parse(payload);
-        JsonElement root = document.RootElement;
-
-        if (root.TryGetProperty("payload", out JsonElement payloadArr)
-            && payloadArr.GetArrayLength() > 1
-            && payloadArr[1].ValueKind == JsonValueKind.Array)
+        try
         {
-            var builder = new StringBuilder();
-            foreach (JsonElement part in payloadArr[1].EnumerateArray())
-            {
-                switch (part.ValueKind)
-                {
-                    case JsonValueKind.String:
-                        builder.Append(part.GetString());
-                        break;
-                    case JsonValueKind.Object:
-                    case JsonValueKind.Array:
-                        builder.Append(JsonSerializer.Serialize(part));
-                        break;
-                    default:
-                        continue;
-                }
-                builder.Append('\n');
-            }
-            return builder.ToString();
-        }
+            // The payload is [0, [title, videoBoxHtml, jsTemplates, infoHtml, opts]]
+            // wrapped in a "payload" property; some responses are a bare array.
+            // Flatten all parts (the trailing opts object included) so the
+            // extractors can parse one string; the first entry is the video title.
+            using var document = JsonDocument.Parse(payload);
+            JsonElement root = document.RootElement;
 
-        return payload;
+            JsonElement payloadArr = root.ValueKind == JsonValueKind.Array
+                ? root
+                : root.TryGetProperty("payload", out JsonElement wrapped) ? wrapped : default;
+
+            if (payloadArr.ValueKind == JsonValueKind.Array
+                && payloadArr.GetArrayLength() > 1
+                && payloadArr[1].ValueKind == JsonValueKind.Array)
+            {
+                var builder = new StringBuilder();
+                foreach (JsonElement part in payloadArr[1].EnumerateArray())
+                {
+                    switch (part.ValueKind)
+                    {
+                        case JsonValueKind.String:
+                            builder.Append(part.GetString());
+                            break;
+                        case JsonValueKind.Object:
+                        case JsonValueKind.Array:
+                            builder.Append(JsonSerializer.Serialize(part));
+                            break;
+                        default:
+                            continue;
+                    }
+                    builder.Append('\n');
+                }
+                return builder.ToString();
+            }
+
+            return payload;
+        }
+        catch (JsonException)
+        {
+            // HTML error page or otherwise non-JSON body: let the extractors
+            // run on the raw payload instead of crashing.
+            return payload;
+        }
     }
 
     protected override IEnumerable<(string Quality, string Url)> ExtractStreams(string html)
