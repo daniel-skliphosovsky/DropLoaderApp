@@ -69,8 +69,7 @@ public sealed class VkDownloader : ScrapeDownloader
 
     public override string PlatformName => "VK";
 
-    protected override string NoStreamError =>
-        "could not extract a video link. The video may be private, age-restricted, or unavailable in your region.";
+    protected override string NoStreamError => Loc.Get("Err.VkNoStream");
 
     public override bool CanHandle(string url) =>
         UrlHelpers.UrlBelongsTo(url, "vk.com", "m.vk.com", "vkvideo.ru", "m.vkvideo.ru");
@@ -227,13 +226,13 @@ public sealed class VkDownloader : ScrapeDownloader
         // itself is the most popular entry, so keep the largest value.
         var views = MaxCount(ViewsRegex, html);
         if (views > 0)
-            details.Add(new ResourceDetail("Views", views.ToString("N0")));
+            details.Add(new ResourceDetail(Loc.Get("Details.Views"), views.ToString("N0")));
 
         var likes = MaxCount(LikesNestedRegex, html);
         if (likes == 0)
             likes = MaxCount(LikesFlatRegex, html);
         if (likes > 0)
-            details.Add(new ResourceDetail("Likes", likes.ToString("N0")));
+            details.Add(new ResourceDetail(Loc.Get("Details.Likes"), likes.ToString("N0")));
 
         return details;
     }

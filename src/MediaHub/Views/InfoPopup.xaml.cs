@@ -77,7 +77,7 @@ public partial class InfoPopup : Popup
                     Details.Add(detail);
 
                 if (Details.Count == 0)
-                    StatusMessage = "No additional information available for this resource";
+                    StatusMessage = Loc.Get("Info.NoInfo");
 
                 IsLoading = false;
                 OnPropertyChanged(nameof(HasDetails));
@@ -90,7 +90,7 @@ public partial class InfoPopup : Popup
         {
             await MainThread.InvokeOnMainThreadAsync(() =>
             {
-                StatusMessage = $"Could not load information: {ex.Message}";
+                StatusMessage = Loc.Get("Info.LoadError", ex.Message);
                 IsLoading = false;
             });
         }

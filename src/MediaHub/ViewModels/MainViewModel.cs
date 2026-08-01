@@ -41,10 +41,10 @@ public partial class MainViewModel : ObservableObject
     /// Shows a placeholder when no folder was picked yet.
     /// </summary>
     public string OutputPathDisplay =>
-        string.IsNullOrWhiteSpace(OutputPath) ? "No folder selected" : OutputPath;
+        string.IsNullOrWhiteSpace(OutputPath) ? Loc.Get("Status.NoFolder") : OutputPath;
 
     [ObservableProperty]
-    private string _platformName = "Auto-detect";
+    private string _platformName = Loc.Get("Status.AutoDetect");
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowPlatformBadge))]
@@ -145,6 +145,40 @@ public partial class MainViewModel : ObservableObject
     private int _themeIndex;
 
     /// <summary>
+    /// Active UI language ("ru"/"en"), switched by the header button and
+    /// persisted in Preferences.
+    /// </summary>
+    [ObservableProperty]
+    private string _languageCode = "ru";
+
+    /// <summary>
+    /// Title of the header language button: shows the language the button
+    /// switches TO, so the current choice is obvious at a glance.
+    /// </summary>
+    public string LocLangButton =>
+        LanguageCode == "ru" ? Loc.Get("Lang.CodeEn") : Loc.Get("Lang.CodeRu");
+
+    // Static XAML-bound strings. They are get-only wrappers over Loc, so a
+    // blanket change notification (see ToggleLanguage) re-reads them under
+    // the new culture and every label updates in place.
+    public string LocSubtitle => Loc.Get("App.Subtitle");
+    public string LocLogoHint => Loc.Get("App.LogoHint");
+    public string LocGithubHint => Loc.Get("Github.Hint");
+    public string LocThemeHint => Loc.Get("Theme.ToggleHint");
+    public string LocLangHint => Loc.Get("Lang.Hint");
+    public string LocUrlPlaceholder => Loc.Get("Url.Placeholder");
+    public string LocUrlHint => Loc.Get("Url.Hint");
+    public string LocDownload => Loc.Get("Download.Button");
+    public string LocDownloadHint => Loc.Get("Download.Hint");
+    public string LocInformation => Loc.Get("Info.Button");
+    public string LocInfoHint => Loc.Get("Info.Hint");
+    public string LocSaveTo => Loc.Get("SaveTo.Label");
+    public string LocSavePathHint => Loc.Get("SaveTo.PathHint");
+    public string LocBrowse => Loc.Get("SaveTo.Browse");
+    public string LocBrowseHint => Loc.Get("SaveTo.BrowseHint");
+    public string LocRecentActivity => Loc.Get("Activity.Title");
+
+    /// <summary>
     /// Metadata for the "what will be downloaded" card, filled after the URL
     /// settles and the platform is known.
     /// </summary>
@@ -204,6 +238,9 @@ public partial class MainViewModel : ObservableObject
 
         // Sync initial theme
         ThemeIndex = Application.Current?.UserAppTheme == AppTheme.Dark ? 1 : 0;
+
+        // Reflect the language App activated at startup (Preferences or "ru").
+        LanguageCode = Loc.CurrentCode == "ru" ? "ru" : "en";
     }
 
     /// <summary>
@@ -230,7 +267,7 @@ public partial class MainViewModel : ObservableObject
             _resolvedIsContent = isContent;
             _currentDownloader = isContent ? _factory.GetDownloader(value) : null;
             PlatformName = _currentDownloader?.PlatformName
-                ?? (string.IsNullOrWhiteSpace(value) ? "Auto-detect" : "Unknown");
+                ?? (string.IsNullOrWhiteSpace(value) ? Loc.Get("Status.AutoDetect") : Loc.Get("Status.Unknown"));
 
             OnPropertyChanged(nameof(PlatformKey));
         }
@@ -281,7 +318,7 @@ public partial class MainViewModel : ObservableObject
                     return;
 
                 Preview = preview;
-                PreviewError = preview is null ? "Couldn't load preview" : null;
+                PreviewError = preview is null ? Loc.Get("Status.PreviewError") : null;
             });
         }
         catch (OperationCanceledException)
@@ -299,7 +336,7 @@ public partial class MainViewModel : ObservableObject
                     return;
 
                 Preview = null;
-                PreviewError = "Couldn't load preview";
+                PreviewError = Loc.Get("Status.PreviewError");
             });
         }
         finally
@@ -363,7 +400,7 @@ public partial class MainViewModel : ObservableObject
     {
         if (string.IsNullOrWhiteSpace(OutputPath))
         {
-            await _dialog.ShowErrorAsync("Please select a folder first.", "No folder selected");
+            await _dialog.ShowErrorAsync(Loc.Get("Dialog.NoFolderMessage"), Loc.Get("Dialog.NoFolderTitle"));
             return;
         }
 
@@ -373,7 +410,7 @@ public partial class MainViewModel : ObservableObject
             // The button is normally disabled for unsupported links, but the
             // command can still be invoked programmatically; guard instead of
             // crashing on a null downloader.
-            await _dialog.ShowErrorAsync("Enter a link to a video or track.", "Unsupported link");
+            await _dialog.ShowErrorAsync(Loc.Get("Dialog.UnsupportedMessage"), Loc.Get("Dialog.UnsupportedTitle"));
             return;
         }
 
@@ -391,19 +428,19 @@ public partial class MainViewModel : ObservableObject
 
         IsDownloading = true;
         Progress = 0;
-        ProgressText = "Starting...";
+        ProgressText = Loc.Get("Status.Starting");
         IsIndeterminate = false;
         DownloadSpeedText = string.Empty;
         _lastBytes = 0;
         _lastSpeedAt = default;
-        DownloadHeadingText = "Downloading";
+        DownloadHeadingText = Loc.Get("Status.Downloading");
         DownloadFileName = DeriveDownloadFileName();
 
         // A fresh download starts a fresh activity log: old statuses (and
         // their failures) make way for the new one.
         Logs.Clear();
         OnPropertyChanged(nameof(HasLogs));
-        AddLog($"Downloading: {DownloadFileName}", "muted", PlatformKey);
+        AddLog(Loc.Get("Status.DownloadingItem", DownloadFileName), "muted", PlatformKey);
 
         // The progress lives in a separate modal popup bound to this same
         // view model; it is closed when the download finishes, fails or is
@@ -456,8 +493,8 @@ public partial class MainViewModel : ObservableObject
 
             if (targets.Count == 0)
             {
-                AddLog("Failed: no items found in playlist", "error", PlatformKey);
-                await _dialog.ShowErrorAsync("Couldn't find any items in this playlist.");
+                AddLog(Loc.Get("Status.FailedPlaylist"), "error", PlatformKey);
+                await _dialog.ShowErrorAsync(Loc.Get("Dialog.EmptyPlaylist"));
             }
             else
             {
@@ -467,7 +504,7 @@ public partial class MainViewModel : ObservableObject
 
                     if (targets.Count > 1)
                     {
-                        DownloadHeadingText = $"Track {i + 1} of {targets.Count}";
+                        DownloadHeadingText = Loc.Get("Status.TrackOf", i + 1, targets.Count);
                         DownloadFileName = targets[i].Title;
                     }
 
@@ -476,20 +513,20 @@ public partial class MainViewModel : ObservableObject
                     if (result.Success)
                     {
                         var savedName = Path.GetFileName(result.FilePath?.TrimEnd('/')) ?? DownloadFileName;
-                        AddLog($"Downloaded: {savedName}", "success", PlatformKey);
+                        AddLog(Loc.Get("Status.DownloadedItem", savedName), "success", PlatformKey);
                         if (i == targets.Count - 1)
-                            await _dialog.ShowAlertAsync("Success", $"Saved to {result.FilePath}");
+                            await _dialog.ShowAlertAsync(Loc.Get("Dialog.Success"), Loc.Get("Dialog.SavedTo", result.FilePath));
                     }
                     else if (cts.IsCancellationRequested ||
-                             string.Equals(result.ErrorMessage, "Cancelled", StringComparison.OrdinalIgnoreCase))
+                             string.Equals(result.ErrorMessage, Loc.Get("Err.Cancelled"), StringComparison.OrdinalIgnoreCase))
                     {
-                        AddLog("Download cancelled", "muted", PlatformKey);
+                        AddLog(Loc.Get("Status.Cancelled"), "muted", PlatformKey);
                         break;
                     }
                     else
                     {
-                        AddLog($"Failed: {result.ErrorMessage}", "error", PlatformKey);
-                        await _dialog.ShowErrorAsync(result.ErrorMessage ?? "Something went wrong while downloading");
+                        AddLog(Loc.Get("Status.Failed", result.ErrorMessage), "error", PlatformKey);
+                        await _dialog.ShowErrorAsync(result.ErrorMessage ?? Loc.Get("Dialog.GenericError"));
                         break;
                     }
                 }
@@ -497,11 +534,11 @@ public partial class MainViewModel : ObservableObject
         }
         catch (OperationCanceledException)
         {
-            AddLog("Download cancelled", "muted", PlatformKey);
+            AddLog(Loc.Get("Status.Cancelled"), "muted", PlatformKey);
         }
         catch (Exception ex)
         {
-            AddLog($"Failed: {ex.Message}", "error", PlatformKey);
+            AddLog(Loc.Get("Status.Failed", ex.Message), "error", PlatformKey);
             await _dialog.ShowErrorAsync(ex.Message);
         }
         finally
@@ -543,7 +580,7 @@ public partial class MainViewModel : ObservableObject
         if (!string.IsNullOrWhiteSpace(segment))
             return segment;
 
-        return $"{PlatformName} download";
+        return Loc.Get("Status.DownloadName", PlatformName);
     }
 
     /// <summary>
@@ -553,7 +590,7 @@ public partial class MainViewModel : ObservableObject
     private static string FormatProgress(DownloadProgress p)
     {
         if (p.TotalBytes is > 0)
-            return $"{FormatBytes(p.BytesReceived)} of {FormatBytes(p.TotalBytes.Value)}";
+            return Loc.Get("Status.Of", FormatBytes(p.BytesReceived), FormatBytes(p.TotalBytes.Value));
 
         return p.BytesReceived > 0 ? FormatBytes(p.BytesReceived) : string.Empty;
     }
@@ -581,7 +618,7 @@ public partial class MainViewModel : ObservableObject
         if (elapsed < 0.5 || p.BytesReceived == 0 || p.BytesReceived < _lastBytes)
             return;
 
-        DownloadSpeedText = $"{FormatBytes((long)((p.BytesReceived - _lastBytes) / elapsed))}/s";
+        DownloadSpeedText = Loc.Get("Status.PerSecond", FormatBytes((long)((p.BytesReceived - _lastBytes) / elapsed)));
         _lastBytes = p.BytesReceived;
         _lastSpeedAt = now;
     }
@@ -710,5 +747,18 @@ public partial class MainViewModel : ObservableObject
             : AppTheme.Light;
 
         ThemeIndex = Application.Current.UserAppTheme == AppTheme.Dark ? 1 : 0;
+    }
+
+    [RelayCommand]
+    private void ToggleLanguage()
+    {
+        LanguageCode = LanguageCode == "ru" ? "en" : "ru";
+        Loc.SetLanguage(LanguageCode);
+        Preferences.Default.Set(Loc.LanguagePreferenceKey, LanguageCode);
+
+        // All Loc* bindings are get-only wrappers; the blanket change
+        // notification makes the binding engine re-read every one of them
+        // under the new culture, so the whole page updates in place.
+        OnPropertyChanged(string.Empty);
     }
 }

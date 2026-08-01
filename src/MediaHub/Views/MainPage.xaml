@@ -4,6 +4,7 @@
              xmlns:vm="clr-namespace:MediaHub.ViewModels"
              xmlns:models="clr-namespace:MediaHub.Models"
              xmlns:anim="clr-namespace:MediaHub.Animations"
+             xmlns:loc="clr-namespace:MediaHub"
              x:Class="MediaHub.Views.MainPage"
              x:DataType="vm:MainViewModel"
              BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundLight}, Dark={StaticResource BackgroundDark}}"
@@ -104,7 +105,7 @@
                     <Border Grid.Column="3" WidthRequest="20" HeightRequest="20"
                             StrokeThickness="0" StrokeShape="RoundRectangle 6"
                             BackgroundColor="Transparent" VerticalOptions="Center"
-                            SemanticProperties.Description="Remove this log entry">
+                            SemanticProperties.Description="{x:Static loc:Loc.ActivityRemoveHint}">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnRemoveLogTapped"
                                                   CommandParameter="{Binding .}" />
@@ -133,10 +134,10 @@
                 <HorizontalStackLayout Spacing="14" VerticalOptions="Center">
                     <Image Source="mediahub_logo.svg" WidthRequest="44" HeightRequest="44"
                            Aspect="AspectFit" VerticalOptions="Center"
-                           SemanticProperties.Description="MediaHub logo" />
+                           SemanticProperties.Description="{Binding LocLogoHint}" />
                     <VerticalStackLayout VerticalOptions="Center" Spacing="0">
                         <Label Text="MediaHub" Style="{StaticResource AppTitleLabel}" FontSize="24" />
-                        <Label Text="Download from TikTok, YouTube, SoundCloud and VK"
+                        <Label Text="{Binding LocSubtitle}"
                                Style="{StaticResource AppSubtitleLabel}" FontSize="13" />
                     </VerticalStackLayout>
 
@@ -145,7 +146,7 @@
                             BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariantLight}, Dark={StaticResource SurfaceVariantDark}}"
                             StrokeThickness="0" StrokeShape="RoundRectangle 10"
                             VerticalOptions="Center" Margin="6,0,0,0"
-                            SemanticProperties.Description="Open the MediaHub repository on GitHub">
+                            SemanticProperties.Description="{Binding LocGithubHint}">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnGitHubTapped" />
                         </Border.GestureRecognizers>
@@ -157,19 +158,35 @@
                     </Border>
                 </HorizontalStackLayout>
 
-                <!-- Theme toggle (always the moon, taps to switch themes) -->
-                <Border Grid.Column="2" Style="{StaticResource IconButton}" VerticalOptions="Center"
-                        SemanticProperties.Description="Switch between light and dark theme">
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding ToggleThemeCommand}" />
-                    </Border.GestureRecognizers>
-                    <Path Fill="Transparent"
-                          Stroke="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}"
-                          StrokeThickness="2" StrokeLineCap="Round" StrokeLineJoin="Round"
-                          Aspect="Uniform" WidthRequest="22" HeightRequest="22"
-                          VerticalOptions="Center" HorizontalOptions="Center"
-                          Data="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                </Border>
+                <!-- Language and theme toggles -->
+                <HorizontalStackLayout Grid.Column="2" Spacing="10" VerticalOptions="Center">
+
+                    <!-- Language toggle: shows the language it switches TO -->
+                    <Border Style="{StaticResource IconButton}" VerticalOptions="Center"
+                            SemanticProperties.Description="{Binding LocLangHint}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleLanguageCommand}" />
+                        </Border.GestureRecognizers>
+                        <Label Text="{Binding LocLangButton}"
+                               FontSize="13" FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}"
+                               VerticalOptions="Center" HorizontalOptions="Center" />
+                    </Border>
+
+                    <!-- Theme toggle (always the moon, taps to switch themes) -->
+                    <Border Style="{StaticResource IconButton}" VerticalOptions="Center"
+                            SemanticProperties.Description="{Binding LocThemeHint}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ToggleThemeCommand}" />
+                        </Border.GestureRecognizers>
+                        <Path Fill="Transparent"
+                              Stroke="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}"
+                              StrokeThickness="2" StrokeLineCap="Round" StrokeLineJoin="Round"
+                              Aspect="Uniform" WidthRequest="22" HeightRequest="22"
+                              VerticalOptions="Center" HorizontalOptions="Center"
+                              Data="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                    </Border>
+                </HorizontalStackLayout>
             </Grid>
         </Border>
         <BoxView Grid.Row="0" HeightRequest="1" VerticalOptions="End"
@@ -274,22 +291,22 @@
 
                                             <Entry Grid.Column="1"
                                                    Text="{Binding Url}"
-                                                   Placeholder="Paste a link to a video, track or photo set..."
+                                                   Placeholder="{Binding LocUrlPlaceholder}"
                                                    Keyboard="Url"
                                                    IsEnabled="{Binding IsDownloading, Converter={StaticResource InverseBoolConverter}}"
                                                    Style="{StaticResource InputEntry}"
                                                    VerticalOptions="Center"
-                                                   SemanticProperties.Hint="Paste a TikTok, YouTube or SoundCloud link" />
+                                                   SemanticProperties.Hint="{Binding LocUrlHint}" />
                                         </Grid>
                                     </Border>
 
-                                    <Button Grid.Column="1" Text="Download"
+                                    <Button Grid.Column="1" Text="{Binding LocDownload}"
                                             Command="{Binding DownloadCommand}"
                                             IsEnabled="{Binding CanStartDownload}"
                                             Style="{StaticResource DownloadButton}"
                                             HeightRequest="56" Padding="20,0"
                                             VerticalOptions="Center"
-                                            SemanticProperties.Description="Start downloading the media" />
+                                            SemanticProperties.Description="{Binding LocDownloadHint}" />
                                 </Grid>
 
                                 <!-- Platform chip -->
@@ -419,7 +436,7 @@
                                                 StrokeThickness="0" StrokeShape="RoundRectangle 12"
                                                 Padding="18,0" HeightRequest="44"
                                                 VerticalOptions="Center"
-                                                SemanticProperties.Description="Show full metadata for this resource">
+                                                SemanticProperties.Description="{Binding LocInfoHint}">
                                             <Border.GestureRecognizers>
                                                 <TapGestureRecognizer Command="{Binding OpenInfoCommand}" />
                                             </Border.GestureRecognizers>
@@ -443,7 +460,7 @@
                                                       Aspect="Uniform" WidthRequest="16" HeightRequest="16"
                                                       VerticalOptions="Center"
                                                       Data="M12 8h.01 M12 12v4 M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" />
-                                                <Label Text="Information" FontSize="14" FontAttributes="Bold"
+                                                <Label Text="{Binding LocInformation}" FontSize="14" FontAttributes="Bold"
                                                        VerticalOptions="Center"
                                                        TextColor="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
                                             </HorizontalStackLayout>
@@ -465,20 +482,20 @@
 
                                 <!-- Save folder -->
                                 <VerticalStackLayout Spacing="8">
-                                    <Label Text="Save to" Style="{StaticResource FieldLabel}" />
+                                    <Label Text="{Binding LocSaveTo}" Style="{StaticResource FieldLabel}" />
                                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                                         <Border Style="{StaticResource InputContainer}">
                                             <Label Text="{Binding OutputPathDisplay}"
                                                    Style="{StaticResource InputEntry}"
                                                    VerticalOptions="Center"
                                                    LineBreakMode="TailTruncation"
-                                                   SemanticProperties.Hint="Folder where the file will be saved" />
+                                                   SemanticProperties.Hint="{Binding LocSavePathHint}" />
                                         </Border>
-                                        <Button Grid.Column="1" Text="Browse..."
+                                        <Button Grid.Column="1" Text="{Binding LocBrowse}"
                                                 Command="{Binding PickFolderCommand}"
                                                 Style="{StaticResource SecondaryButton}"
                                                 VerticalOptions="Center"
-                                                SemanticProperties.Description="Choose the folder where files will be saved" />
+                                                SemanticProperties.Description="{Binding LocBrowseHint}" />
                                     </Grid>
                                 </VerticalStackLayout>
 
@@ -501,7 +518,7 @@
                 </DataTrigger>
             </Border.Triggers>
             <VerticalStackLayout Spacing="8">
-                <Label Text="Recent activity" FontSize="12" FontAttributes="Bold"
+                <Label Text="{Binding LocRecentActivity}" FontSize="12" FontAttributes="Bold"
                        TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
                 <CollectionView ItemsSource="{Binding Logs}"
                                 ItemTemplate="{StaticResource LogEntryTemplate}"

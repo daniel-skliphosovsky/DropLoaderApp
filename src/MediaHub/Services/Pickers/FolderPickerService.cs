@@ -37,7 +37,7 @@ public sealed class FolderPickerService : IFolderPickerService
         catch (Exception ex)
         {
             Debug.WriteLine($"Folder picker failed: {ex}");
-            await _dialog.ShowErrorAsync(ex.Message, "Could not pick a folder");
+            await _dialog.ShowErrorAsync(ex.Message, Loc.Get("Dialog.PickFolderError"));
             return null;
         }
     }

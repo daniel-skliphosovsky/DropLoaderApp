@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="App.Subtitle" xml:space="preserve">
+    <value>Скачивание из TikTok, YouTube, SoundCloud и VK</value>
+  </data>
+  <data name="App.LogoHint" xml:space="preserve">
+    <value>Логотип MediaHub</value>
+  </data>
+  <data name="Github.Hint" xml:space="preserve">
+    <value>Открыть репозиторий MediaHub на GitHub</value>
+  </data>
+  <data name="Theme.ToggleHint" xml:space="preserve">
+    <value>Переключить светлую и тёмную тему</value>
+  </data>
+  <data name="Lang.Hint" xml:space="preserve">
+    <value>Переключить язык</value>
+  </data>
+  <data name="Lang.CodeEn" xml:space="preserve">
+    <value>EN</value>
+  </data>
+  <data name="Lang.CodeRu" xml:space="preserve">
+    <value>RU</value>
+  </data>
+  <data name="Url.Placeholder" xml:space="preserve">
+    <value>Вставьте ссылку на видео, трек или набор фото...</value>
+  </data>
+  <data name="Url.Hint" xml:space="preserve">
+    <value>Вставьте ссылку TikTok, YouTube или SoundCloud</value>
+  </data>
+  <data name="Download.Button" xml:space="preserve">
+    <value>Скачать</value>
+  </data>
+  <data name="Download.Hint" xml:space="preserve">
+    <value>Начать скачивание</value>
+  </data>
+  <data name="Info.Button" xml:space="preserve">
+    <value>Информация</value>
+  </data>
+  <data name="Info.Hint" xml:space="preserve">
+    <value>Показать полные сведения о ресурсе</value>
+  </data>
+  <data name="SaveTo.Label" xml:space="preserve">
+    <value>Сохранить в</value>
+  </data>
+  <data name="SaveTo.PathHint" xml:space="preserve">
+    <value>Папка, в которую будет сохранён файл</value>
+  </data>
+  <data name="SaveTo.Browse" xml:space="preserve">
+    <value>Обзор...</value>
+  </data>
+  <data name="SaveTo.BrowseHint" xml:space="preserve">
+    <value>Выберите папку для сохранения файлов</value>
+  </data>
+  <data name="Activity.Title" xml:space="preserve">
+    <value>Недавняя активность</value>
+  </data>
+  <data name="Activity.RemoveHint" xml:space="preserve">
+    <value>Удалить запись из журнала</value>
+  </data>
+  <data name="Popup.Stop" xml:space="preserve">
+    <value>Остановить</value>
+  </data>
+  <data name="Popup.StopHint" xml:space="preserve">
+    <value>Отменить текущее скачивание</value>
+  </data>
+  <data name="Popup.Loading" xml:space="preserve">
+    <value>Загрузка информации...</value>
+  </data>
+  <data name="Popup.Close" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="Popup.CloseHint" xml:space="preserve">
+    <value>Закрыть окно информации</value>
+  </data>
+  <data name="Status.AutoDetect" xml:space="preserve">
+    <value>Автоопределение</value>
+  </data>
+  <data name="Status.Unknown" xml:space="preserve">
+    <value>Неизвестно</value>
+  </data>
+  <data name="Status.NoFolder" xml:space="preserve">
+    <value>Папка не выбрана</value>
+  </data>
+  <data name="Status.Starting" xml:space="preserve">
+    <value>Запуск...</value>
+  </data>
+  <data name="Status.Downloading" xml:space="preserve">
+    <value>Скачивание</value>
+  </data>
+  <data name="Status.TrackOf" xml:space="preserve">
+    <value>Трек {0} из {1}</value>
+  </data>
+  <data name="Status.PreviewError" xml:space="preserve">
+    <value>Не удалось загрузить предпросмотр</value>
+  </data>
+  <data name="Status.Of" xml:space="preserve">
+    <value>{0} из {1}</value>
+  </data>
+  <data name="Status.PerSecond" xml:space="preserve">
+    <value>{0}/с</value>
+  </data>
+  <data name="Status.DownloadingItem" xml:space="preserve">
+    <value>Скачивание: {0}</value>
+  </data>
+  <data name="Status.DownloadedItem" xml:space="preserve">
+    <value>Скачано: {0}</value>
+  </data>
+  <data name="Status.Cancelled" xml:space="preserve">
+    <value>Скачивание отменено</value>
+  </data>
+  <data name="Status.Failed" xml:space="preserve">
+    <value>Ошибка: {0}</value>
+  </data>
+  <data name="Status.FailedPlaylist" xml:space="preserve">
+    <value>Ошибка: в плейлисте не найдено элементов</value>
+  </data>
+  <data name="Status.DownloadName" xml:space="preserve">
+    <value>Скачивание {0}</value>
+  </data>
+  <data name="Dialog.Error" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="Dialog.Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Dialog.Yes" xml:space="preserve">
+    <value>Да</value>
+  </data>
+  <data name="Dialog.No" xml:space="preserve">
+    <value>Нет</value>
+  </data>
+  <data name="Dialog.Success" xml:space="preserve">
+    <value>Успех</value>
+  </data>
+  <data name="Dialog.NoFolderTitle" xml:space="preserve">
+    <value>Папка не выбрана</value>
+  </data>
+  <data name="Dialog.NoFolderMessage" xml:space="preserve">
+    <value>Сначала выберите папку.</value>
+  </data>
+  <data name="Dialog.UnsupportedTitle" xml:space="preserve">
+    <value>Неподдерживаемая ссылка</value>
+  </data>
+  <data name="Dialog.UnsupportedMessage" xml:space="preserve">
+    <value>Введите ссылку на видео или трек.</value>
+  </data>
+  <data name="Dialog.EmptyPlaylist" xml:space="preserve">
+    <value>Не удалось найти элементы в этом плейлисте.</value>
+  </data>
+  <data name="Dialog.SavedTo" xml:space="preserve">
+    <value>Сохранено в {0}</value>
+  </data>
+  <data name="Dialog.GenericError" xml:space="preserve">
+    <value>Что-то пошло не так при скачивании</value>
+  </data>
+  <data name="Dialog.UnexpectedTitle" xml:space="preserve">
+    <value>Непредвиденная ошибка</value>
+  </data>
+  <data name="Dialog.UnexpectedMessage" xml:space="preserve">
+    <value>Что-то пошло не так: {0}. Подробности записаны в файл журнала.</value>
+  </data>
+  <data name="Dialog.Fatal" xml:space="preserve">
+    <value>Неизвестная фатальная ошибка</value>
+  </data>
+  <data name="Dialog.PickFolderError" xml:space="preserve">
+    <value>Не удалось выбрать папку</value>
+  </data>
+  <data name="Info.NoInfo" xml:space="preserve">
+    <value>Дополнительная информация для этого ресурса недоступна</value>
+  </data>
+  <data name="Info.LoadError" xml:space="preserve">
+    <value>Не удалось загрузить информацию: {0}</value>
+  </data>
+  <data name="Progress.Fetching" xml:space="preserve">
+    <value>Получение данных...</value>
+  </data>
+  <data name="Progress.FetchingMetadata" xml:space="preserve">
+    <value>Получение метаданных...</value>
+  </data>
+  <data name="Progress.DownloadingVideo" xml:space="preserve">
+    <value>Скачивание видео...</value>
+  </data>
+  <data name="Progress.DownloadingImages" xml:space="preserve">
+    <value>Скачивание изображений...</value>
+  </data>
+  <data name="Progress.DownloadingFile" xml:space="preserve">
+    <value>Скачивание {0}...</value>
+  </data>
+  <data name="Progress.Downloading" xml:space="preserve">
+    <value>Скачивание...</value>
+  </data>
+  <data name="Err.NoStream" xml:space="preserve">
+    <value>Поток не найден</value>
+  </data>
+  <data name="Err.TrackNotFound" xml:space="preserve">
+    <value>Трек не найден</value>
+  </data>
+  <data name="Err.NoStreamUrl" xml:space="preserve">
+    <value>Нет ссылки на поток</value>
+  </data>
+  <data name="Err.NoContent" xml:space="preserve">
+    <value>Скачиваемый контент не найден</value>
+  </data>
+  <data name="Err.Cancelled" xml:space="preserve">
+    <value>Отменено</value>
+  </data>
+  <data name="Err.PlatformPrefix" xml:space="preserve">
+    <value>{0}: {1}</value>
+  </data>
+  <data name="Err.ScrapeNoStream" xml:space="preserve">
+    <value>не удалось извлечь ссылку на видео (страница может требовать вход или иметь региональные ограничения)</value>
+  </data>
+  <data name="Err.VkNoStream" xml:space="preserve">
+    <value>не удалось извлечь ссылку на видео. Видео может быть приватным, иметь возрастные ограничения или быть недоступным в вашем регионе.</value>
+  </data>
+  <data name="Quality.Audio" xml:space="preserve">
+    <value>Аудио</value>
+  </data>
+  <data name="Quality.Video" xml:space="preserve">
+    <value>Видео</value>
+  </data>
+  <data name="Quality.Images" xml:space="preserve">
+    <value>{0} фото</value>
+  </data>
+  <data name="Details.Title" xml:space="preserve">
+    <value>Название</value>
+  </data>
+  <data name="Details.Author" xml:space="preserve">
+    <value>Автор</value>
+  </data>
+  <data name="Details.Duration" xml:space="preserve">
+    <value>Длительность</value>
+  </data>
+  <data name="Details.Uploaded" xml:space="preserve">
+    <value>Опубликовано</value>
+  </data>
+  <data name="Details.Views" xml:space="preserve">
+    <value>Просмотры</value>
+  </data>
+  <data name="Details.Likes" xml:space="preserve">
+    <value>Нравится</value>
+  </data>
+  <data name="Details.Description" xml:space="preserve">
+    <value>Описание</value>
+  </data>
+  <data name="Details.Keywords" xml:space="preserve">
+    <value>Ключевые слова</value>
+  </data>
+  <data name="Details.Genre" xml:space="preserve">
+    <value>Жанр</value>
+  </data>
+  <data name="Details.Plays" xml:space="preserve">
+    <value>Прослушивания</value>
+  </data>
+  <data name="Details.Comments" xml:space="preserve">
+    <value>Комментарии</value>
+  </data>
+  <data name="Details.Downloads" xml:space="preserve">
+    <value>Скачивания</value>
+  </data>
+  <data name="Details.Downloadable" xml:space="preserve">
+    <value>Доступно для скачивания</value>
+  </data>
+  <data name="Details.Posted" xml:space="preserve">
+    <value>Опубликовано</value>
+  </data>
+  <data name="Details.Link" xml:space="preserve">
+    <value>Ссылка</value>
+  </data>
+  <data name="Details.AuthorId" xml:space="preserve">
+    <value>ID автора</value>
+  </data>
+  <data name="Details.Region" xml:space="preserve">
+    <value>Регион</value>
+  </data>
+  <data name="Details.Verified" xml:space="preserve">
+    <value>Верифицирован</value>
+  </data>
+  <data name="Details.Yes" xml:space="preserve">
+    <value>Да</value>
+  </data>
+  <data name="Details.Shares" xml:space="preserve">
+    <value>Репосты</value>
+  </data>
+  <data name="Details.Sound" xml:space="preserve">
+    <value>Звук</value>
+  </data>
+</root>

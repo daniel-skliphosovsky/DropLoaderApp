@@ -1,5 +1,6 @@
 ﻿using MediaHub.Services.Logging;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Storage;
 
 namespace MediaHub;
 
@@ -12,6 +13,11 @@ public partial class App : Application
         // The design is dark-first; the header toggle can still flip to light.
         UserAppTheme = AppTheme.Dark;
         InitializeComponent();
+
+        // Russian is the default UI language; the header toggle switches to
+        // English and the choice is persisted across launches.
+        Loc.SetLanguage(Preferences.Default.Get(Loc.LanguagePreferenceKey, "ru"));
+
         InstallErrorHandlers();
     }
 
@@ -38,7 +44,7 @@ public partial class App : Application
         _errorHandlersInstalled = true;
 
         AppDomain.CurrentDomain.UnhandledException += (_, e) =>
-            OnUnhandledException(e.ExceptionObject as Exception ?? new Exception("Unknown fatal error"));
+            OnUnhandledException(e.ExceptionObject as Exception ?? new Exception(Loc.Get("Dialog.Fatal")));
 
         TaskScheduler.UnobservedTaskException += (_, e) =>
         {
@@ -63,9 +69,9 @@ public partial class App : Application
                     if (page is not null)
                     {
                         _ = page.DisplayAlert(
-                            "Unexpected error",
-                            $"Something went wrong: {exception.Message}\nDetails were written to the log file.",
-                            "OK");
+                            Loc.Get("Dialog.UnexpectedTitle"),
+                            Loc.Get("Dialog.UnexpectedMessage", exception.Message),
+                            Loc.Get("Dialog.Ok"));
                     }
                 }
                 catch

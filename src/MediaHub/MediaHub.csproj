@@ -64,4 +64,12 @@
     <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
+  <!-- Localization resources -->
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Strings\AppResources.resx" />
+    <EmbeddedResource Update="Resources\Strings\AppResources.ru.resx">
+      <DependentUpon>AppResources.resx</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

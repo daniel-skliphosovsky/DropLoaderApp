@@ -3,6 +3,7 @@
            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
            xmlns:mct="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
            xmlns:vm="clr-namespace:MediaHub.ViewModels"
+           xmlns:loc="clr-namespace:MediaHub"
            x:Class="MediaHub.Views.DownloadingPopup"
            x:DataType="vm:MainViewModel"
            CanBeDismissedByTappingOutsideOfPopup="False"
@@ -53,10 +54,10 @@
 
         <!-- Stop: full width, in the app's accent palette -->
         <Button Grid.Row="2"
-                Text="Stop"
+                Text="{x:Static loc:Loc.PopupStop}"
                 Margin="0,28,0,0"
                 Command="{Binding CancelDownloadCommand}"
                 Style="{StaticResource DownloadButton}"
-                SemanticProperties.Description="Cancel the current download" />
+                SemanticProperties.Description="{x:Static loc:Loc.PopupStopHint}" />
     </Grid>
 </mct:Popup>

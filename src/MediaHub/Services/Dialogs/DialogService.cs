@@ -5,7 +5,7 @@ namespace MediaHub.Services.Dialogs;
 
 public sealed class DialogService : IDialogService
 {
-    public async Task ShowAlertAsync(string title, string message, string cancel = "OK")
+    public async Task ShowAlertAsync(string title, string message, string? cancel = null)
     {
         var page = GetCurrentPage();
         if (page is null)
@@ -13,7 +13,7 @@ public sealed class DialogService : IDialogService
 
         try
         {
-            await page.DisplayAlert(title, message, cancel);
+            await page.DisplayAlert(title, message, cancel ?? Loc.Get("Dialog.Ok"));
         }
         catch (Exception ex)
         {
@@ -21,10 +21,10 @@ public sealed class DialogService : IDialogService
         }
     }
 
-    public async Task ShowErrorAsync(string message, string title = "Error")
-        => await ShowAlertAsync(title, message, "OK");
+    public async Task ShowErrorAsync(string message, string? title = null)
+        => await ShowAlertAsync(title ?? Loc.Get("Dialog.Error"), message);
 
-    public async Task<bool> ShowConfirmAsync(string title, string message, string accept = "Yes", string cancel = "No")
+    public async Task<bool> ShowConfirmAsync(string title, string message, string? accept = null, string? cancel = null)
     {
         var page = GetCurrentPage();
         if (page is null)
@@ -32,7 +32,7 @@ public sealed class DialogService : IDialogService
 
         try
         {
-            return await page.DisplayAlert(title, message, accept, cancel);
+            return await page.DisplayAlert(title, message, accept ?? Loc.Get("Dialog.Yes"), cancel ?? Loc.Get("Dialog.No"));
         }
         catch (Exception ex)
         {

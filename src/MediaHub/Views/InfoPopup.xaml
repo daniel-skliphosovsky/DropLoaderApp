@@ -3,6 +3,7 @@
            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
            xmlns:mct="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
            xmlns:models="clr-namespace:MediaHub.Models"
+           xmlns:loc="clr-namespace:MediaHub"
            x:Class="MediaHub.Views.InfoPopup"
            x:DataType="views:InfoPopup"
            xmlns:views="clr-namespace:MediaHub.Views"
@@ -29,7 +30,7 @@
 
         <!-- Header: title + close X -->
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-            <Label Text="Information"
+            <Label Text="{x:Static loc:Loc.PopupInformation}"
                    FontSize="18" FontAttributes="Bold"
                    VerticalOptions="Center"
                    TextColor="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
@@ -37,7 +38,7 @@
                     BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariantLight}, Dark={StaticResource SurfaceVariantDark}}"
                     StrokeThickness="0" StrokeShape="RoundRectangle 10"
                     VerticalOptions="Center"
-                    SemanticProperties.Description="Close the information popup">
+                    SemanticProperties.Description="{x:Static loc:Loc.PopupCloseHint}">
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnCloseTapped" />
                 </Border.GestureRecognizers>
@@ -55,7 +56,7 @@
             <ActivityIndicator IsRunning="True" IsVisible="True"
                                WidthRequest="20" HeightRequest="20"
                                Color="{AppThemeBinding Light={StaticResource PrimaryLight}, Dark={StaticResource PrimaryDark}}" />
-            <Label Grid.Column="1" Text="Loading information..."
+            <Label Grid.Column="1" Text="{x:Static loc:Loc.PopupLoading}"
                    FontSize="13" VerticalOptions="Center"
                    TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
         </Grid>
@@ -74,11 +75,11 @@
         </ScrollView>
 
         <!-- Close -->
-        <Button Grid.Row="2" Text="Close"
+        <Button Grid.Row="2" Text="{x:Static loc:Loc.PopupClose}"
                 Command="{Binding CloseCommand}"
                 Style="{StaticResource SecondaryButton}"
                 Margin="0,8,0,0"
                 VerticalOptions="End"
-                SemanticProperties.Description="Close the information popup" />
+                SemanticProperties.Description="{x:Static loc:Loc.PopupCloseHint}" />
     </Grid>
 </mct:Popup>

@@ -46,8 +46,8 @@ public sealed class TikTokDownloader : IDownloader
             description = description[..100] + "...";
 
         var quality = publication.Video is not null
-            ? "Video"
-            : publication.Images is { Count: > 0 } images ? $"{images.Count} images" : null;
+            ? Loc.Get("Quality.Video")
+            : publication.Images is { Count: > 0 } images ? Loc.Get("Quality.Images", images.Count) : null;
 
         return new MediaPreview
         {
@@ -66,31 +66,31 @@ public sealed class TikTokDownloader : IDownloader
     {
         var publication = await _tikTok.Publications.GetAsync(url, ct);
         var details = new List<ResourceDetail>();
-        ResourceDetail.AddIfPresent(details, "Description", publication.Description);
-        ResourceDetail.AddIfPresent(details, "Author", publication.Author?.Nickname);
-        ResourceDetail.AddIfPresent(details, "Author ID", publication.Author?.UserId);
-        ResourceDetail.AddIfPresent(details, "Region", publication.Author?.Region);
+        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Description"), publication.Description);
+        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Author"), publication.Author?.Nickname);
+        ResourceDetail.AddIfPresent(details, Loc.Get("Details.AuthorId"), publication.Author?.UserId);
+        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Region"), publication.Author?.Region);
         if (publication.Author is { IsVerified: true })
-            details.Add(new ResourceDetail("Verified", "Yes"));
+            details.Add(new ResourceDetail(Loc.Get("Details.Verified"), Loc.Get("Details.Yes")));
 
         if (publication.Video is { Duration: > 0 } video)
-            ResourceDetail.AddIfPresent(details, "Duration",
+            ResourceDetail.AddIfPresent(details, Loc.Get("Details.Duration"),
                 MediaPreview.FormatDuration(TimeSpan.FromMilliseconds(video.Duration)));
 
         if (publication.Statistics is { } stats)
         {
-            AddCount(details, "Likes", stats.DiggCount);
-            AddCount(details, "Views", stats.PlayCount);
-            AddCount(details, "Comments", stats.CommentCount);
-            AddCount(details, "Shares", stats.ShareCount);
-            AddCount(details, "Downloads", stats.DownloadCount);
+            AddCount(details, Loc.Get("Details.Likes"), stats.DiggCount);
+            AddCount(details, Loc.Get("Details.Views"), stats.PlayCount);
+            AddCount(details, Loc.Get("Details.Comments"), stats.CommentCount);
+            AddCount(details, Loc.Get("Details.Shares"), stats.ShareCount);
+            AddCount(details, Loc.Get("Details.Downloads"), stats.DownloadCount);
         }
 
         if (publication.Soundtrack is { } soundtrack &&
             !string.IsNullOrWhiteSpace(soundtrack.Title) &&
             !string.IsNullOrWhiteSpace(soundtrack.Author))
         {
-            details.Add(new ResourceDetail("Sound", $"{soundtrack.Title} - {soundtrack.Author}"));
+            details.Add(new ResourceDetail(Loc.Get("Details.Sound"), $"{soundtrack.Title} - {soundtrack.Author}"));
         }
 
         return details;
@@ -110,17 +110,17 @@ public sealed class TikTokDownloader : IDownloader
         string? filePath = null;
         try
         {
-            progress?.Report(new DownloadProgress(0, null, 0, "Fetching metadata..."));
+            progress?.Report(new DownloadProgress(0, null, 0, Loc.Get("Progress.FetchingMetadata")));
 
             var publication = await _tikTok.Publications.GetAsync(url, ct);
             var baseName = SanitizeFileName($"{publication.Author.Nickname}_{publication.Id}");
 
             if (publication.Video is not null)
             {
-                progress?.Report(new DownloadProgress(0, null, 0, "Downloading video..."));
+                progress?.Report(new DownloadProgress(0, null, 0, Loc.Get("Progress.DownloadingVideo")));
 
                 var downloadProgress = new Progress<double>(p =>
-                    progress?.Report(new DownloadProgress(0, null, p, "Downloading video...")));
+                    progress?.Report(new DownloadProgress(0, null, p, Loc.Get("Progress.DownloadingVideo"))));
 
                 // The library appends the .mp4 extension itself, so the
                 // custom file name is passed without it.
@@ -132,10 +132,10 @@ public sealed class TikTokDownloader : IDownloader
 
             if (publication.Images is { Count: > 0 })
             {
-                progress?.Report(new DownloadProgress(0, null, 0, "Downloading images..."));
+                progress?.Report(new DownloadProgress(0, null, 0, Loc.Get("Progress.DownloadingImages")));
 
                 var downloadProgress = new Progress<double>(p =>
-                    progress?.Report(new DownloadProgress(0, null, p, "Downloading images...")));
+                    progress?.Report(new DownloadProgress(0, null, p, Loc.Get("Progress.DownloadingImages"))));
 
                 var dirPath = Path.Combine(outputPath, baseName);
                 await _tikTok.DownloadImagesAsync(publication.Images, dirPath, baseName, downloadProgress, ct);
@@ -143,12 +143,12 @@ public sealed class TikTokDownloader : IDownloader
                 return new DownloadResult(true, dirPath, null);
             }
 
-            return new DownloadResult(false, null, "No downloadable content found");
+            return new DownloadResult(false, null, Loc.Get("Err.NoContent"));
         }
         catch (OperationCanceledException)
         {
             TryDeleteFile(filePath);
-            return new DownloadResult(false, null, "Cancelled");
+            return new DownloadResult(false, null, Loc.Get("Err.Cancelled"));
         }
         catch (TikTokExplodeException ex)
         {
@@ -157,7 +157,7 @@ public sealed class TikTokDownloader : IDownloader
         }
         catch (Exception ex)
         {
-            return new DownloadResult(false, null, $"TikTok: {ex.Message}");
+            return new DownloadResult(false, null, Loc.Get("Err.PlatformPrefix", PlatformName, ex.Message));
         }
     }
 

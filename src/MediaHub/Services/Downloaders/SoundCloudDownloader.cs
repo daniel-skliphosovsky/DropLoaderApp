@@ -39,7 +39,7 @@ public sealed class SoundCloudDownloader : IDownloader
             Description = track.Description ?? string.Empty,
             ThumbnailUrl = track.ArtworkUrl?.ToString(),
             Duration = track.Duration is { } milliseconds ? TimeSpan.FromMilliseconds(milliseconds) : null,
-            QualityText = "Audio",
+            QualityText = Loc.Get("Quality.Audio"),
             Platform = PlatformName
         };
     }
@@ -51,20 +51,20 @@ public sealed class SoundCloudDownloader : IDownloader
             return [];
 
         var details = new List<ResourceDetail>();
-        ResourceDetail.AddIfPresent(details, "Title", track.Title);
-        ResourceDetail.AddIfPresent(details, "Author", track.User?.Username);
+        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Title"), track.Title);
+        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Author"), track.User?.Username);
         if (track.Duration is { } milliseconds)
-            ResourceDetail.AddIfPresent(details, "Duration",
+            ResourceDetail.AddIfPresent(details, Loc.Get("Details.Duration"),
                 MediaPreview.FormatDuration(TimeSpan.FromMilliseconds(milliseconds)));
-        ResourceDetail.AddIfPresent(details, "Genre", track.Genre);
-        ResourceDetail.AddIfPresent(details, "Plays", track.PlaybackCount?.ToString("N0"));
-        ResourceDetail.AddIfPresent(details, "Likes", track.LikesCount?.ToString("N0"));
-        ResourceDetail.AddIfPresent(details, "Comments", track.CommentCount?.ToString("N0"));
-        ResourceDetail.AddIfPresent(details, "Downloads", track.DownloadCount?.ToString("N0"));
-        ResourceDetail.AddIfPresent(details, "Downloadable", track.Downloadable.ToString());
-        ResourceDetail.AddIfPresent(details, "Posted", track.CreatedAt.ToString("d"));
-        ResourceDetail.AddIfPresent(details, "Description", track.Description);
-        ResourceDetail.AddIfPresent(details, "Link", track.PermalinkUrl?.ToString());
+        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Genre"), track.Genre);
+        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Plays"), track.PlaybackCount?.ToString("N0"));
+        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Likes"), track.LikesCount?.ToString("N0"));
+        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Comments"), track.CommentCount?.ToString("N0"));
+        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Downloads"), track.DownloadCount?.ToString("N0"));
+        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Downloadable"), track.Downloadable.ToString());
+        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Posted"), track.CreatedAt.ToString("d"));
+        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Description"), track.Description);
+        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Link"), track.PermalinkUrl?.ToString());
         return details;
     }
 
@@ -76,15 +76,15 @@ public sealed class SoundCloudDownloader : IDownloader
         string? filePath = null;
         try
         {
-            progress?.Report(new DownloadProgress(0, null, 0, "Fetching..."));
+            progress?.Report(new DownloadProgress(0, null, 0, Loc.Get("Progress.Fetching")));
 
             var track = await GetTrackAsync(url, ct);
             if (track == null)
-                return new DownloadResult(false, null, "Track not found");
+                return new DownloadResult(false, null, Loc.Get("Err.TrackNotFound"));
 
             var streamUrl = await GetDownloadUrlAsync(track, ct);
             if (string.IsNullOrEmpty(streamUrl))
-                return new DownloadResult(false, null, "No stream URL");
+                return new DownloadResult(false, null, Loc.Get("Err.NoStreamUrl"));
 
             filePath = Path.Combine(outputPath, $"{SanitizeFileName(track.Title ?? "track")}.mp3");
 
@@ -104,7 +104,7 @@ public sealed class SoundCloudDownloader : IDownloader
                 await fileStream.WriteAsync(buffer.AsMemory(0, read), ct);
                 totalRead += read;
                 progress?.Report(new DownloadProgress(totalRead, totalBytes,
-                    totalBytes > 0 ? (double)totalRead / totalBytes : null, "Downloading..."));
+                    totalBytes > 0 ? (double)totalRead / totalBytes : null, Loc.Get("Progress.Downloading")));
             }
 
             return new DownloadResult(true, filePath, null);
@@ -112,11 +112,11 @@ public sealed class SoundCloudDownloader : IDownloader
         catch (OperationCanceledException)
         {
             TryDeleteFile(filePath);
-            return new DownloadResult(false, null, "Cancelled");
+            return new DownloadResult(false, null, Loc.Get("Err.Cancelled"));
         }
         catch (Exception ex)
         {
-            return new DownloadResult(false, null, $"SoundCloud: {ex.Message}");
+            return new DownloadResult(false, null, Loc.Get("Err.PlatformPrefix", PlatformName, ex.Message));
         }
     }
 
