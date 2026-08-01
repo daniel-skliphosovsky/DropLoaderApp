@@ -435,19 +435,10 @@ public partial class MainViewModel : ObservableObject
         // The progress lives in a modal popup bound to this same view model.
         // It must be on screen BEFORE the download starts so the user gets
         // immediate feedback. A failure to open it is reported as a dialog
-        // instead of being swallowed silently (which previously left the
-        // Download button disabled forever with no popup at all).
+        // instead of being swallowed silently. This block lives inside the
+        // try below so the finally resets IsDownloading on every path after
+        // it is set to true, including a popup failure.
         DownloadingPopup? popup = null;
-        try
-        {
-            popup = new DownloadingPopup(this);
-            Shell.Current.ShowPopup(popup);
-        }
-        catch (Exception)
-        {
-            await _dialog.ShowErrorAsync(Loc.Get(LocKeys.DialogPopupError), Loc.Get(LocKeys.DialogError));
-            return;
-        }
 
         // Result dialog content; shown only after the popup is closed so the
         // alert is never hidden underneath it. Null means "no dialog" (the
@@ -457,6 +448,16 @@ public partial class MainViewModel : ObservableObject
 
         try
         {
+            try
+            {
+                popup = new DownloadingPopup(this);
+                Shell.Current.ShowPopup(popup);
+            }
+            catch (Exception)
+            {
+                await _dialog.ShowErrorAsync(Loc.Get(LocKeys.DialogPopupError), Loc.Get(LocKeys.DialogError));
+                return;
+            }
             // Progress<T> is created on the UI thread, so its callbacks are
             // marshalled back to the UI context automatically.
             var progress = new Progress<DownloadProgress>(p =>
@@ -544,6 +545,7 @@ public partial class MainViewModel : ObservableObject
         {
             IsDownloading = false;
             ProgressText = string.Empty;
+            DownloadHeadingText = string.Empty;
 
             if (popup is not null)
             {
