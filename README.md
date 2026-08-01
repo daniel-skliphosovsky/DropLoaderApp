@@ -2,7 +2,7 @@
 
 An application that helps you to download media from popular platforms.
 
-Built with .NET MAUI for macOS and Windows. Paste a link from TikTok, YouTube or SoundCloud, pick a folder, and MediaHub takes care of the rest — it detects the platform automatically, downloads the media, and reports progress with the option to cancel at any time.
+Built with .NET MAUI for macOS and Windows. Paste a link from TikTok, YouTube, SoundCloud, VK or Vimeo, pick a folder, and MediaHub takes care of the rest — it detects the platform automatically, downloads the media, and reports progress with the option to cancel at any time.
 
 **v4.0.0** is a fresh start: the window is bigger and size-constrained (1040x680, minimum 900x620, maximum 1160x760), the download block now floats in the center of the screen, and the whole interface was scaled up — larger fields, buttons and typography, a cleaner single-outline input, the app icon as the header logo, and a moon-only theme toggle.
 
@@ -80,7 +80,8 @@ Built with .NET MAUI for macOS and Windows. Paste a link from TikTok, YouTube or
 - TikTok videos and image galleries
 - YouTube videos (best available quality)
 - SoundCloud tracks
-- VK Video — coming soon
+- VK videos
+- Vimeo videos
 - Automatic platform detection from the URL (short links, www./m. prefixes, any case)
 - Light and Dark theme with one-click switching
 - Platform badge that updates live while you type the link
@@ -91,7 +92,7 @@ Built with .NET MAUI for macOS and Windows. Paste a link from TikTok, YouTube or
 
 # Usage
 1. Open App
-2. Paste the media link into the link field (TikTok, YouTube or SoundCloud)
+2. Paste the media link into the link field (TikTok, YouTube, SoundCloud, VK, Vimeo)
 3. Select the path where the file will be saved
 4. Click the Download Button to start downloading
 5. Track the progress, cancel anytime if needed
@@ -104,6 +105,10 @@ Built with .NET MAUI for macOS and Windows. Paste a link from TikTok, YouTube or
 Also, don't be alarmed if the download doesn't start. This is also related to TikTok API -> Solution: just wait a bit (usually up to 10 seconds) and the download will start
 
 **YouTube**: Due to changes in YouTube policy, audio track can be in .webm extension
+
+**VK**: Only public videos can be downloaded. Private or region-restricted videos return an error, and some pages may require a retry when the first attempt fails with a network error
+
+**Vimeo**: Videos that require login or are region-restricted cannot be downloaded. The first attempt may occasionally fail with a network error — just try again
 
 # Install
 

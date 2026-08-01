@@ -16,6 +16,7 @@ public sealed class TrayService : ITrayService
 {
     private const uint WM_APP = 0x8000;
     private const uint WM_RBUTTONUP = 0x0205;
+    private const uint WM_LBUTTONUP = 0x0202;
     private const uint WM_CONTEXTMENU = 0x007B;
 
     private const uint NIM_ADD = 0x00000000;
@@ -212,9 +213,20 @@ public sealed class TrayService : ITrayService
 
     private IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
     {
-        if (msg == TrayCallbackMessage && (uint)lParam is WM_RBUTTONUP or WM_CONTEXTMENU)
+        if (msg == TrayCallbackMessage)
         {
-            ShowContextMenu();
+            switch ((uint)lParam)
+            {
+                case WM_RBUTTONUP:
+                case WM_CONTEXTMENU:
+                    ShowContextMenu();
+                    break;
+                case WM_LBUTTONUP:
+                    // Left click on the tray icon opens the window.
+                    ShowRequested?.Invoke(this, EventArgs.Empty);
+                    break;
+            }
+
             return IntPtr.Zero;
         }
 

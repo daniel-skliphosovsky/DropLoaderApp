@@ -106,6 +106,8 @@ public abstract class ScrapeDownloader : IDownloader
         }
         catch (Exception ex)
         {
+            // A network error mid-download leaves a partial file behind; clean it up.
+            TryDeleteFile(filePath);
             return new DownloadResult(false, null, $"{PlatformName}: {ex.Message}");
         }
     }

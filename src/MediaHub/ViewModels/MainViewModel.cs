@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using MediaHub.Models;
 using MediaHub.Services.Downloaders;
 using MediaHub.Services.Interfaces;
+using Microsoft.Maui.ApplicationModel;
 
 namespace MediaHub.ViewModels;
 
@@ -214,14 +215,20 @@ public partial class MainViewModel : ObservableObject
         try
         {
             await Task.Delay(650, ct);
-            IsPreviewLoading = true;
+            SetPreviewLoading(true);
 
             var preview = await downloader.GetPreviewAsync(url, ct);
             if (ct.IsCancellationRequested)
                 return;
 
-            Preview = preview;
-            PreviewError = preview is null ? "Couldn't load preview" : null;
+            SetPreviewResult(() =>
+            {
+                if (ct.IsCancellationRequested)
+                    return;
+
+                Preview = preview;
+                PreviewError = preview is null ? "Couldn't load preview" : null;
+            });
         }
         catch (OperationCanceledException)
         {
@@ -232,20 +239,44 @@ public partial class MainViewModel : ObservableObject
                 return;
 
             // Preview is best-effort: never block the download because of it.
-            Preview = null;
-            PreviewError = "Couldn't load preview";
+            SetPreviewResult(() =>
+            {
+                if (ct.IsCancellationRequested)
+                    return;
+
+                Preview = null;
+                PreviewError = "Couldn't load preview";
+            });
         }
         finally
         {
             // Only the current generation of the preview request may touch the
             // spinner; an older cancelled one must leave it alone.
-            lock (_previewLock)
+            SetPreviewResult(() =>
             {
-                if (ReferenceEquals(_previewCts, cts))
-                    IsPreviewLoading = false;
-            }
+                lock (_previewLock)
+                {
+                    if (ReferenceEquals(_previewCts, cts))
+                        IsPreviewLoading = false;
+                }
+            });
         }
     }
+
+    /// <summary>
+    /// The preview libraries may resume on a thread pool thread, so any
+    /// observable state mutation is marshalled back to the UI thread.
+    /// </summary>
+    private static void SetPreviewResult(Action apply)
+    {
+        if (MainThread.IsMainThread)
+            apply();
+        else
+            MainThread.BeginInvokeOnMainThread(apply);
+    }
+
+    private void SetPreviewLoading(bool isLoading) =>
+        SetPreviewResult(() => IsPreviewLoading = isLoading);
 
     private void CancelPreview()
     {
