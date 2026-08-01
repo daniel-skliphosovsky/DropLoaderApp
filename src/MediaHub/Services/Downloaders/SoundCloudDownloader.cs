@@ -101,7 +101,20 @@ public sealed class SoundCloudDownloader : IDownloader
         }
     }
 
-    private static string SanitizeFileName(string name) =>
-        string.Join("_", name.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries))
-            .Trim().TrimEnd('.', ' ');
+    private static string SanitizeFileName(string name)
+    {
+        // Strip characters invalid on Windows and macOS, plus control
+        // characters, then trim and clamp the length so the file name stays
+        // valid on both platforms.
+        var invalid = Path.GetInvalidFileNameChars().ToHashSet();
+        var builder = new System.Text.StringBuilder(name.Length);
+        foreach (var c in name)
+            builder.Append(invalid.Contains(c) || char.IsControl(c) ? '_' : c);
+
+        const int maxLength = 120;
+        var sanitized = builder.ToString().Trim().TrimEnd('.', ' ');
+        return sanitized.Length <= maxLength
+            ? sanitized
+            : sanitized[..maxLength].TrimEnd('.', ' ');
+    }
 }

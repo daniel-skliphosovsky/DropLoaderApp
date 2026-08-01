@@ -1,61 +1,72 @@
-﻿using MediaHub.Services.Interfaces;
+﻿using MediaHub.Services.Logging;
+using Microsoft.Maui.Controls;
 
 namespace MediaHub;
 
 public partial class App : Application
 {
-    private readonly ITrayService _tray;
-    private Window? _window;
+    private static bool _errorHandlersInstalled;
 
-    public App(ITrayService tray)
+    public App()
     {
         InitializeComponent();
-        _tray = tray;
-
-        _tray.ShowRequested += OnTrayShowRequested;
-        _tray.ExitRequested += OnTrayExitRequested;
-        _tray.Initialize();
+        InstallErrorHandlers();
     }
 
     protected override Window CreateWindow(IActivationState? activationState)
     {
-        _window = CreateMainWindow();
-        return _window;
-    }
-
-    private Window CreateMainWindow()
-    {
-        var window = new Window(new AppShell())
+        // The window opens at the minimum size and can be resized up to the
+        // maximum; closing the window quits the app (standard MAUI behavior).
+        return new Window(new AppShell())
         {
-            Width = 1040,
-            Height = 680,
+            Width = 900,
+            Height = 620,
             MinimumWidth = 900,
             MinimumHeight = 620,
             MaximumWidth = 1160,
             MaximumHeight = 760
         };
-
-        window.Destroying += (_, _) => _window = null;
-        _tray.AttachWindow(window);
-        return window;
     }
 
-    private void OnTrayShowRequested(object? sender, EventArgs e)
+    private static void InstallErrorHandlers()
     {
-        if (_window is { } window)
+        if (_errorHandlersInstalled)
+            return;
+        _errorHandlersInstalled = true;
+
+        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+            OnUnhandledException(e.ExceptionObject as Exception ?? new Exception("Unknown fatal error"));
+
+        TaskScheduler.UnobservedTaskException += (_, e) =>
         {
-            ActivateWindow(window);
-            _tray.ShowWindow();
-        }
-        else
-        {
-            // The previous window was closed to the tray; open a fresh one.
-            OpenWindow(CreateMainWindow());
-        }
+            OnUnhandledException(e.Exception);
+            e.SetObserved();
+        };
     }
 
-    private void OnTrayExitRequested(object? sender, EventArgs e)
+    private static void OnUnhandledException(Exception exception)
     {
-        _tray.ExitApplication();
+        AppLogger.Log(exception);
+
+        // The dialog is best-effort (the exception may be fatal); the full
+        // details always land in the log file.
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            try
+            {
+                var page = Current?.Windows.FirstOrDefault()?.Page;
+                if (page is not null)
+                {
+                    _ = page.DisplayAlert(
+                        "Unexpected error",
+                        $"Something went wrong: {exception.Message}\nDetails were written to the log file.",
+                        "OK");
+                }
+            }
+            catch
+            {
+                // Never throw from an error handler.
+            }
+        });
     }
 }

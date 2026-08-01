@@ -12,7 +12,6 @@ public partial class MainViewModel : ObservableObject
     private readonly DownloaderFactory _factory;
     private readonly IFolderPickerService _folderPicker;
     private readonly IDialogService _dialog;
-    private readonly ITrayService _tray;
 
     private readonly object _ctsLock = new();
     private CancellationTokenSource? _cts;
@@ -65,7 +64,7 @@ public partial class MainViewModel : ObservableObject
 
     /// <summary>
     /// Stable key for styling the platform chip and input icon:
-    /// "tiktok", "youtube", "soundcloud", "vk", "vimeo" or "unknown".
+    /// "tiktok", "youtube", "soundcloud", "vk" or "unknown".
     /// </summary>
     public string PlatformKey
     {
@@ -81,8 +80,6 @@ public partial class MainViewModel : ObservableObject
                 return "soundcloud";
             if (UrlHelpers.UrlBelongsTo(Url, "vk.com", "m.vk.com"))
                 return "vk";
-            if (UrlHelpers.UrlBelongsTo(Url, "vimeo.com"))
-                return "vimeo";
             return "unknown";
         }
     }
@@ -151,12 +148,11 @@ public partial class MainViewModel : ObservableObject
 
     public string VersionText => $"MediaHub v{AppInfo.Current.VersionString}  |  daniel-skliphosovsky";
 
-    public MainViewModel(DownloaderFactory factory, IFolderPickerService folderPicker, IDialogService dialog, ITrayService tray)
+    public MainViewModel(DownloaderFactory factory, IFolderPickerService folderPicker, IDialogService dialog)
     {
         _factory = factory;
         _folderPicker = folderPicker;
         _dialog = dialog;
-        _tray = tray;
 
         // Sync initial theme
         ThemeIndex = Application.Current?.UserAppTheme == AppTheme.Dark ? 1 : 0;
@@ -328,7 +324,6 @@ public partial class MainViewModel : ObservableObject
         ProgressText = "Starting...";
         Status = string.Empty;
         StatusKind = string.Empty;
-        _tray.SetDownloading(true);
 
         try
         {
@@ -348,7 +343,6 @@ public partial class MainViewModel : ObservableObject
             {
                 Status = "Downloaded successfully";
                 StatusKind = "success";
-                _tray.ShowNotification("Download finished", Path.GetFileName(result.FilePath ?? "download"));
                 await _dialog.ShowAlertAsync("Success", $"Saved to {result.FilePath}");
             }
             else if (cts.IsCancellationRequested ||
@@ -361,7 +355,6 @@ public partial class MainViewModel : ObservableObject
             {
                 Status = $"Failed: {result.ErrorMessage}";
                 StatusKind = "error";
-                _tray.ShowNotification("Download failed", result.ErrorMessage ?? "Something went wrong while downloading");
                 await _dialog.ShowErrorAsync(result.ErrorMessage ?? "Something went wrong while downloading");
             }
         }
@@ -374,14 +367,12 @@ public partial class MainViewModel : ObservableObject
         {
             Status = $"Failed: {ex.Message}";
             StatusKind = "error";
-            _tray.ShowNotification("Download failed", ex.Message);
             await _dialog.ShowErrorAsync(ex.Message);
         }
         finally
         {
             IsDownloading = false;
             ProgressText = string.Empty;
-            _tray.SetDownloading(false);
 
             lock (_ctsLock)
             {

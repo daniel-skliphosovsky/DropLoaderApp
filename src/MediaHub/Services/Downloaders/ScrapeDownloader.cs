@@ -7,9 +7,9 @@ namespace MediaHub.Services.Downloaders;
 
 /// <summary>
 /// Base for downloaders that scrape an HTML page for a direct mp4 link
-/// without any API key or login (VK, Vimeo). Metadata comes from the page
-/// itself (og tags or embedded JSON), the file is streamed like everywhere
-/// else in the app.
+/// without any API key or login (VK). Metadata comes from the page itself
+/// (og tags or embedded JSON), the file is streamed like everywhere else in
+/// the app.
 /// </summary>
 public abstract class ScrapeDownloader : IDownloader
 {
@@ -73,7 +73,7 @@ public abstract class ScrapeDownloader : IDownloader
             var title = ExtractTitle(html)?.Trim() ?? string.Empty;
             filePath = Path.Combine(outputPath, $"{SanitizeFileName(title.Length > 0 ? title : $"{PlatformName.ToLowerInvariant()}-video")}.mp4");
 
-            using var request = new HttpRequestMessage(HttpMethod.Get, best.Value.Url);
+            using var request = new HttpRequestMessage(HttpMethod.Get, EnsureHttps(best.Value.Url));
             request.Headers.UserAgent.ParseAdd(UserAgent);
             if (Uri.TryCreate(ResolvePageUrl(url), UriKind.Absolute, out var referer))
                 request.Headers.Referrer = referer;
@@ -114,12 +114,21 @@ public abstract class ScrapeDownloader : IDownloader
 
     protected async Task<string> FetchPageAsync(string url, CancellationToken ct)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Get, url);
+        using var request = new HttpRequestMessage(HttpMethod.Get, EnsureHttps(url));
         request.Headers.UserAgent.ParseAdd(UserAgent);
         using var response = await Http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsStringAsync(ct);
     }
+
+    /// <summary>
+    /// Upgrades a plain-http URL to https. Page and media requests never go
+    /// out over an unencrypted connection.
+    /// </summary>
+    private static string EnsureHttps(string url) =>
+        url.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+            ? "https://" + url[7..]
+            : url;
 
     protected static (string Quality, string Url)? PickBest(IEnumerable<(string Quality, string Url)> streams)
     {
@@ -175,7 +184,20 @@ public abstract class ScrapeDownloader : IDownloader
         }
     }
 
-    private static string SanitizeFileName(string name) =>
-        string.Join("_", name.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries))
-            .Trim().TrimEnd('.', ' ');
+    private static string SanitizeFileName(string name)
+    {
+        // Strip characters invalid on Windows and macOS, plus control
+        // characters, then trim and clamp the length so the file name stays
+        // valid on both platforms.
+        var invalid = Path.GetInvalidFileNameChars().ToHashSet();
+        var builder = new System.Text.StringBuilder(name.Length);
+        foreach (var c in name)
+            builder.Append(invalid.Contains(c) || char.IsControl(c) ? '_' : c);
+
+        const int maxLength = 120;
+        var sanitized = builder.ToString().Trim().TrimEnd('.', ' ');
+        return sanitized.Length <= maxLength
+            ? sanitized
+            : sanitized[..maxLength].TrimEnd('.', ' ');
+    }
 }

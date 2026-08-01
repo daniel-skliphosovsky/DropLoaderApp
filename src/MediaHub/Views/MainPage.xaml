@@ -23,7 +23,7 @@
                            SemanticProperties.Description="MediaHub logo" />
                     <VerticalStackLayout VerticalOptions="Center" Spacing="2">
                         <Label Text="MediaHub" Style="{StaticResource AppTitleLabel}" />
-                        <Label Text="Download media from TikTok, YouTube, SoundCloud, VK and Vimeo"
+                        <Label Text="Download media from TikTok, YouTube, SoundCloud and VK"
                                Style="{StaticResource AppSubtitleLabel}" />
                     </VerticalStackLayout>
                 </HorizontalStackLayout>
@@ -55,7 +55,7 @@
                     <VerticalStackLayout Spacing="24">
 
                         <!-- Card -->
-                        <Border x:Name="Card" Style="{StaticResource CardBorder}" Opacity="0">
+                        <Border Style="{StaticResource CardBorder}">
                             <VerticalStackLayout Spacing="22">
 
                                 <Label Text="Add a link" Style="{StaticResource SectionTitleLabel}" />
@@ -151,18 +151,6 @@
                                                         </DataTrigger>
                                                     </Path.Triggers>
                                                 </Path>
-                                                <!-- Vimeo: a V -->
-                                                <Path Fill="Transparent" IsVisible="False"
-                                                      Stroke="{AppThemeBinding Light={StaticResource VimeoLight}, Dark={StaticResource VimeoDark}}"
-                                                      StrokeThickness="2" StrokeLineCap="Round" StrokeLineJoin="Round"
-                                                      Aspect="Uniform"
-                                                      Data="M4 7l4 11 4-9 4 9 4-11">
-                                                    <Path.Triggers>
-                                                        <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="vimeo">
-                                                            <Setter Property="IsVisible" Value="True" />
-                                                        </DataTrigger>
-                                                    </Path.Triggers>
-                                                </Path>
                                             </Grid>
 
                                             <Entry Grid.Column="1"
@@ -199,9 +187,6 @@
                                             <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="vk">
                                                 <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource VKContainerLight}, Dark={StaticResource VKContainerDark}}" />
                                             </DataTrigger>
-                                            <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="vimeo">
-                                                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource VimeoContainerLight}, Dark={StaticResource VimeoContainerDark}}" />
-                                            </DataTrigger>
                                         </Border.Triggers>
                                         <Label Text="{Binding PlatformName}" FontSize="13" FontAttributes="Bold" VerticalOptions="Center">
                                             <Label.Triggers>
@@ -216,9 +201,6 @@
                                                 </DataTrigger>
                                                 <DataTrigger TargetType="Label" Binding="{Binding PlatformKey}" Value="vk">
                                                     <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnVKContainerLight}, Dark={StaticResource OnVKContainerDark}}" />
-                                                </DataTrigger>
-                                                <DataTrigger TargetType="Label" Binding="{Binding PlatformKey}" Value="vimeo">
-                                                    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnVimeoContainerLight}, Dark={StaticResource OnVimeoContainerDark}}" />
                                                 </DataTrigger>
                                             </Label.Triggers>
                                         </Label>

@@ -54,10 +54,6 @@
     <Color x:Key="VKContainerLight">#E0EFFF</Color>
     <Color x:Key="OnVKContainerLight">#00458F</Color>
 
-    <Color x:Key="VimeoLight">#1AB7EA</Color>
-    <Color x:Key="VimeoContainerLight">#DFF5FD</Color>
-    <Color x:Key="OnVimeoContainerLight">#00597A</Color>
-
     <!-- ============ Dark Theme ============ -->
     <Color x:Key="BackgroundDark">#0F0F1A</Color>
     <Color x:Key="SurfaceDark">#1A1A2E</Color>
@@ -105,9 +101,5 @@
     <Color x:Key="VKDark">#4D9BFF</Color>
     <Color x:Key="VKContainerDark">#0A2A55</Color>
     <Color x:Key="OnVKContainerDark">#C9E2FF</Color>
-
-    <Color x:Key="VimeoDark">#4FC3EA</Color>
-    <Color x:Key="VimeoContainerDark">#0A3345</Color>
-    <Color x:Key="OnVimeoContainerDark">#C9ECFA</Color>
 
 </ResourceDictionary>

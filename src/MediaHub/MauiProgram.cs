@@ -74,18 +74,11 @@ public static class MauiProgram
         builder.Services.AddSingleton<IFolderPickerService, FolderPickerService>();
         builder.Services.AddSingleton<DownloaderFactory>();
 
-#if MACCATALYST
-        builder.Services.AddSingleton<ITrayService, MediaHub.MacCatalyst.TrayService>();
-#elif WINDOWS
-        builder.Services.AddSingleton<ITrayService, MediaHub.WinUI.TrayService>();
-#endif
-
         // Downloaders (transient, resolved through the factory)
         builder.Services.AddTransient<IDownloader, TikTokDownloader>();
         builder.Services.AddTransient<IDownloader, YouTubeDownloader>();
         builder.Services.AddTransient<IDownloader, SoundCloudDownloader>();
         builder.Services.AddTransient<IDownloader, VkDownloader>();
-        builder.Services.AddTransient<IDownloader, VimeoDownloader>();
 
         // ViewModels and Pages
         builder.Services.AddTransient<MainViewModel>();

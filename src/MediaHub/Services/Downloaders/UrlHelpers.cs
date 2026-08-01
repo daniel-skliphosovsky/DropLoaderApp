@@ -12,7 +12,7 @@ internal static class UrlHelpers
             return null;
 
         // Media links never contain legit whitespace; dropping it also
-        // tolerates stray newlines or spaces around the pasted URL.
+        // tolerates loose newlines or spaces around the pasted URL.
         var value = new string(url.Where(c => !char.IsWhiteSpace(c)).ToArray());
         if (!Uri.TryCreate(value, UriKind.Absolute, out var uri) &&
             !Uri.TryCreate("https://" + value, UriKind.Absolute, out uri))

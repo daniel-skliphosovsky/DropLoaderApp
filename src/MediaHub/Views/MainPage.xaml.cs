@@ -4,24 +4,10 @@ namespace MediaHub.Views;
 
 public partial class MainPage : ContentPage
 {
-    private bool _cardAnimated;
-
     public MainPage(MainViewModel viewModel)
     {
         InitializeComponent();
         BindingContext = viewModel;
-    }
-
-    protected override void OnAppearing()
-    {
-        base.OnAppearing();
-
-        // Soft entrance for the main card on first appearance.
-        if (!_cardAnimated)
-        {
-            _cardAnimated = true;
-            Card.FadeTo(1, 250, Easing.CubicOut);
-        }
     }
 
     protected override void OnDisappearing()
@@ -39,7 +25,10 @@ public partial class MainPage : ContentPage
     // scrolls when the window gets too small for it.
     private void OnScrollViewSizeChanged(object? sender, EventArgs e)
     {
-        if (sender is ScrollView scroll && scroll.Content is Grid host)
+        if (sender is ScrollView { Content: Grid host } scroll &&
+            !double.IsNaN(scroll.Height) && scroll.Height > 0)
+        {
             host.MinimumHeightRequest = scroll.Height;
+        }
     }
 }
