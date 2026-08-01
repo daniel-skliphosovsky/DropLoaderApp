@@ -4,7 +4,9 @@ namespace MediaHub.Services.Downloaders;
 
 internal static class UrlHelpers
 {
-    private static readonly Regex VkResourcePath = new(@"^(video|clip)\d+_\d+");
+    // VK video ids are <oid>_<vid>; negative oids (community videos) carry a
+    // leading minus, e.g. video-145052891_456247130.
+    private static readonly Regex VkResourcePath = new(@"^(video|clip)-?\d+_\d+");
 
     /// <summary>
     /// Returns the lowercased host of the URL, tolerating a missing scheme

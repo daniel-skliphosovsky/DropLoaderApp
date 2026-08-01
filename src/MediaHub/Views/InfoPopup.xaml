@@ -13,43 +13,27 @@
     <mct:Popup.Resources>
         <!-- One labeled metadata row -->
         <DataTemplate x:Key="DetailRowTemplate" x:DataType="models:ResourceDetail">
-            <Grid ColumnDefinitions="120,*" ColumnSpacing="14" Padding="0,3">
-                <Label Text="{Binding Label}" FontSize="12" FontAttributes="Bold"
+            <Grid ColumnDefinitions="150,*" ColumnSpacing="16" Padding="0,4">
+                <Label Text="{Binding Label}" FontSize="14" FontAttributes="Bold"
                        TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
-                <Label Grid.Column="1" Text="{Binding Value}" FontSize="12"
+                <Label Grid.Column="1" Text="{Binding Value}" FontSize="14"
                        MaxLines="6" LineBreakMode="WordWrap"
                        TextColor="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
             </Grid>
         </DataTemplate>
     </mct:Popup.Resources>
 
-    <!-- One integral block: the popup surface IS the card, no inner border.
-         Header with a close X, then the metadata list (or a loading state
-         while the platform library answers), then a Close button. -->
-    <Grid Padding="28,24" MaximumWidthRequest="520" RowDefinitions="Auto,Auto,*" RowSpacing="16">
+    <!-- Large metadata popup: the title on top, the Label/Value rows in a
+         ScrollView (or a loading/error note), and a single full-width Close
+         button in the accent palette at the bottom. No close cross. -->
+    <Grid Padding="36,30" WidthRequest="640" HeightRequest="560"
+          RowDefinitions="Auto,Auto,*,Auto" RowSpacing="18">
 
-        <!-- Header: title + close X -->
-        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-            <Label Text="{x:Static loc:Loc.PopupInformation}"
-                   FontSize="18" FontAttributes="Bold"
-                   VerticalOptions="Center"
-                   TextColor="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
-            <Border Grid.Column="1" WidthRequest="36" HeightRequest="36"
-                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariantLight}, Dark={StaticResource SurfaceVariantDark}}"
-                    StrokeThickness="0" StrokeShape="RoundRectangle 10"
-                    VerticalOptions="Center"
-                    SemanticProperties.Description="{x:Static loc:Loc.PopupCloseHint}">
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnCloseTapped" />
-                </Border.GestureRecognizers>
-                <Path Fill="Transparent"
-                      Stroke="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}"
-                      StrokeThickness="2" StrokeLineCap="Round"
-                      Aspect="Uniform" WidthRequest="16" HeightRequest="16"
-                      VerticalOptions="Center" HorizontalOptions="Center"
-                      Data="M6 6l12 12 M18 6L6 18" />
-            </Border>
-        </Grid>
+        <!-- Header: title only -->
+        <Label Text="{x:Static loc:Loc.PopupInformation}"
+               FontSize="22" FontAttributes="Bold"
+               VerticalOptions="Center"
+               TextColor="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
 
         <!-- Loading state -->
         <Grid Grid.Row="1" IsVisible="{Binding IsLoading}" ColumnDefinitions="Auto,*" ColumnSpacing="12">
@@ -57,29 +41,29 @@
                                WidthRequest="20" HeightRequest="20"
                                Color="{AppThemeBinding Light={StaticResource PrimaryLight}, Dark={StaticResource PrimaryDark}}" />
             <Label Grid.Column="1" Text="{x:Static loc:Loc.PopupLoading}"
-                   FontSize="13" VerticalOptions="Center"
+                   FontSize="14" VerticalOptions="Center"
                    TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
         </Grid>
 
         <!-- Error / empty note -->
         <Label Grid.Row="1" IsVisible="{Binding HasStatus}"
                Text="{Binding StatusMessage}"
-               FontSize="13" MaxLines="3" LineBreakMode="WordWrap"
+               FontSize="14" MaxLines="3" LineBreakMode="WordWrap"
                TextColor="{AppThemeBinding Light={StaticResource ErrorLight}, Dark={StaticResource ErrorDark}}" />
 
         <!-- Metadata rows -->
         <ScrollView Grid.Row="2" IsVisible="{Binding HasDetails}">
-            <VerticalStackLayout Spacing="0"
+            <VerticalStackLayout Spacing="2"
                                  BindableLayout.ItemsSource="{Binding Details}"
                                  BindableLayout.ItemTemplate="{StaticResource DetailRowTemplate}" />
         </ScrollView>
 
         <!-- Close -->
-        <Button Grid.Row="2" Text="{x:Static loc:Loc.PopupClose}"
+        <Button Grid.Row="3" Text="{x:Static loc:Loc.PopupClose}"
                 Command="{Binding CloseCommand}"
-                Style="{StaticResource SecondaryButton}"
-                Margin="0,8,0,0"
-                VerticalOptions="End"
+                Style="{StaticResource DownloadButton}"
+                HeightRequest="52"
+                Margin="0,4,0,0"
                 SemanticProperties.Description="{x:Static loc:Loc.PopupCloseHint}" />
     </Grid>
 </mct:Popup>

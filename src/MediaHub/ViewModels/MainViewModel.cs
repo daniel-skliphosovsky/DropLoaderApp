@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Maui.Views;
@@ -34,17 +33,25 @@ public partial class MainViewModel : ObservableObject
     private string _url = string.Empty;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(OutputPathDisplay))]
-    private string _outputPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+    [NotifyPropertyChangedFor(nameof(PathDisplayText))]
+    [NotifyPropertyChangedFor(nameof(IsPathSelected))]
+    private string _outputPath = string.Empty;
 
     /// <summary>
-    /// Shows a placeholder when no folder was picked yet.
+    /// True once the user picked a save folder; the save-path entry shows a
+    /// muted placeholder text until then.
     /// </summary>
-    public string OutputPathDisplay =>
-        string.IsNullOrWhiteSpace(OutputPath) ? Loc.Get("Status.NoFolder") : OutputPath;
+    public bool IsPathSelected => !string.IsNullOrWhiteSpace(OutputPath);
+
+    /// <summary>
+    /// The chosen save path, or a muted localized placeholder asking the user
+    /// to pick a folder when none was selected yet.
+    /// </summary>
+    public string PathDisplayText =>
+        IsPathSelected ? OutputPath : Loc.Get(LocKeys.SaveToPlaceholder);
 
     [ObservableProperty]
-    private string _platformName = Loc.Get("Status.AutoDetect");
+    private string _platformName = Loc.Get(LocKeys.StatusAutoDetect);
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowPlatformBadge))]
@@ -119,17 +126,9 @@ public partial class MainViewModel : ObservableObject
     public bool ShowDownloadSpeed => !string.IsNullOrEmpty(DownloadSpeedText);
 
     /// <summary>
-    /// Bottom activity log: recent download events with their platform and
-    /// status. Cleared whenever a new download starts.
-    /// </summary>
-    public ObservableCollection<LogEntry> Logs { get; } = [];
-
-    public bool HasLogs => Logs.Count > 0;
-
-    /// <summary>
-    /// Name of the file being downloaded, shown as the title of the progress
-    /// popup. Filled when the download starts from the preview title, a URL
-    /// segment or the platform name.
+    /// Name of the file being downloaded, shown under the popup heading.
+    /// Filled when the download starts from the preview title, a URL segment
+    /// or the platform name.
     /// </summary>
     [ObservableProperty]
     private string _downloadFileName = string.Empty;
@@ -156,27 +155,25 @@ public partial class MainViewModel : ObservableObject
     /// switches TO, so the current choice is obvious at a glance.
     /// </summary>
     public string LocLangButton =>
-        LanguageCode == "ru" ? Loc.Get("Lang.CodeEn") : Loc.Get("Lang.CodeRu");
+        LanguageCode == "ru" ? Loc.Get(LocKeys.LangCodeEn) : Loc.Get(LocKeys.LangCodeRu);
 
     // Static XAML-bound strings. They are get-only wrappers over Loc, so a
     // blanket change notification (see ToggleLanguage) re-reads them under
     // the new culture and every label updates in place.
-    public string LocSubtitle => Loc.Get("App.Subtitle");
-    public string LocLogoHint => Loc.Get("App.LogoHint");
-    public string LocGithubHint => Loc.Get("Github.Hint");
-    public string LocThemeHint => Loc.Get("Theme.ToggleHint");
-    public string LocLangHint => Loc.Get("Lang.Hint");
-    public string LocUrlPlaceholder => Loc.Get("Url.Placeholder");
-    public string LocUrlHint => Loc.Get("Url.Hint");
-    public string LocDownload => Loc.Get("Download.Button");
-    public string LocDownloadHint => Loc.Get("Download.Hint");
-    public string LocInformation => Loc.Get("Info.Button");
-    public string LocInfoHint => Loc.Get("Info.Hint");
-    public string LocSaveTo => Loc.Get("SaveTo.Label");
-    public string LocSavePathHint => Loc.Get("SaveTo.PathHint");
-    public string LocBrowse => Loc.Get("SaveTo.Browse");
-    public string LocBrowseHint => Loc.Get("SaveTo.BrowseHint");
-    public string LocRecentActivity => Loc.Get("Activity.Title");
+    public string LocSubtitle => Loc.Get(LocKeys.AppSubtitle);
+    public string LocGithubHint => Loc.Get(LocKeys.GithubHint);
+    public string LocThemeHint => Loc.Get(LocKeys.ThemeToggleHint);
+    public string LocLangHint => Loc.Get(LocKeys.LangHint);
+    public string LocUrlPlaceholder => Loc.Get(LocKeys.UrlPlaceholder);
+    public string LocUrlHint => Loc.Get(LocKeys.UrlHint);
+    public string LocDownload => Loc.Get(LocKeys.DownloadButton);
+    public string LocDownloadHint => Loc.Get(LocKeys.DownloadHint);
+    public string LocInformation => Loc.Get(LocKeys.InfoButton);
+    public string LocInfoHint => Loc.Get(LocKeys.InfoHint);
+    public string LocSaveTo => Loc.Get(LocKeys.SaveToLabel);
+    public string LocSavePathHint => Loc.Get(LocKeys.SaveToPathHint);
+    public string LocBrowse => Loc.Get(LocKeys.SaveToBrowse);
+    public string LocBrowseHint => Loc.Get(LocKeys.SaveToBrowseHint);
 
     /// <summary>
     /// Metadata for the "what will be downloaded" card, filled after the URL
@@ -230,11 +227,10 @@ public partial class MainViewModel : ObservableObject
         _folderPicker = folderPicker;
         _dialog = dialog;
 
-        // Remember the last folder the user saved into and restore it as the
-        // default, so downloads land where the user expects them to.
-        var lastPath = Preferences.Default.Get(SavePathKey, string.Empty);
-        if (!string.IsNullOrWhiteSpace(lastPath))
-            OutputPath = lastPath;
+        // No save folder is restored at startup: the user must pick one before
+        // the first download (see the guard in DownloadAsync). The last choice
+        // is still remembered in Preferences so PickFolderAsync can pre-fill
+        // the picker, but it is never applied automatically.
 
         // Sync initial theme
         ThemeIndex = Application.Current?.UserAppTheme == AppTheme.Dark ? 1 : 0;
@@ -267,7 +263,7 @@ public partial class MainViewModel : ObservableObject
             _resolvedIsContent = isContent;
             _currentDownloader = isContent ? _factory.GetDownloader(value) : null;
             PlatformName = _currentDownloader?.PlatformName
-                ?? (string.IsNullOrWhiteSpace(value) ? Loc.Get("Status.AutoDetect") : Loc.Get("Status.Unknown"));
+                ?? (string.IsNullOrWhiteSpace(value) ? Loc.Get(LocKeys.StatusAutoDetect) : Loc.Get(LocKeys.StatusUnknown));
 
             OnPropertyChanged(nameof(PlatformKey));
         }
@@ -318,7 +314,7 @@ public partial class MainViewModel : ObservableObject
                     return;
 
                 Preview = preview;
-                PreviewError = preview is null ? Loc.Get("Status.PreviewError") : null;
+                PreviewError = preview is null ? Loc.Get(LocKeys.StatusPreviewError) : null;
             });
         }
         catch (OperationCanceledException)
@@ -336,7 +332,7 @@ public partial class MainViewModel : ObservableObject
                     return;
 
                 Preview = null;
-                PreviewError = Loc.Get("Status.PreviewError");
+                PreviewError = Loc.Get(LocKeys.StatusPreviewError);
             });
         }
         finally
@@ -400,7 +396,7 @@ public partial class MainViewModel : ObservableObject
     {
         if (string.IsNullOrWhiteSpace(OutputPath))
         {
-            await _dialog.ShowErrorAsync(Loc.Get("Dialog.NoFolderMessage"), Loc.Get("Dialog.NoFolderTitle"));
+            await _dialog.ShowErrorAsync(Loc.Get(LocKeys.DialogNoFolderMessage), Loc.Get(LocKeys.DialogNoFolderTitle));
             return;
         }
 
@@ -410,7 +406,7 @@ public partial class MainViewModel : ObservableObject
             // The button is normally disabled for unsupported links, but the
             // command can still be invoked programmatically; guard instead of
             // crashing on a null downloader.
-            await _dialog.ShowErrorAsync(Loc.Get("Dialog.UnsupportedMessage"), Loc.Get("Dialog.UnsupportedTitle"));
+            await _dialog.ShowErrorAsync(Loc.Get(LocKeys.DialogUnsupportedMessage), Loc.Get(LocKeys.DialogUnsupportedTitle));
             return;
         }
 
@@ -428,33 +424,36 @@ public partial class MainViewModel : ObservableObject
 
         IsDownloading = true;
         Progress = 0;
-        ProgressText = Loc.Get("Status.Starting");
+        ProgressText = Loc.Get(LocKeys.StatusStarting);
         IsIndeterminate = false;
         DownloadSpeedText = string.Empty;
         _lastBytes = 0;
         _lastSpeedAt = default;
-        DownloadHeadingText = Loc.Get("Status.Downloading");
+        DownloadHeadingText = Loc.Get(LocKeys.StatusDownloading);
         DownloadFileName = DeriveDownloadFileName();
 
-        // A fresh download starts a fresh activity log: old statuses (and
-        // their failures) make way for the new one.
-        Logs.Clear();
-        OnPropertyChanged(nameof(HasLogs));
-        AddLog(Loc.Get("Status.DownloadingItem", DownloadFileName), "muted", PlatformKey);
-
-        // The progress lives in a separate modal popup bound to this same
-        // view model; it is closed when the download finishes, fails or is
-        // cancelled (see the finally block below).
-        var popup = new DownloadingPopup(this);
+        // The progress lives in a modal popup bound to this same view model.
+        // It must be on screen BEFORE the download starts so the user gets
+        // immediate feedback. A failure to open it is reported as a dialog
+        // instead of being swallowed silently (which previously left the
+        // Download button disabled forever with no popup at all).
+        DownloadingPopup? popup = null;
         try
         {
+            popup = new DownloadingPopup(this);
             Shell.Current.ShowPopup(popup);
         }
-        catch
+        catch (Exception)
         {
-            // Shell may be unavailable (e.g. during shutdown); the download
-            // still proceeds without the progress popup.
+            await _dialog.ShowErrorAsync(Loc.Get(LocKeys.DialogPopupError), Loc.Get(LocKeys.DialogError));
+            return;
         }
+
+        // Result dialog content; shown only after the popup is closed so the
+        // alert is never hidden underneath it. Null means "no dialog" (the
+        // user cancelled or nothing went wrong).
+        string? resultTitle = null;
+        string? resultMessage = null;
 
         try
         {
@@ -493,8 +492,8 @@ public partial class MainViewModel : ObservableObject
 
             if (targets.Count == 0)
             {
-                AddLog(Loc.Get("Status.FailedPlaylist"), "error", PlatformKey);
-                await _dialog.ShowErrorAsync(Loc.Get("Dialog.EmptyPlaylist"));
+                resultTitle = LocKeys.DialogError;
+                resultMessage = Loc.Get(LocKeys.DialogEmptyPlaylist);
             }
             else
             {
@@ -504,7 +503,7 @@ public partial class MainViewModel : ObservableObject
 
                     if (targets.Count > 1)
                     {
-                        DownloadHeadingText = Loc.Get("Status.TrackOf", i + 1, targets.Count);
+                        DownloadHeadingText = Loc.Get(LocKeys.StatusTrackOf, i + 1, targets.Count);
                         DownloadFileName = targets[i].Title;
                     }
 
@@ -512,21 +511,22 @@ public partial class MainViewModel : ObservableObject
 
                     if (result.Success)
                     {
-                        var savedName = Path.GetFileName(result.FilePath?.TrimEnd('/')) ?? DownloadFileName;
-                        AddLog(Loc.Get("Status.DownloadedItem", savedName), "success", PlatformKey);
                         if (i == targets.Count - 1)
-                            await _dialog.ShowAlertAsync(Loc.Get("Dialog.Success"), Loc.Get("Dialog.SavedTo", result.FilePath));
+                        {
+                            resultTitle = LocKeys.DialogSuccess;
+                            resultMessage = Loc.Get(LocKeys.DialogSavedTo, result.FilePath);
+                        }
                     }
                     else if (cts.IsCancellationRequested ||
-                             string.Equals(result.ErrorMessage, Loc.Get("Err.Cancelled"), StringComparison.OrdinalIgnoreCase))
+                             string.Equals(result.ErrorMessage, Loc.Get(LocKeys.ErrCancelled), StringComparison.OrdinalIgnoreCase))
                     {
-                        AddLog(Loc.Get("Status.Cancelled"), "muted", PlatformKey);
+                        // The user pressed Stop; no result dialog needed.
                         break;
                     }
                     else
                     {
-                        AddLog(Loc.Get("Status.Failed", result.ErrorMessage), "error", PlatformKey);
-                        await _dialog.ShowErrorAsync(result.ErrorMessage ?? Loc.Get("Dialog.GenericError"));
+                        resultTitle = LocKeys.DialogError;
+                        resultMessage = result.ErrorMessage ?? Loc.Get(LocKeys.DialogGenericError);
                         break;
                     }
                 }
@@ -534,26 +534,28 @@ public partial class MainViewModel : ObservableObject
         }
         catch (OperationCanceledException)
         {
-            AddLog(Loc.Get("Status.Cancelled"), "muted", PlatformKey);
         }
         catch (Exception ex)
         {
-            AddLog(Loc.Get("Status.Failed", ex.Message), "error", PlatformKey);
-            await _dialog.ShowErrorAsync(ex.Message);
+            resultTitle = LocKeys.DialogError;
+            resultMessage = ex.Message;
         }
         finally
         {
             IsDownloading = false;
             ProgressText = string.Empty;
 
-            try
+            if (popup is not null)
             {
-                await popup.CloseAsync();
-            }
-            catch
-            {
-                // The window may already be closing while the download is
-                // cancelled; dismissing the popup is best-effort.
+                try
+                {
+                    await popup.CloseAsync();
+                }
+                catch
+                {
+                    // The window may already be closing while the download is
+                    // cancelled; dismissing the popup is best-effort.
+                }
             }
 
             lock (_ctsLock)
@@ -565,6 +567,9 @@ public partial class MainViewModel : ObservableObject
                 }
             }
         }
+
+        if (resultTitle is not null && resultMessage is not null)
+            await _dialog.ShowAlertAsync(Loc.Get(resultTitle), resultMessage);
     }
 
     /// <summary>
@@ -580,7 +585,7 @@ public partial class MainViewModel : ObservableObject
         if (!string.IsNullOrWhiteSpace(segment))
             return segment;
 
-        return Loc.Get("Status.DownloadName", PlatformName);
+        return Loc.Get(LocKeys.StatusDownloadName, PlatformName);
     }
 
     /// <summary>
@@ -590,7 +595,7 @@ public partial class MainViewModel : ObservableObject
     private static string FormatProgress(DownloadProgress p)
     {
         if (p.TotalBytes is > 0)
-            return Loc.Get("Status.Of", FormatBytes(p.BytesReceived), FormatBytes(p.TotalBytes.Value));
+            return Loc.Get(LocKeys.StatusOf, FormatBytes(p.BytesReceived), FormatBytes(p.TotalBytes.Value));
 
         return p.BytesReceived > 0 ? FormatBytes(p.BytesReceived) : string.Empty;
     }
@@ -618,71 +623,10 @@ public partial class MainViewModel : ObservableObject
         if (elapsed < 0.5 || p.BytesReceived == 0 || p.BytesReceived < _lastBytes)
             return;
 
-        DownloadSpeedText = Loc.Get("Status.PerSecond", FormatBytes((long)((p.BytesReceived - _lastBytes) / elapsed)));
+        DownloadSpeedText = Loc.Get(LocKeys.StatusPerSecond, FormatBytes((long)((p.BytesReceived - _lastBytes) / elapsed)));
         _lastBytes = p.BytesReceived;
         _lastSpeedAt = now;
     }
-
-    /// <summary>
-    /// Removes a single row from the activity log (the per-row X button).
-    /// </summary>
-    [RelayCommand]
-    private void RemoveLog(LogEntry entry)
-    {
-        if (Logs.Remove(entry))
-            OnPropertyChanged(nameof(HasLogs));
-    }
-
-    /// <summary>
-    /// Appends an activity row and keeps HasLogs in sync with the collection.
-    /// </summary>
-    private void AddLog(string message, string kind, string platformKey)
-    {
-        Logs.Add(new LogEntry
-        {
-            Message = message,
-            Kind = kind,
-            PlatformKey = platformKey,
-            TimeText = DateTime.Now.ToString("HH:mm:ss"),
-            IconData = GetLogIconData(platformKey, kind),
-            GlyphData = GetLogGlyphData(platformKey)
-        });
-        OnPropertyChanged(nameof(HasLogs));
-    }
-
-    /// <summary>
-    /// White inner glyph for the filled platform logos (the "VK" letters and
-    /// the YouTube play triangle); empty for everything else.
-    /// </summary>
-    private static string GetLogGlyphData(string platformKey) => platformKey switch
-    {
-        "youtube" => "M10.6 8.8v6.4l5.4-3.2z",
-        "vk" => "M8.6 8.6l1.9 5 1.9-5h1.6l-2.7 7.2h-1.6L6.9 8.6z",
-        _ => string.Empty
-    };
-
-    /// <summary>
-    /// Compact SVG path data for the log row icon: the platform logo when the
-    /// event belongs to one, otherwise a status glyph for the kind.
-    /// </summary>
-    private static string GetLogIconData(string platformKey, string kind) => platformKey switch
-    {
-        "tiktok" => "M9 18V5l12-2v13 M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0z M21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z",
-        // YouTube: red rounded square with the play triangle set inside it
-        // (a margin around the triangle, like the official logo).
-        "youtube" => "M4.5 7A3.5 3.5 0 0 1 8 3.5h8A3.5 3.5 0 0 1 19.5 7v10a3.5 3.5 0 0 1-3.5 3.5H8A3.5 3.5 0 0 1 4.5 17z",
-        "soundcloud" => "M2 13v-2 M5 13V9 M8 13V6 M11 13V8 M14 13v-3",
-        // VK: bigger blue rounded square with the "VK" letters inside,
-        // inset from the edges (official proportions).
-        "vk" => "M5.5 5A2.5 2.5 0 0 1 8 2.5h8A2.5 2.5 0 0 1 18.5 5v14a2.5 2.5 0 0 1-2.5 2.5H8A2.5 2.5 0 0 1 5.5 19z",
-        _ => kind switch
-        {
-            "success" => "M20 6L9 17l-5-5",
-            "error" => "M12 9v4 M12 17h.01 M12 3l9 16a1 1 0 0 1-.87 1.5H3.87a1 1 0 0 1-.87-1.5z",
-            // Compact cancel: a small X inside a circle.
-            _ => "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z M15 9l-6 6 M9 9l6 6"
-        }
-    };
 
     /// <summary>
     /// Opens the modal "Information" popup for the current resource. The

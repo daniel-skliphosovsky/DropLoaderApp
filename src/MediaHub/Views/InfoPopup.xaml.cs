@@ -77,7 +77,7 @@ public partial class InfoPopup : Popup
                     Details.Add(detail);
 
                 if (Details.Count == 0)
-                    StatusMessage = Loc.Get("Info.NoInfo");
+                    StatusMessage = Loc.Get(LocKeys.InfoNoInfo);
 
                 IsLoading = false;
                 OnPropertyChanged(nameof(HasDetails));
@@ -90,11 +90,9 @@ public partial class InfoPopup : Popup
         {
             await MainThread.InvokeOnMainThreadAsync(() =>
             {
-                StatusMessage = Loc.Get("Info.LoadError", ex.Message);
+                StatusMessage = Loc.Get(LocKeys.InfoLoadError, ex.Message);
                 IsLoading = false;
             });
         }
     }
-
-    private void OnCloseTapped(object? sender, TappedEventArgs e) => Close();
 }

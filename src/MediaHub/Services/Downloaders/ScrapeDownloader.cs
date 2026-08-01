@@ -42,7 +42,7 @@ public abstract class ScrapeDownloader : IDownloader
     /// overrides it with a more specific hint about private/region-locked
     /// videos.
     /// </summary>
-    protected virtual string NoStreamError => Loc.Get("Err.ScrapeNoStream");
+    protected virtual string NoStreamError => Loc.Get(LocKeys.ErrScrapeNoStream);
 
     public virtual async Task<MediaPreview?> GetPreviewAsync(string url, CancellationToken ct = default)
     {
@@ -72,11 +72,11 @@ public abstract class ScrapeDownloader : IDownloader
     protected virtual IReadOnlyList<ResourceDetail> BuildDetails(string html)
     {
         var details = new List<ResourceDetail>();
-        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Title"), ExtractTitle(html));
-        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Author"), ExtractAuthor(html));
+        ResourceDetail.AddIfPresent(details, Loc.Get(LocKeys.DetailsTitle), ExtractTitle(html));
+        ResourceDetail.AddIfPresent(details, Loc.Get(LocKeys.DetailsAuthor), ExtractAuthor(html));
         if (ExtractDurationSeconds(html) is { } seconds)
-            ResourceDetail.AddIfPresent(details, Loc.Get("Details.Duration"), MediaPreview.FormatDuration(TimeSpan.FromSeconds(seconds)));
-        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Description"), ExtractDescription(html));
+            ResourceDetail.AddIfPresent(details, Loc.Get(LocKeys.DetailsDuration), MediaPreview.FormatDuration(TimeSpan.FromSeconds(seconds)));
+        ResourceDetail.AddIfPresent(details, Loc.Get(LocKeys.DetailsDescription), ExtractDescription(html));
         return details;
     }
 
@@ -88,14 +88,14 @@ public abstract class ScrapeDownloader : IDownloader
         string? filePath = null;
         try
         {
-            progress?.Report(new DownloadProgress(0, null, 0, Loc.Get("Progress.Fetching")));
+            progress?.Report(new DownloadProgress(0, null, 0, Loc.Get(LocKeys.ProgressFetching)));
 
             var html = await FetchPageAsync(ResolvePageUrl(url), ct);
             var best = PickBest(ExtractStreams(html));
             if (best is null)
-                return new DownloadResult(false, null, Loc.Get("Err.PlatformPrefix", PlatformName, NoStreamError));
+                return new DownloadResult(false, null, Loc.Get(LocKeys.ErrPlatformPrefix, PlatformName, NoStreamError));
 
-            progress?.Report(new DownloadProgress(0, null, 0, Loc.Get("Progress.Downloading")));
+            progress?.Report(new DownloadProgress(0, null, 0, Loc.Get(LocKeys.ProgressDownloading)));
 
             var title = ExtractTitle(html)?.Trim() ?? string.Empty;
             filePath = Path.Combine(outputPath, $"{SanitizeFileName(title.Length > 0 ? title : $"{PlatformName.ToLowerInvariant()}-video")}.mp4");
@@ -122,7 +122,7 @@ public abstract class ScrapeDownloader : IDownloader
                 await fileStream.WriteAsync(buffer.AsMemory(0, read), ct);
                 totalRead += read;
                 progress?.Report(new DownloadProgress(totalRead, totalBytes,
-                    totalBytes > 0 ? (double)totalRead / totalBytes : null, Loc.Get("Progress.Downloading")));
+                    totalBytes > 0 ? (double)totalRead / totalBytes : null, Loc.Get(LocKeys.ProgressDownloading)));
             }
 
             return new DownloadResult(true, filePath, null);
@@ -130,13 +130,13 @@ public abstract class ScrapeDownloader : IDownloader
         catch (OperationCanceledException)
         {
             TryDeleteFile(filePath);
-            return new DownloadResult(false, null, Loc.Get("Err.Cancelled"));
+            return new DownloadResult(false, null, Loc.Get(LocKeys.ErrCancelled));
         }
         catch (Exception ex)
         {
             // A network error mid-download leaves a partial file behind; clean it up.
             TryDeleteFile(filePath);
-            return new DownloadResult(false, null, Loc.Get("Err.PlatformPrefix", PlatformName, ex.Message));
+            return new DownloadResult(false, null, Loc.Get(LocKeys.ErrPlatformPrefix, PlatformName, ex.Message));
         }
     }
 

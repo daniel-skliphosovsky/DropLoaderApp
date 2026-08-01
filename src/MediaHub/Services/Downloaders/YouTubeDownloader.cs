@@ -83,7 +83,7 @@ public sealed class YouTubeDownloader : IDownloader
 
             quality = best is not null
                 ? $"{best.VideoQuality.Label} MP4"
-                : manifest.GetAudioOnlyStreams().Any() ? Loc.Get("Quality.Audio") : null;
+                : manifest.GetAudioOnlyStreams().Any() ? Loc.Get(LocKeys.QualityAudio) : null;
         }
         catch (Exception)
         {
@@ -105,17 +105,17 @@ public sealed class YouTubeDownloader : IDownloader
     {
         var video = await _client.Videos.GetAsync(url, ct);
         var details = new List<ResourceDetail>();
-        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Title"), video.Title);
-        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Author"), video.Author.ChannelTitle);
-        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Duration"),
+        ResourceDetail.AddIfPresent(details, Loc.Get(LocKeys.DetailsTitle), video.Title);
+        ResourceDetail.AddIfPresent(details, Loc.Get(LocKeys.DetailsAuthor), video.Author.ChannelTitle);
+        ResourceDetail.AddIfPresent(details, Loc.Get(LocKeys.DetailsDuration),
             video.Duration is { } duration ? MediaPreview.FormatDuration(duration) : null);
-        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Uploaded"), video.UploadDate.ToString("d"));
-        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Views"),
+        ResourceDetail.AddIfPresent(details, Loc.Get(LocKeys.DetailsUploaded), video.UploadDate.ToString("d"));
+        ResourceDetail.AddIfPresent(details, Loc.Get(LocKeys.DetailsViews),
             video.Engagement.ViewCount > 0 ? video.Engagement.ViewCount.ToString("N0") : null);
-        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Likes"),
+        ResourceDetail.AddIfPresent(details, Loc.Get(LocKeys.DetailsLikes),
             video.Engagement.LikeCount > 0 ? video.Engagement.LikeCount.ToString("N0") : null);
-        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Description"), video.Description);
-        ResourceDetail.AddIfPresent(details, Loc.Get("Details.Keywords"),
+        ResourceDetail.AddIfPresent(details, Loc.Get(LocKeys.DetailsDescription), video.Description);
+        ResourceDetail.AddIfPresent(details, Loc.Get(LocKeys.DetailsKeywords),
             video.Keywords is { Count: > 0 } keywords ? string.Join(", ", keywords) : null);
         return details;
     }
@@ -127,7 +127,7 @@ public sealed class YouTubeDownloader : IDownloader
     {
         try
         {
-            progress?.Report(new DownloadProgress(0, null, 0, Loc.Get("Progress.Fetching")));
+            progress?.Report(new DownloadProgress(0, null, 0, Loc.Get(LocKeys.ProgressFetching)));
 
             var video = await _client.Videos.GetAsync(url, ct);
             var manifest = await _client.Videos.Streams.GetManifestAsync(video.Id, ct);
@@ -138,22 +138,22 @@ public sealed class YouTubeDownloader : IDownloader
                 ?? manifest.GetAudioOnlyStreams().FirstOrDefault();
 
             if (streamInfo == null)
-                return new DownloadResult(false, null, Loc.Get("Err.NoStream"));
+                return new DownloadResult(false, null, Loc.Get(LocKeys.ErrNoStream));
 
             var filePath = Path.Combine(outputPath, $"{video.Id}.{streamInfo.Container.Name}");
             var fileProgress = new Progress<double>(p =>
-                progress?.Report(new DownloadProgress(0, null, p, Loc.Get("Progress.DownloadingFile", video.Title))));
+                progress?.Report(new DownloadProgress(0, null, p, Loc.Get(LocKeys.ProgressDownloadingFile, video.Title))));
 
             await _client.Videos.Streams.DownloadAsync(streamInfo, filePath, fileProgress, ct);
             return new DownloadResult(true, filePath, null);
         }
         catch (OperationCanceledException)
         {
-            return new DownloadResult(false, null, Loc.Get("Err.Cancelled"));
+            return new DownloadResult(false, null, Loc.Get(LocKeys.ErrCancelled));
         }
         catch (Exception ex)
         {
-            return new DownloadResult(false, null, Loc.Get("Err.PlatformPrefix", PlatformName, ex.Message));
+            return new DownloadResult(false, null, Loc.Get(LocKeys.ErrPlatformPrefix, PlatformName, ex.Message));
         }
     }
 }

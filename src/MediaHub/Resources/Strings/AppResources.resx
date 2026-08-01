@@ -15,9 +15,6 @@
   <data name="App.Subtitle" xml:space="preserve">
     <value>Download from TikTok, YouTube, SoundCloud and VK</value>
   </data>
-  <data name="App.LogoHint" xml:space="preserve">
-    <value>MediaHub logo</value>
-  </data>
   <data name="Github.Hint" xml:space="preserve">
     <value>Open the MediaHub repository on GitHub</value>
   </data>
@@ -34,7 +31,7 @@
     <value>RU</value>
   </data>
   <data name="Url.Placeholder" xml:space="preserve">
-    <value>Paste a link to a video, track or photo set...</value>
+    <value>Enter a link...</value>
   </data>
   <data name="Url.Hint" xml:space="preserve">
     <value>Paste a TikTok, YouTube or SoundCloud link</value>
@@ -63,11 +60,8 @@
   <data name="SaveTo.BrowseHint" xml:space="preserve">
     <value>Choose the folder where files will be saved</value>
   </data>
-  <data name="Activity.Title" xml:space="preserve">
-    <value>Recent activity</value>
-  </data>
-  <data name="Activity.RemoveHint" xml:space="preserve">
-    <value>Remove this log entry</value>
+  <data name="SaveTo.Placeholder" xml:space="preserve">
+    <value>Select a folder to save downloads</value>
   </data>
   <data name="Popup.Stop" xml:space="preserve">
     <value>Stop</value>
@@ -90,9 +84,6 @@
   <data name="Status.Unknown" xml:space="preserve">
     <value>Unknown</value>
   </data>
-  <data name="Status.NoFolder" xml:space="preserve">
-    <value>No folder selected</value>
-  </data>
   <data name="Status.Starting" xml:space="preserve">
     <value>Starting...</value>
   </data>
@@ -110,21 +101,6 @@
   </data>
   <data name="Status.PerSecond" xml:space="preserve">
     <value>{0}/s</value>
-  </data>
-  <data name="Status.DownloadingItem" xml:space="preserve">
-    <value>Downloading: {0}</value>
-  </data>
-  <data name="Status.DownloadedItem" xml:space="preserve">
-    <value>Downloaded: {0}</value>
-  </data>
-  <data name="Status.Cancelled" xml:space="preserve">
-    <value>Download cancelled</value>
-  </data>
-  <data name="Status.Failed" xml:space="preserve">
-    <value>Failed: {0}</value>
-  </data>
-  <data name="Status.FailedPlaylist" xml:space="preserve">
-    <value>Failed: no items found in playlist</value>
   </data>
   <data name="Status.DownloadName" xml:space="preserve">
     <value>{0} download</value>
@@ -148,7 +124,7 @@
     <value>No folder selected</value>
   </data>
   <data name="Dialog.NoFolderMessage" xml:space="preserve">
-    <value>Please select a folder first.</value>
+    <value>Please select a save folder first.</value>
   </data>
   <data name="Dialog.UnsupportedTitle" xml:space="preserve">
     <value>Unsupported link</value>
@@ -176,6 +152,9 @@
   </data>
   <data name="Dialog.PickFolderError" xml:space="preserve">
     <value>Could not pick a folder</value>
+  </data>
+  <data name="Dialog.PopupError" xml:space="preserve">
+    <value>Could not open the download progress window.</value>
   </data>
   <data name="Info.NoInfo" xml:space="preserve">
     <value>No additional information available for this resource</value>

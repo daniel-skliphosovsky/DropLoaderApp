@@ -1,4 +1,3 @@
-using MediaHub.Models;
 using MediaHub.ViewModels;
 using Microsoft.Maui.ApplicationModel;
 
@@ -10,16 +9,6 @@ public partial class MainPage : ContentPage
     {
         InitializeComponent();
         BindingContext = viewModel;
-    }
-
-    /// <summary>
-    /// Removes a log row: the tap lives here instead of a Source binding so
-    /// the template compiles cleanly; it still executes the VM command.
-    /// </summary>
-    private void OnRemoveLogTapped(object? sender, TappedEventArgs e)
-    {
-        if (e.Parameter is LogEntry entry && BindingContext is MainViewModel viewModel)
-            viewModel.RemoveLogCommand.Execute(entry);
     }
 
     /// <summary>

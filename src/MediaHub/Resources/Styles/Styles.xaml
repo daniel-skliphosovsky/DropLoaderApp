@@ -60,7 +60,7 @@
         <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource OutlineLight}, Dark={StaticResource OutlineDark}}" />
         <Setter Property="StrokeThickness" Value="1" />
         <Setter Property="StrokeShape" Value="RoundRectangle 12" />
-        <Setter Property="HeightRequest" Value="56" />
+        <Setter Property="HeightRequest" Value="52" />
     </Style>
 
     <!-- ============ Inputs ============ -->

@@ -44,7 +44,7 @@ public partial class App : Application
         _errorHandlersInstalled = true;
 
         AppDomain.CurrentDomain.UnhandledException += (_, e) =>
-            OnUnhandledException(e.ExceptionObject as Exception ?? new Exception(Loc.Get("Dialog.Fatal")));
+            OnUnhandledException(e.ExceptionObject as Exception ?? new Exception(Loc.Get(LocKeys.DialogFatal)));
 
         TaskScheduler.UnobservedTaskException += (_, e) =>
         {
@@ -69,9 +69,9 @@ public partial class App : Application
                     if (page is not null)
                     {
                         _ = page.DisplayAlert(
-                            Loc.Get("Dialog.UnexpectedTitle"),
-                            Loc.Get("Dialog.UnexpectedMessage", exception.Message),
-                            Loc.Get("Dialog.Ok"));
+                            Loc.Get(LocKeys.DialogUnexpectedTitle),
+                            Loc.Get(LocKeys.DialogUnexpectedMessage, exception.Message),
+                            Loc.Get(LocKeys.DialogOk));
                     }
                 }
                 catch

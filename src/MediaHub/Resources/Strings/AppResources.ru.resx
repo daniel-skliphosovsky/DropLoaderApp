@@ -15,9 +15,6 @@
   <data name="App.Subtitle" xml:space="preserve">
     <value>Скачивание из TikTok, YouTube, SoundCloud и VK</value>
   </data>
-  <data name="App.LogoHint" xml:space="preserve">
-    <value>Логотип MediaHub</value>
-  </data>
   <data name="Github.Hint" xml:space="preserve">
     <value>Открыть репозиторий MediaHub на GitHub</value>
   </data>
@@ -34,7 +31,7 @@
     <value>RU</value>
   </data>
   <data name="Url.Placeholder" xml:space="preserve">
-    <value>Вставьте ссылку на видео, трек или набор фото...</value>
+    <value>Введите ссылку...</value>
   </data>
   <data name="Url.Hint" xml:space="preserve">
     <value>Вставьте ссылку TikTok, YouTube или SoundCloud</value>
@@ -63,11 +60,8 @@
   <data name="SaveTo.BrowseHint" xml:space="preserve">
     <value>Выберите папку для сохранения файлов</value>
   </data>
-  <data name="Activity.Title" xml:space="preserve">
-    <value>Недавняя активность</value>
-  </data>
-  <data name="Activity.RemoveHint" xml:space="preserve">
-    <value>Удалить запись из журнала</value>
+  <data name="SaveTo.Placeholder" xml:space="preserve">
+    <value>Выберите папку для сохранения скачиваний</value>
   </data>
   <data name="Popup.Stop" xml:space="preserve">
     <value>Остановить</value>
@@ -90,9 +84,6 @@
   <data name="Status.Unknown" xml:space="preserve">
     <value>Неизвестно</value>
   </data>
-  <data name="Status.NoFolder" xml:space="preserve">
-    <value>Папка не выбрана</value>
-  </data>
   <data name="Status.Starting" xml:space="preserve">
     <value>Запуск...</value>
   </data>
@@ -110,21 +101,6 @@
   </data>
   <data name="Status.PerSecond" xml:space="preserve">
     <value>{0}/с</value>
-  </data>
-  <data name="Status.DownloadingItem" xml:space="preserve">
-    <value>Скачивание: {0}</value>
-  </data>
-  <data name="Status.DownloadedItem" xml:space="preserve">
-    <value>Скачано: {0}</value>
-  </data>
-  <data name="Status.Cancelled" xml:space="preserve">
-    <value>Скачивание отменено</value>
-  </data>
-  <data name="Status.Failed" xml:space="preserve">
-    <value>Ошибка: {0}</value>
-  </data>
-  <data name="Status.FailedPlaylist" xml:space="preserve">
-    <value>Ошибка: в плейлисте не найдено элементов</value>
   </data>
   <data name="Status.DownloadName" xml:space="preserve">
     <value>Скачивание {0}</value>
@@ -148,7 +124,7 @@
     <value>Папка не выбрана</value>
   </data>
   <data name="Dialog.NoFolderMessage" xml:space="preserve">
-    <value>Сначала выберите папку.</value>
+    <value>Сначала выберите папку для сохранения.</value>
   </data>
   <data name="Dialog.UnsupportedTitle" xml:space="preserve">
     <value>Неподдерживаемая ссылка</value>
@@ -176,6 +152,9 @@
   </data>
   <data name="Dialog.PickFolderError" xml:space="preserve">
     <value>Не удалось выбрать папку</value>
+  </data>
+  <data name="Dialog.PopupError" xml:space="preserve">
+    <value>Не удалось открыть окно прогресса скачивания.</value>
   </data>
   <data name="Info.NoInfo" xml:space="preserve">
     <value>Дополнительная информация для этого ресурса недоступна</value>

@@ -47,11 +47,10 @@ public static class Loc
     // Popup strings are fetched through x:Static, which is evaluated when each
     // popup instance is created, so they always reflect the current language
     // without any change notifications.
-    public static string PopupStop => Get("Popup.Stop");
-    public static string PopupStopHint => Get("Popup.StopHint");
-    public static string PopupInformation => Get("Info.Button");
-    public static string PopupLoading => Get("Popup.Loading");
-    public static string PopupClose => Get("Popup.Close");
-    public static string PopupCloseHint => Get("Popup.CloseHint");
-    public static string ActivityRemoveHint => Get("Activity.RemoveHint");
+    public static string PopupStop => Get(LocKeys.PopupStop);
+    public static string PopupStopHint => Get(LocKeys.PopupStopHint);
+    public static string PopupInformation => Get(LocKeys.InfoButton);
+    public static string PopupLoading => Get(LocKeys.PopupLoading);
+    public static string PopupClose => Get(LocKeys.PopupClose);
+    public static string PopupCloseHint => Get(LocKeys.PopupCloseHint);
 }

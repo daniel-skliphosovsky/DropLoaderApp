@@ -13,7 +13,7 @@ public sealed class DialogService : IDialogService
 
         try
         {
-            await page.DisplayAlert(title, message, cancel ?? Loc.Get("Dialog.Ok"));
+            await page.DisplayAlert(title, message, cancel ?? Loc.Get(LocKeys.DialogOk));
         }
         catch (Exception ex)
         {
@@ -22,7 +22,7 @@ public sealed class DialogService : IDialogService
     }
 
     public async Task ShowErrorAsync(string message, string? title = null)
-        => await ShowAlertAsync(title ?? Loc.Get("Dialog.Error"), message);
+        => await ShowAlertAsync(title ?? Loc.Get(LocKeys.DialogError), message);
 
     public async Task<bool> ShowConfirmAsync(string title, string message, string? accept = null, string? cancel = null)
     {
@@ -32,7 +32,7 @@ public sealed class DialogService : IDialogService
 
         try
         {
-            return await page.DisplayAlert(title, message, accept ?? Loc.Get("Dialog.Yes"), cancel ?? Loc.Get("Dialog.No"));
+            return await page.DisplayAlert(title, message, accept ?? Loc.Get(LocKeys.DialogYes), cancel ?? Loc.Get(LocKeys.DialogNo));
         }
         catch (Exception ex)
         {
