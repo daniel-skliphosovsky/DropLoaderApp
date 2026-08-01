@@ -1,6 +1,8 @@
+using System.Net;
 using MediaHub.Models;
 using MediaHub.Services.Interfaces;
 using SoundCloudExplode;
+using SoundCloudExplode.Tracks;
 
 namespace MediaHub.Services.Downloaders;
 
@@ -8,21 +10,25 @@ public sealed class SoundCloudDownloader : IDownloader
 {
     public string PlatformName => "SoundCloud";
 
-    private readonly HttpClient _http;
-    private readonly SoundCloudClient _client;
+    // SoundCloudExplode 1.6.7 ships a dead client id (wDSKS1Bp...) that the
+    // API rejects with 401. The live page embeds a fresh client id, so we
+    // scrape it once and cache it, falling back to a known-good session id
+    // if the page stops exposing one.
+    private const string FallbackClientId = "yNSW5UvBmb1A5j7qPUtIMuB9Itx3jsOC";
 
-    public SoundCloudDownloader(HttpClient httpClient)
-    {
-        _http = httpClient;
-        _client = new SoundCloudClient(httpClient);
-    }
+    private static readonly SemaphoreSlim ClientIdLock = new(1, 1);
+    private static string? _clientId;
+
+    private readonly HttpClient _http;
+
+    public SoundCloudDownloader(HttpClient httpClient) => _http = httpClient;
 
     public bool CanHandle(string url) =>
         UrlHelpers.UrlBelongsTo(url, "soundcloud.com", "on.soundcloud.com");
 
     public async Task<MediaPreview?> GetPreviewAsync(string url, CancellationToken ct = default)
     {
-        var track = await _client.Tracks.GetAsync(url, ct);
+        var track = await GetTrackAsync(url, ct);
         if (track is null)
             return null;
 
@@ -47,11 +53,11 @@ public sealed class SoundCloudDownloader : IDownloader
         {
             progress?.Report(new DownloadProgress(0, null, 0, "Fetching..."));
 
-            var track = await _client.Tracks.GetAsync(url, ct);
+            var track = await GetTrackAsync(url, ct);
             if (track == null)
                 return new DownloadResult(false, null, "Track not found");
 
-            var streamUrl = await _client.Tracks.GetDownloadUrlAsync(track, ct);
+            var streamUrl = await GetDownloadUrlAsync(track, ct);
             if (string.IsNullOrEmpty(streamUrl))
                 return new DownloadResult(false, null, "No stream URL");
 
@@ -86,6 +92,82 @@ public sealed class SoundCloudDownloader : IDownloader
         catch (Exception ex)
         {
             return new DownloadResult(false, null, $"SoundCloud: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Resolves a track with the cached client id. A 401 means the cached id
+    /// was revoked, so it is dropped and the request retried once with a
+    /// freshly scraped id.
+    /// </summary>
+    private async Task<Track?> GetTrackAsync(string url, CancellationToken ct)
+    {
+        for (var attempt = 0; attempt < 2; attempt++)
+        {
+            var client = new SoundCloudClient(await ResolveClientIdAsync(ct), _http);
+            try
+            {
+                return await client.Tracks.GetAsync(url, ct);
+            }
+            catch (HttpRequestException ex) when (attempt == 0 && ex.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                _clientId = null;
+            }
+        }
+
+        return null;
+    }
+
+    private async Task<string?> GetDownloadUrlAsync(Track track, CancellationToken ct)
+    {
+        for (var attempt = 0; attempt < 2; attempt++)
+        {
+            var client = new SoundCloudClient(await ResolveClientIdAsync(ct), _http);
+            try
+            {
+                return await client.Tracks.GetDownloadUrlAsync(track, ct);
+            }
+            catch (HttpRequestException ex) when (attempt == 0 && ex.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                _clientId = null;
+            }
+        }
+
+        return null;
+    }
+
+    private async Task<string> ResolveClientIdAsync(CancellationToken ct)
+    {
+        if (_clientId is not null)
+            return _clientId;
+
+        await ClientIdLock.WaitAsync(ct);
+        try
+        {
+            if (_clientId is null)
+                _clientId = await FetchClientIdAsync(ct) ?? FallbackClientId;
+        }
+        finally
+        {
+            ClientIdLock.Release();
+        }
+
+        return _clientId;
+    }
+
+    private async Task<string?> FetchClientIdAsync(CancellationToken ct)
+    {
+        try
+        {
+            // Scrape the client id the same way SoundCloudExplode does, via a
+            // throwaway client so any failure stays local and we can fall back.
+            var probe = new SoundCloudClient(_http);
+            var id = await probe.GetClientIdAsync(ct);
+            return string.IsNullOrWhiteSpace(id) ? null : id;
+        }
+        catch
+        {
+            return null;
         }
     }
 

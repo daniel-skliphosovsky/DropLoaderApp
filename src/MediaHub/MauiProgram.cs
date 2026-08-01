@@ -35,14 +35,16 @@ public static class MauiProgram
 #endif
 
         // Single HttpClient shared by all downloaders and underlying clients.
-        // The modern browser User-Agent is set here once so every downloader
-        // (including the Explode libraries) sends the same header; a stale or
-        // generic agent gets the media APIs to reject requests with 401/400.
+        // The modern browser User-Agent is forced on every request here, not
+        // just set as a default: Explode libraries stamp their own stale UA
+        // onto the request headers during SendAsync, which would otherwise
+        // beat the DefaultRequestHeaders value.
         builder.Services.AddSingleton(_ =>
         {
-            var http = new HttpClient { Timeout = TimeSpan.FromMinutes(5) };
-            http.DefaultRequestHeaders.UserAgent.ParseAdd(
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36");
+            var http = new HttpClient(new ForcedUserAgentHandler())
+            {
+                Timeout = TimeSpan.FromMinutes(5)
+            };
             return http;
         });
 
@@ -74,5 +76,26 @@ public static class MauiProgram
 #endif
 
         return builder.Build();
+    }
+}
+
+/// <summary>
+/// Forces the modern browser User-Agent on every request. SoundCloudExplode
+/// and similar libraries overwrite the client default with their own stale
+/// agent inside SendAsync; stamping it here guarantees the shared value wins.
+/// </summary>
+internal sealed class ForcedUserAgentHandler : HttpMessageHandler
+{
+    private const string UserAgent =
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
+
+    private readonly HttpMessageInvoker _inner = new(new SocketsHttpHandler());
+
+    protected override async Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        request.Headers.Remove("User-Agent");
+        request.Headers.TryAddWithoutValidation("User-Agent", UserAgent);
+        return await _inner.SendAsync(request, cancellationToken);
     }
 }

@@ -20,6 +20,9 @@ public sealed class VkDownloader : ScrapeDownloader
 
     public override string PlatformName => "VK";
 
+    protected override string NoStreamError =>
+        "could not extract a video link. The video may be private, age-restricted, or unavailable in your region.";
+
     public override bool CanHandle(string url) =>
         UrlHelpers.UrlBelongsTo(url, "vk.com", "m.vk.com", "vkvideo.ru", "m.vkvideo.ru");
 
@@ -45,7 +48,30 @@ public sealed class VkDownloader : ScrapeDownloader
                 streams.Add((match.Groups["quality"].Value + "p", streamUrl));
         }
 
+        // Fall back to og:video / og:video:url meta tags. VK drops them on
+        // some pages (especially vkvideo.ru), but when present they carry the
+        // direct mp4, which beats the embedded-json sources above. Only trust
+        // them when they point at an actual media file, not at a page.
+        var ogUrl = GetMetaProperty(html, "og:video") ?? GetMetaProperty(html, "og:video:url");
+        if (IsMediaUrl(ogUrl))
+            streams.Add(("best", ogUrl!));
+
         return streams;
+    }
+
+    private static bool IsMediaUrl(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url) ||
+            !url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        var uri = new Uri(url, UriKind.Absolute);
+        var lower = uri.AbsolutePath.ToLowerInvariant();
+        return lower.EndsWith(".mp4") ||
+               lower.EndsWith(".m3u8") ||
+               lower.EndsWith(".webm") ||
+               uri.Host.Contains("vkvideocdn") ||
+               uri.Host.Contains("userapi.com");
     }
 
     protected override long? ExtractDurationSeconds(string html)

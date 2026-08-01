@@ -36,6 +36,14 @@ public abstract class ScrapeDownloader : IDownloader
     protected virtual string? ExtractAuthor(string html) => null;
     protected virtual long? ExtractDurationSeconds(string html) => null;
 
+    /// <summary>
+    /// Error shown when no playable stream could be found on the page. VK
+    /// overrides it with a more specific hint about private/region-locked
+    /// videos.
+    /// </summary>
+    protected virtual string NoStreamError =>
+        "could not extract a video link (the page may require login or be region-restricted)";
+
     public virtual async Task<MediaPreview?> GetPreviewAsync(string url, CancellationToken ct = default)
     {
         var html = await FetchPageAsync(ResolvePageUrl(url), ct);
@@ -65,8 +73,7 @@ public abstract class ScrapeDownloader : IDownloader
             var html = await FetchPageAsync(ResolvePageUrl(url), ct);
             var best = PickBest(ExtractStreams(html));
             if (best is null)
-                return new DownloadResult(false, null,
-                    $"{PlatformName}: could not extract a video link (the page may require login or be region-restricted)");
+                return new DownloadResult(false, null, $"{PlatformName}: {NoStreamError}");
 
             progress?.Report(new DownloadProgress(0, null, 0, "Downloading..."));
 
