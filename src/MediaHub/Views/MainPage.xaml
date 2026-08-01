@@ -315,40 +315,6 @@
                                         HorizontalOptions="Fill"
                                         SemanticProperties.Description="Start downloading the media" />
 
-                                <!-- Progress section (visible while downloading) -->
-                                <VerticalStackLayout Spacing="12"
-                                                     IsVisible="{Binding IsDownloading}">
-                                    <VerticalStackLayout.Triggers>
-                                        <DataTrigger TargetType="VerticalStackLayout"
-                                                     Binding="{Binding IsDownloading}" Value="True">
-                                            <DataTrigger.EnterActions>
-                                                <anim:FadeInAction />
-                                            </DataTrigger.EnterActions>
-                                        </DataTrigger>
-                                    </VerticalStackLayout.Triggers>
-
-                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-                                        <Label Text="{Binding ProgressText}"
-                                               Style="{StaticResource CaptionLabel}"
-                                               LineBreakMode="TailTruncation"
-                                               VerticalOptions="Center" />
-                                        <Label Grid.Column="1"
-                                               Text="{Binding Progress, StringFormat='{0:P0}'}"
-                                               Style="{StaticResource CaptionLabel}"
-                                               FontAttributes="Bold" VerticalOptions="Center" />
-                                    </Grid>
-
-                                    <ProgressBar Progress="{Binding Progress}"
-                                                 Style="{StaticResource ProgressBarStyle}" />
-
-                                    <Button Text="Cancel"
-                                            Command="{Binding CancelDownloadCommand}"
-                                            Style="{StaticResource DangerButton}"
-                                            HorizontalOptions="Center"
-                                            WidthRequest="140"
-                                            SemanticProperties.Description="Cancel the current download" />
-                                </VerticalStackLayout>
-
                                 <!-- Status message -->
                                 <Border IsVisible="{Binding ShowStatus}"
                                         BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceContainerLight}, Dark={StaticResource SurfaceContainerDark}}"

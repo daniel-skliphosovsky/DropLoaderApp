@@ -1,8 +1,10 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Maui.Views;
 using MediaHub.Models;
 using MediaHub.Services.Downloaders;
 using MediaHub.Services.Interfaces;
+using MediaHub.Views;
 using Microsoft.Maui.ApplicationModel;
 
 namespace MediaHub.ViewModels;
@@ -72,13 +74,13 @@ public partial class MainViewModel : ObservableObject
         {
             if (string.IsNullOrWhiteSpace(Url))
                 return "unknown";
-            if (UrlHelpers.UrlBelongsTo(Url, "tiktok.com", "vm.tiktok.com"))
+            if (UrlHelpers.UrlBelongsTo(Url, "tiktok.com", "vm.tiktok.com", "vt.tiktok.com", "www.tiktok.com", "m.tiktok.com"))
                 return "tiktok";
             if (UrlHelpers.UrlBelongsTo(Url, "youtube.com", "youtu.be"))
                 return "youtube";
             if (UrlHelpers.UrlBelongsTo(Url, "soundcloud.com"))
                 return "soundcloud";
-            if (UrlHelpers.UrlBelongsTo(Url, "vk.com", "m.vk.com"))
+            if (UrlHelpers.UrlBelongsTo(Url, "vk.com", "m.vk.com", "vkvideo.ru", "m.vkvideo.ru"))
                 return "vk";
             return "unknown";
         }
@@ -96,6 +98,14 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     private string _statusKind = string.Empty;
+
+    /// <summary>
+    /// Name of the file being downloaded, shown as the title of the progress
+    /// popup. Filled when the download starts from the preview title, a URL
+    /// segment or the platform name.
+    /// </summary>
+    [ObservableProperty]
+    private string _downloadFileName = string.Empty;
 
     public bool ShowStatus => !string.IsNullOrEmpty(Status);
 
@@ -324,6 +334,13 @@ public partial class MainViewModel : ObservableObject
         ProgressText = "Starting...";
         Status = string.Empty;
         StatusKind = string.Empty;
+        DownloadFileName = DeriveDownloadFileName();
+
+        // The progress lives in a separate modal popup bound to this same
+        // view model; it is closed when the download finishes, fails or is
+        // cancelled (see the finally block below).
+        var popup = new DownloadingPopup(this);
+        Shell.Current.ShowPopup(popup);
 
         try
         {
@@ -374,6 +391,16 @@ public partial class MainViewModel : ObservableObject
             IsDownloading = false;
             ProgressText = string.Empty;
 
+            try
+            {
+                await popup.CloseAsync();
+            }
+            catch
+            {
+                // The window may already be closing while the download is
+                // cancelled; dismissing the popup is best-effort.
+            }
+
             lock (_ctsLock)
             {
                 if (ReferenceEquals(_cts, cts))
@@ -383,6 +410,22 @@ public partial class MainViewModel : ObservableObject
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Picks the file name shown in the progress popup: the preview title when
+    /// available, otherwise the last URL segment, otherwise the platform name.
+    /// </summary>
+    private string DeriveDownloadFileName()
+    {
+        if (!string.IsNullOrWhiteSpace(Preview?.Title))
+            return Preview.Title;
+
+        var segment = Url.TrimEnd('/').Split('/').LastOrDefault();
+        if (!string.IsNullOrWhiteSpace(segment))
+            return segment;
+
+        return $"{PlatformName} download";
     }
 
     private static string FormatProgress(DownloadProgress p)

@@ -21,7 +21,7 @@ public sealed class VkDownloader : ScrapeDownloader
     public override string PlatformName => "VK";
 
     public override bool CanHandle(string url) =>
-        UrlHelpers.UrlBelongsTo(url, "vk.com", "m.vk.com");
+        UrlHelpers.UrlBelongsTo(url, "vk.com", "m.vk.com", "vkvideo.ru", "m.vkvideo.ru");
 
     protected override string ResolvePageUrl(string url)
     {

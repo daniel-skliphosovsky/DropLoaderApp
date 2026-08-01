@@ -15,16 +15,17 @@ public partial class App : Application
 
     protected override Window CreateWindow(IActivationState? activationState)
     {
-        // The window opens at the minimum size and can be resized up to the
-        // maximum; closing the window quits the app (standard MAUI behavior).
+        // The window starts at its minimum size and can be resized freely all
+        // the way up to fullscreen (no maximum constraint), so the user can
+        // expand it with the green button or by dragging the edges.
         return new Window(new AppShell())
         {
-            Width = 900,
-            Height = 620,
-            MinimumWidth = 900,
-            MinimumHeight = 620,
-            MaximumWidth = 1160,
-            MaximumHeight = 760
+            Width = 800,
+            Height = 560,
+            MinimumWidth = 800,
+            MinimumHeight = 560,
+            MaximumWidth = 4000,
+            MaximumHeight = 3000
         };
     }
 

@@ -18,7 +18,8 @@ public sealed class TikTokDownloader : IDownloader
     }
 
     public bool CanHandle(string url) =>
-        UrlHelpers.UrlBelongsTo(url, "tiktok.com", "vm.tiktok.com");
+        UrlHelpers.UrlBelongsTo(url,
+            "tiktok.com", "vm.tiktok.com", "vt.tiktok.com", "www.tiktok.com", "m.tiktok.com");
 
     public async Task<MediaPreview?> GetPreviewAsync(string url, CancellationToken ct = default)
     {

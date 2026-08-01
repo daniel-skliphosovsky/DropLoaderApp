@@ -8,10 +8,6 @@ using MediaHub.Views;
 using Microsoft.Extensions.Logging;
 using TikTokExplode;
 
-#if MACCATALYST
-using Microsoft.Maui.LifecycleEvents;
-#endif
-
 namespace MediaHub;
 
 public static class MauiProgram
@@ -28,26 +24,6 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
-#if MACCATALYST
-        // The window is size-constrained (see App.CreateWindow). Keep the green
-        // button from pushing the app into fullscreen - it becomes a plain zoom.
-        builder.ConfigureLifecycleEvents(events =>
-            events.AddiOS(iOS => iOS.OnActivated(_ =>
-            {
-                // AllowsFullScreen exists since macOS 16; on older systems the
-                // green button is simply left alone.
-                if (!OperatingSystem.IsIOSVersionAtLeast(16))
-                    return;
-
-                foreach (var scene in (UIKit.UIApplication.SharedApplication?.ConnectedScenes ?? [])
-                             .OfType<UIKit.UIWindowScene>())
-                {
-                    if (scene.SizeRestrictions is { } restrictions)
-                        restrictions.AllowsFullScreen = false;
-                }
-            })));
-#endif
-
         // Entry: the styled container already draws the outline, so drop the
         // native border/underline the platform adds on top of it.
 #if WINDOWS
@@ -59,7 +35,16 @@ public static class MauiProgram
 #endif
 
         // Single HttpClient shared by all downloaders and underlying clients.
-        builder.Services.AddSingleton(new HttpClient { Timeout = TimeSpan.FromMinutes(5) });
+        // The modern browser User-Agent is set here once so every downloader
+        // (including the Explode libraries) sends the same header; a stale or
+        // generic agent gets the media APIs to reject requests with 401/400.
+        builder.Services.AddSingleton(_ =>
+        {
+            var http = new HttpClient { Timeout = TimeSpan.FromMinutes(5) };
+            http.DefaultRequestHeaders.UserAgent.ParseAdd(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36");
+            return http;
+        });
 
         // TikTokClient takes ownership of no resources here (it was given the
         // shared HttpClient), so a plain singleton is fine. The options pin the

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mct:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+           xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+           xmlns:mct="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
+           xmlns:vm="clr-namespace:MediaHub.ViewModels"
+           x:Class="MediaHub.Views.DownloadingPopup"
+           x:DataType="vm:MainViewModel"
+           CanBeDismissedByTappingOutsideOfPopup="False"
+           Size="460, 340"
+           Color="{AppThemeBinding Light={StaticResource BackgroundLight}, Dark={StaticResource BackgroundDark}}">
+
+    <!-- Modal card shown while a download is running; bound straight to the
+         MainViewModel that drives the download. -->
+    <Border Style="{StaticResource CardBorder}"
+            StrokeShape="RoundRectangle 24"
+            Padding="32,28">
+        <VerticalStackLayout Spacing="18">
+
+            <Label Text="Downloading" Style="{StaticResource SectionTitleLabel}" />
+
+            <Label Text="{Binding DownloadFileName}"
+                   FontSize="15" FontAttributes="Bold" FontFamily="OpenSansSemibold"
+                   MaxLines="2" LineBreakMode="TailTruncation"
+                   TextColor="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+
+            <ProgressBar Progress="{Binding Progress}" Style="{StaticResource ProgressBarStyle}" />
+
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <Label Text="{Binding ProgressText}"
+                       Style="{StaticResource CaptionLabel}"
+                       LineBreakMode="TailTruncation"
+                       VerticalOptions="Center" />
+                <Label Grid.Column="1"
+                       Text="{Binding Progress, StringFormat='{0:P0}'}"
+                       Style="{StaticResource CaptionLabel}"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center" />
+            </Grid>
+
+            <Button Text="Cancel"
+                    Command="{Binding CancelDownloadCommand}"
+                    Style="{StaticResource DangerButton}"
+                    HorizontalOptions="Center"
+                    WidthRequest="150"
+                    SemanticProperties.Description="Cancel the current download" />
+        </VerticalStackLayout>
+    </Border>
+</mct:Popup>
