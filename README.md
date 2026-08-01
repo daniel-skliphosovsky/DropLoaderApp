@@ -1,9 +1,14 @@
-# DropLoaderApp
-An application that helps you to download media from popular platforms
+# DropLoader
+
+An application that helps you to download media from popular platforms.
 
 Built with .NET MAUI for macOS and Windows. Paste a link from TikTok, YouTube or SoundCloud, pick a folder, and DropLoader takes care of the rest — it detects the platform automatically, downloads the media, and reports progress with the option to cancel at any time.
 
-**v2.1.0** brings a rewritten TikTok downloader on the updated TikTokExplode library, a single shared HTTP client for all downloaders, and a refreshed Material 3 interface with button states, smoother transitions and clearer status feedback.
+**v3.0.0** brings a fully redesigned interface: a responsive resizable window (980x640, minimum 780x520), a new app icon and splash screen, platform badges that light up as you type, smoother progress and status feedback, plus the folder picker fix on macOS (cancelling the dialog no longer shows an error).
+
+[![CI](https://img.shields.io/github/actions/workflow/status/daniel-skliphosovsky/DropLoader/ci.yml?style=for-the-badge&label=CI&logo=github)](https://github.com/daniel-skliphosovsky/DropLoader/actions)
+[![Release](https://img.shields.io/github/actions/workflow/status/daniel-skliphosovsky/DropLoader/release.yml?style=for-the-badge&label=Release&logo=github)](https://github.com/daniel-skliphosovsky/DropLoader/actions)
+[![License](https://img.shields.io/badge/License-MIT-6C5CE7?style=for-the-badge)](https://github.com/daniel-skliphosovsky/DropLoader/blob/main/LICENSE)
 
 # Screenshots
 
@@ -77,15 +82,16 @@ Built with .NET MAUI for macOS and Windows. Paste a link from TikTok, YouTube or
 - SoundCloud tracks
 - Automatic platform detection from the URL (short links, www./m. prefixes, any case)
 - Light and Dark theme with one-click switching
-- Progress bar with percentage, cancel support
-- Material Design 3 interface with button states and smooth transitions
-- Fixed window size (680x480)
+- Progress bar with percentage and byte counts, cancel support
+- Platform badge that updates live while you type the link
+- Responsive resizable window (980x640, minimum 780x520)
+- Material Design 3 interface, app icon and splash screen
 
 # Usage
 1. Open App
-2. Paste the media link into the «Link» field (TikTok, YouTube or SoundCloud)
+2. Paste the media link into the link field (TikTok, YouTube or SoundCloud)
 3. Select the path where the file will be saved
-4. Click the «Download» Button to start downloading
+4. Click the Download Button to start downloading
 5. Track the progress, cancel anytime if needed
 
 # Possible Problems
@@ -104,7 +110,7 @@ Also, don't be alarmed if the download doesn't start. This is also related to Ti
 1. **Go to Releases**
    Download the latest version from our GitHub releases page:
 
-   [![Latest Release](https://img.shields.io/badge/Download_Latest_Release-0066CC?style=for-the-badge&logo=github)](https://github.com/daniel-skliphosovsky/DropLoaderApp/releases)
+   [![Latest Release](https://img.shields.io/badge/Download_Latest_Release-0066CC?style=for-the-badge&logo=github)](https://github.com/daniel-skliphosovsky/DropLoader/releases)
 
 2. **Find the latest release**
    Look for the most recent version at the top of the releases page
@@ -122,10 +128,10 @@ Also, don't be alarmed if the download doesn't start. This is also related to Ti
 # Build from Source
 
 ```bash
-git clone https://github.com/daniel-skliphosovsky/DropLoaderApp.git
-cd DropLoaderApp
-dotnet restore src/DropLoaderApp.App/DropLoaderApp.App.csproj
-dotnet build src/DropLoaderApp.App/DropLoaderApp.App.csproj --configuration Release
+git clone https://github.com/daniel-skliphosovsky/DropLoader.git
+cd DropLoader
+dotnet restore src/DropLoader/DropLoader.csproj
+dotnet build src/DropLoader/DropLoader.csproj --configuration Release
 ```
 
 # License

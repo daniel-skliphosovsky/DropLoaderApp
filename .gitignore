@@ -15,8 +15,8 @@ test-results/
 *.dmg
 *.app
 
-# But NOT our .NET MAUI project directory (which unfortunately ends in .App)
-!/src/DropLoaderApp.App/
+# But NOT our .NET MAUI project directory (no longer ends in .App)
+!/src/DropLoader/
 
 # content below from: https://github.com/github/gitignore/blob/main/Global/macOS.gitignore
 # General

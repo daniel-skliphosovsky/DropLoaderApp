@@ -19,12 +19,12 @@ jobs:
       - name: Install MAUI workload
         run: dotnet workload install maui
       - name: Publish Windows
-        run: dotnet publish src/DropLoaderApp.App/DropLoaderApp.App.csproj -c Release -f net9.0-windows10.0.19041.0 -r win-x64 --self-contained true -p:WindowsPackageType=None -p:PublishSingleFile=true -p:PublishTrimmed=false -p:IncludeNativeLibrariesForSelfExtract=true -p:UseMonoRuntime=false -p:PublishReadyToRun=false
+        run: dotnet publish src/DropLoader/DropLoader.csproj -c Release -f net9.0-windows10.0.19041.0 -r win-x64 --self-contained true -p:WindowsPackageType=None -p:PublishSingleFile=true -p:PublishTrimmed=false -p:IncludeNativeLibrariesForSelfExtract=true -p:UseMonoRuntime=false -p:PublishReadyToRun=false
       - name: Upload exe
         uses: actions/upload-artifact@v4
         with:
-          name: DropLoaderApp-exe
-          path: src/DropLoaderApp.App/bin/Release/net9.0-windows10.0.19041.0/win-x64/publish/*.exe
+          name: DropLoader-exe
+          path: src/DropLoader/bin/Release/net9.0-windows10.0.19041.0/win-x64/publish/*.exe
           if-no-files-found: error
 
   build-macos:
@@ -41,34 +41,34 @@ jobs:
         run: dotnet workload install maui
       - name: Publish macOS
         run: |
-          dotnet publish src/DropLoaderApp.App/DropLoaderApp.App.csproj \
+          dotnet publish src/DropLoader/DropLoader.csproj \
             -c Release -f net9.0-maccatalyst \
             -p:CreatePackage=false -p:EnableCodeSigning=false -p:CodesignKey=-
       - name: Package app (pkg preferred, zip fallback)
         shell: bash
         run: |
           set -e
-          APP_PATH=$(ls -d src/DropLoaderApp.App/bin/Release/net9.0-maccatalyst/*.app | head -1)
+          APP_PATH=$(ls -d src/DropLoader/bin/Release/net9.0-maccatalyst/*.app | head -1)
           echo "Found app bundle: $APP_PATH"
           APP_DIR=$(dirname "$APP_PATH")
           APP_NAME=$(basename "$APP_PATH")
           mkdir -p artifact
           if command -v productbuild >/dev/null 2>&1; then
-            productbuild --component "$APP_PATH" /Applications artifact/DropLoaderApp.pkg \
+            productbuild --component "$APP_PATH" /Applications artifact/DropLoader.pkg \
               && echo "PKG created" \
               || echo "productbuild FAILED, will fallback to zip"
           else
             echo "productbuild not available, will fallback to zip"
           fi
-          if [ ! -f artifact/DropLoaderApp.pkg ]; then
+          if [ ! -f artifact/DropLoader.pkg ]; then
             echo "Falling back to zip"
-            (cd "$APP_DIR" && zip -r -q "$GITHUB_WORKSPACE/artifact/DropLoaderApp.zip" "$APP_NAME")
+            (cd "$APP_DIR" && zip -r -q "$GITHUB_WORKSPACE/artifact/DropLoader.zip" "$APP_NAME")
           fi
           ls -la artifact/
       - name: Upload pkg/zip
         uses: actions/upload-artifact@v4
         with:
-          name: DropLoaderApp-macos
+          name: DropLoader-macos
           path: artifact/
           if-no-files-found: error
 
@@ -80,14 +80,14 @@ jobs:
       - name: List artifacts
         run: find . -type f | sort
       - name: Delete previous release/tag
-        run: gh release delete v2.1.0 --yes --cleanup-tag 2>/dev/null || true
+        run: gh release delete v3.0.0 --yes --cleanup-tag 2>/dev/null || true
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v2.1.0
+          tag_name: v3.0.0
           files: |
-            DropLoaderApp-exe/*.exe
-            DropLoaderApp-macos/*
+            DropLoader-exe/*.exe
+            DropLoader-macos/*
           generate_release_notes: true
