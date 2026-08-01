@@ -6,43 +6,70 @@
            x:Class="MediaHub.Views.DownloadingPopup"
            x:DataType="vm:MainViewModel"
            CanBeDismissedByTappingOutsideOfPopup="False"
-           Size="460, 340"
+           Size="440, 240"
            Color="{AppThemeBinding Light={StaticResource BackgroundLight}, Dark={StaticResource BackgroundDark}}">
 
-    <!-- Modal card shown while a download is running; bound straight to the
-         MainViewModel that drives the download. -->
-    <Border Style="{StaticResource CardBorder}"
-            StrokeShape="RoundRectangle 24"
-            Padding="32,28">
-        <VerticalStackLayout Spacing="18">
+    <!-- Compact modal card: every row earns its height, the middle row absorbs
+         the slack, so there is no dead space under the Cancel button. -->
+    <Border StrokeThickness="1"
+            StrokeShape="RoundRectangle 20"
+            Padding="24,22"
+            BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}"
+            Stroke="{AppThemeBinding Light={StaticResource OutlineLight}, Dark={StaticResource OutlineDark}}">
+        <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="12">
 
-            <Label Text="Downloading" Style="{StaticResource SectionTitleLabel}" />
-
-            <Label Text="{Binding DownloadFileName}"
-                   FontSize="15" FontAttributes="Bold" FontFamily="OpenSansSemibold"
-                   MaxLines="2" LineBreakMode="TailTruncation"
-                   TextColor="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
-
-            <ProgressBar Progress="{Binding Progress}" Style="{StaticResource ProgressBarStyle}" />
-
-            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-                <Label Text="{Binding ProgressText}"
-                       Style="{StaticResource CaptionLabel}"
-                       LineBreakMode="TailTruncation"
-                       VerticalOptions="Center" />
-                <Label Grid.Column="1"
-                       Text="{Binding Progress, StringFormat='{0:P0}'}"
-                       Style="{StaticResource CaptionLabel}"
-                       FontAttributes="Bold"
-                       VerticalOptions="Center" />
+            <!-- Header: spinner + title + file name -->
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                <ActivityIndicator IsRunning="True" IsVisible="True"
+                                   WidthRequest="20" HeightRequest="20"
+                                   Color="{AppThemeBinding Light={StaticResource PrimaryLight}, Dark={StaticResource PrimaryDark}}" />
+                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                    <Label Text="Downloading"
+                           FontSize="18" FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+                    <Label Text="{Binding DownloadFileName}"
+                           FontSize="13" MaxLines="2" LineBreakMode="TailTruncation"
+                           TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
+                </VerticalStackLayout>
             </Grid>
 
-            <Button Text="Cancel"
+            <!-- Progress: determinate bar, or an indeterminate spinner when the
+                 downloader reports no percentage (unknown total size). -->
+            <Grid Grid.Row="1">
+                <ProgressBar Progress="{Binding Progress}"
+                             Style="{StaticResource ProgressBarStyle}"
+                             IsVisible="{Binding IsIndeterminate, Converter={StaticResource InverseBoolConverter}}" />
+                <ActivityIndicator IsRunning="{Binding IsIndeterminate}"
+                                   IsVisible="{Binding IsIndeterminate}"
+                                   HorizontalOptions="Start"
+                                   WidthRequest="24" HeightRequest="24"
+                                   Color="{AppThemeBinding Light={StaticResource PrimaryLight}, Dark={StaticResource PrimaryDark}}" />
+            </Grid>
+
+            <!-- Stats: percent + bytes on the left, speed on the right -->
+            <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="12" VerticalOptions="Center">
+                <Label Text="{Binding ProgressText}"
+                       FontSize="13" LineBreakMode="TailTruncation"
+                       VerticalOptions="Center"
+                       TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
+                <Label Grid.Column="1"
+                       Text="{Binding DownloadSpeedText}"
+                       IsVisible="{Binding ShowDownloadSpeed}"
+                       FontSize="13" FontAttributes="Bold"
+                       VerticalOptions="Center"
+                       TextColor="{AppThemeBinding Light={StaticResource PrimaryVariantLight}, Dark={StaticResource PrimaryDark}}" />
+            </Grid>
+
+            <!-- Cancel: compact, pinned to the bottom-right -->
+            <Button Grid.Row="3"
+                    Text="Cancel"
                     Command="{Binding CancelDownloadCommand}"
-                    Style="{StaticResource DangerButton}"
-                    HorizontalOptions="Center"
-                    WidthRequest="150"
+                    HorizontalOptions="End"
+                    HeightRequest="38" CornerRadius="10" Padding="22,0"
+                    FontSize="14" FontAttributes="Bold"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource ErrorContainerLight}, Dark={StaticResource ErrorContainerDark}}"
+                    TextColor="{AppThemeBinding Light={StaticResource OnErrorContainerLight}, Dark={StaticResource OnErrorContainerDark}}"
                     SemanticProperties.Description="Cancel the current download" />
-        </VerticalStackLayout>
+        </Grid>
     </Border>
 </mct:Popup>

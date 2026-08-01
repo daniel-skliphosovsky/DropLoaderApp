@@ -9,23 +9,25 @@ public partial class App : Application
 
     public App()
     {
+        // The design is dark-first; the header toggle can still flip to light.
+        UserAppTheme = AppTheme.Dark;
         InitializeComponent();
         InstallErrorHandlers();
     }
 
     protected override Window CreateWindow(IActivationState? activationState)
     {
-        // The window starts at its minimum size and can be resized freely all
-        // the way up to fullscreen (no maximum constraint), so the user can
-        // expand it with the green button or by dragging the edges.
-        return new Window(new AppShell())
+        // Fixed medium window: min == max == actual size locks resizing on
+        // every platform; MediaHubWindow's platform partials additionally strip
+        // the minimize/fullscreen chrome on macOS and Windows.
+        return new MediaHubWindow(new AppShell())
         {
-            Width = 800,
-            Height = 560,
-            MinimumWidth = 800,
-            MinimumHeight = 560,
-            MaximumWidth = 4000,
-            MaximumHeight = 3000
+            Width = 1024,
+            Height = 680,
+            MinimumWidth = 1024,
+            MinimumHeight = 680,
+            MaximumWidth = 1024,
+            MaximumHeight = 680
         };
     }
 

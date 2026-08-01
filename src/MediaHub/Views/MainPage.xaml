@@ -9,22 +9,22 @@
              Shell.NavBarIsVisible="False"
              Shell.FlyoutBehavior="Disabled">
 
-    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="0">
+    <Grid RowDefinitions="Auto,*,Auto,Auto" RowSpacing="0">
 
         <!-- ================= Header ================= -->
         <Border Grid.Row="0" StrokeThickness="0"
                 BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}">
             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16"
-                  Padding="32,20,32,18">
+                  Padding="32,16,32,14">
 
-                <HorizontalStackLayout Spacing="16" VerticalOptions="Center">
-                    <Image Source="mediahub_logo.svg" WidthRequest="56" HeightRequest="56"
+                <HorizontalStackLayout Spacing="14" VerticalOptions="Center">
+                    <Image Source="mediahub_logo.svg" WidthRequest="44" HeightRequest="44"
                            Aspect="AspectFit" VerticalOptions="Center"
                            SemanticProperties.Description="MediaHub logo" />
-                    <VerticalStackLayout VerticalOptions="Center" Spacing="2">
-                        <Label Text="MediaHub" Style="{StaticResource AppTitleLabel}" />
-                        <Label Text="Download media from TikTok, YouTube, SoundCloud and VK"
-                               Style="{StaticResource AppSubtitleLabel}" />
+                    <VerticalStackLayout VerticalOptions="Center" Spacing="0">
+                        <Label Text="MediaHub" Style="{StaticResource AppTitleLabel}" FontSize="24" />
+                        <Label Text="Download from TikTok, YouTube, SoundCloud and VK"
+                               Style="{StaticResource AppSubtitleLabel}" FontSize="13" />
                     </VerticalStackLayout>
                 </HorizontalStackLayout>
 
@@ -37,7 +37,7 @@
                     <Path Fill="Transparent"
                           Stroke="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}"
                           StrokeThickness="2" StrokeLineCap="Round" StrokeLineJoin="Round"
-                          Aspect="Uniform" WidthRequest="24" HeightRequest="24"
+                          Aspect="Uniform" WidthRequest="22" HeightRequest="22"
                           VerticalOptions="Center" HorizontalOptions="Center"
                           Data="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
                 </Border>
@@ -49,22 +49,20 @@
         <!-- ================= Main content ================= -->
         <ScrollView Grid.Row="1" SizeChanged="OnScrollViewSizeChanged">
             <Grid x:Name="ContentHost">
-                <VerticalStackLayout Padding="36,44,36,28" Spacing="0"
-                                     MaximumWidthRequest="740"
+                <VerticalStackLayout Padding="36,36,36,24" Spacing="0"
+                                     MaximumWidthRequest="760"
                                      HorizontalOptions="Center" VerticalOptions="Center">
-                    <VerticalStackLayout Spacing="24">
+                    <VerticalStackLayout Spacing="20">
 
-                        <!-- Card -->
-                        <Border Style="{StaticResource CardBorder}">
-                            <VerticalStackLayout Spacing="22">
+                        <Border Style="{StaticResource CardBorder}" Padding="32,26">
+                            <VerticalStackLayout Spacing="20">
 
-                                <Label Text="Add a link" Style="{StaticResource SectionTitleLabel}" />
+                                <Label Text="Add a link" Style="{StaticResource SectionTitleLabel}" FontSize="20" />
 
-                                <!-- URL field -->
-                                <VerticalStackLayout Spacing="8">
-                                    <Label Text="Media link" Style="{StaticResource FieldLabel}" />
+                                <!-- URL row: input + paste + download -->
+                                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
                                     <Border Style="{StaticResource InputContainer}">
-                                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
 
                                             <!-- Platform icon, auto-detected -->
                                             <Grid Grid.Column="0" WidthRequest="22" HeightRequest="22"
@@ -93,7 +91,7 @@
                                                         </DataTrigger>
                                                     </Path.Triggers>
                                                 </Path>
-                                                <!-- YouTube: rounded rect -->
+                                                <!-- YouTube: rounded rect + play -->
                                                 <Path Fill="Transparent" IsVisible="False"
                                                       Stroke="{AppThemeBinding Light={StaticResource YouTubeLight}, Dark={StaticResource YouTubeDark}}"
                                                       StrokeThickness="2" StrokeLineCap="Round" StrokeLineJoin="Round"
@@ -105,7 +103,6 @@
                                                         </DataTrigger>
                                                     </Path.Triggers>
                                                 </Path>
-                                                <!-- YouTube: play triangle -->
                                                 <Path Fill="{AppThemeBinding Light={StaticResource YouTubeLight}, Dark={StaticResource YouTubeDark}}" IsVisible="False"
                                                       StrokeThickness="0" Aspect="Uniform"
                                                       Data="M10 9.5v5l4.5-2.5z">
@@ -139,7 +136,6 @@
                                                         </DataTrigger>
                                                     </Path.Triggers>
                                                 </Path>
-                                                <!-- VK: the letter -->
                                                 <Path Fill="Transparent" IsVisible="False"
                                                       Stroke="{AppThemeBinding Light={StaticResource VKLight}, Dark={StaticResource VKDark}}"
                                                       StrokeThickness="2" StrokeLineCap="Round" StrokeLineJoin="Round"
@@ -164,53 +160,68 @@
                                         </Grid>
                                     </Border>
 
-                                    <!-- Platform chip -->
-                                    <Border Style="{StaticResource ChipStyle}"
-                                            IsVisible="{Binding ShowPlatformBadge}"
-                                            HorizontalOptions="Start">
-                                        <Border.Triggers>
-                                            <DataTrigger TargetType="Border"
-                                                         Binding="{Binding ShowPlatformBadge}" Value="True">
-                                                <DataTrigger.EnterActions>
-                                                    <anim:FadeInAction />
-                                                </DataTrigger.EnterActions>
-                                            </DataTrigger>
-                                            <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="tiktok">
-                                                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource TikTokContainerLight}, Dark={StaticResource TikTokContainerDark}}" />
-                                            </DataTrigger>
-                                            <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="youtube">
-                                                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource YouTubeContainerLight}, Dark={StaticResource YouTubeContainerDark}}" />
-                                            </DataTrigger>
-                                            <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="soundcloud">
-                                                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource SoundCloudContainerLight}, Dark={StaticResource SoundCloudContainerDark}}" />
-                                            </DataTrigger>
-                                            <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="vk">
-                                                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource VKContainerLight}, Dark={StaticResource VKContainerDark}}" />
-                                            </DataTrigger>
-                                        </Border.Triggers>
-                                        <Label Text="{Binding PlatformName}" FontSize="13" FontAttributes="Bold" VerticalOptions="Center">
-                                            <Label.Triggers>
-                                                <DataTrigger TargetType="Label" Binding="{Binding PlatformKey}" Value="tiktok">
-                                                    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnTikTokContainerLight}, Dark={StaticResource OnTikTokContainerDark}}" />
-                                                </DataTrigger>
-                                                <DataTrigger TargetType="Label" Binding="{Binding PlatformKey}" Value="youtube">
-                                                    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnYouTubeContainerLight}, Dark={StaticResource OnYouTubeContainerDark}}" />
-                                                </DataTrigger>
-                                                <DataTrigger TargetType="Label" Binding="{Binding PlatformKey}" Value="soundcloud">
-                                                    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSoundCloudContainerLight}, Dark={StaticResource OnSoundCloudContainerDark}}" />
-                                                </DataTrigger>
-                                                <DataTrigger TargetType="Label" Binding="{Binding PlatformKey}" Value="vk">
-                                                    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnVKContainerLight}, Dark={StaticResource OnVKContainerDark}}" />
-                                                </DataTrigger>
-                                            </Label.Triggers>
-                                        </Label>
-                                    </Border>
-                                </VerticalStackLayout>
+                                    <Button Grid.Column="1" Text="Paste"
+                                            Command="{Binding PasteCommand}"
+                                            Style="{StaticResource SecondaryButton}"
+                                            HeightRequest="56" Padding="18,0"
+                                            VerticalOptions="Center"
+                                            SemanticProperties.Description="Paste the link from the clipboard" />
 
-                                <!-- Preview card: what will be downloaded -->
+                                    <Button Grid.Column="2" Text="Download"
+                                            Command="{Binding DownloadCommand}"
+                                            IsEnabled="{Binding CanStartDownload}"
+                                            Style="{StaticResource DownloadButton}"
+                                            HeightRequest="56" Padding="20,0"
+                                            VerticalOptions="Center"
+                                            SemanticProperties.Description="Start downloading the media" />
+                                </Grid>
+
+                                <!-- Platform chip -->
+                                <Border Style="{StaticResource ChipStyle}"
+                                        IsVisible="{Binding ShowPlatformBadge}"
+                                        HorizontalOptions="Start">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border"
+                                                     Binding="{Binding ShowPlatformBadge}" Value="True">
+                                            <DataTrigger.EnterActions>
+                                                <anim:FadeInAction />
+                                            </DataTrigger.EnterActions>
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="tiktok">
+                                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource TikTokContainerLight}, Dark={StaticResource TikTokContainerDark}}" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="youtube">
+                                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource YouTubeContainerLight}, Dark={StaticResource YouTubeContainerDark}}" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="soundcloud">
+                                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource SoundCloudContainerLight}, Dark={StaticResource SoundCloudContainerDark}}" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="vk">
+                                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource VKContainerLight}, Dark={StaticResource VKContainerDark}}" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="{Binding PlatformName}" FontSize="13" FontAttributes="Bold" VerticalOptions="Center">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding PlatformKey}" Value="tiktok">
+                                                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnTikTokContainerLight}, Dark={StaticResource OnTikTokContainerDark}}" />
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Label" Binding="{Binding PlatformKey}" Value="youtube">
+                                                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnYouTubeContainerLight}, Dark={StaticResource OnYouTubeContainerDark}}" />
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Label" Binding="{Binding PlatformKey}" Value="soundcloud">
+                                                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSoundCloudContainerLight}, Dark={StaticResource OnSoundCloudContainerDark}}" />
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Label" Binding="{Binding PlatformKey}" Value="vk">
+                                                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnVKContainerLight}, Dark={StaticResource OnVKContainerDark}}" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </Border>
+
+                                <!-- Metadata card: what will be downloaded -->
                                 <Border IsVisible="{Binding ShowPreviewSection}"
                                         BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceContainerLight}, Dark={StaticResource SurfaceContainerDark}}"
-                                        StrokeThickness="0" StrokeShape="RoundRectangle 14" Padding="16">
+                                        StrokeThickness="0" StrokeShape="RoundRectangle 14" Padding="18">
                                     <Border.Triggers>
                                         <DataTrigger TargetType="Border"
                                                      Binding="{Binding ShowPreviewSection}" Value="True">
@@ -219,67 +230,182 @@
                                             </DataTrigger.EnterActions>
                                         </DataTrigger>
                                     </Border.Triggers>
-                                    <Grid ColumnDefinitions="96,*" ColumnSpacing="16">
+                                    <Grid RowDefinitions="Auto,Auto" RowSpacing="14">
 
-                                        <!-- Thumbnail -->
-                                        <Border Grid.Column="0" WidthRequest="96" HeightRequest="96"
-                                                StrokeThickness="0" StrokeShape="RoundRectangle 12"
-                                                BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariantLight}, Dark={StaticResource SurfaceVariantDark}}">
-                                            <Grid>
-                                                <!-- Placeholder shown when there is no cover -->
-                                                <Path Fill="Transparent"
-                                                      IsVisible="{Binding HasPreviewThumbnail, Converter={StaticResource InverseBoolConverter}}"
-                                                      Stroke="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}"
-                                                      StrokeThickness="2" StrokeLineCap="Round" StrokeLineJoin="Round"
-                                                      Aspect="Uniform" WidthRequest="28" HeightRequest="28"
-                                                      HorizontalOptions="Center" VerticalOptions="Center"
-                                                      Data="M4 16l1.5-3 2.5 2.5 3.5-5L16 16z M6 20a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2z" />
-                                                <Image Source="{Binding PreviewThumbnailUrl}"
-                                                       Aspect="AspectFill"
-                                                       IsVisible="{Binding HasPreviewThumbnail}"
-                                                       SemanticProperties.Description="Preview thumbnail" />
-                                            </Grid>
-                                        </Border>
+                                        <Grid ColumnDefinitions="112,*" ColumnSpacing="16">
 
-                                        <!-- Title, author, quality -->
-                                        <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
-                                            <Label Text="{Binding PreviewTitle}"
-                                                   FontSize="15" FontAttributes="Bold"
-                                                   FontFamily="OpenSansSemibold"
-                                                   MaxLines="2" LineBreakMode="TailTruncation"
-                                                   TextColor="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
-                                            <Label Text="{Binding PreviewAuthor}"
-                                                   IsVisible="{Binding HasPreviewAuthor}"
-                                                   FontSize="13"
-                                                   LineBreakMode="TailTruncation"
-                                                   TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
-                                            <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
-                                                <Border Padding="10,4" StrokeThickness="0"
-                                                        StrokeShape="RoundRectangle 999"
-                                                        IsVisible="{Binding HasPreviewQuality}"
-                                                        BackgroundColor="{AppThemeBinding Light={StaticResource PrimaryContainerLight}, Dark={StaticResource PrimaryContainerDark}}">
-                                                    <Label Text="{Binding PreviewQuality}"
-                                                           FontSize="12" FontAttributes="Bold"
-                                                           TextColor="{AppThemeBinding Light={StaticResource OnPrimaryContainerLight}, Dark={StaticResource OnPrimaryContainerDark}}" />
+                                            <!-- Thumbnail: lazy AsyncImage over a platform-tinted
+                                                 placeholder, so the card works without a picture -->
+                                            <Border Grid.Column="0" WidthRequest="112" HeightRequest="112"
+                                                    StrokeThickness="0" StrokeShape="RoundRectangle 12"
+                                                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariantLight}, Dark={StaticResource SurfaceVariantDark}}">
+                                                <Border.Triggers>
+                                                    <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="tiktok">
+                                                        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource TikTokContainerLight}, Dark={StaticResource TikTokContainerDark}}" />
+                                                    </DataTrigger>
+                                                    <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="youtube">
+                                                        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource YouTubeContainerLight}, Dark={StaticResource YouTubeContainerDark}}" />
+                                                    </DataTrigger>
+                                                    <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="soundcloud">
+                                                        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource SoundCloudContainerLight}, Dark={StaticResource SoundCloudContainerDark}}" />
+                                                    </DataTrigger>
+                                                    <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="vk">
+                                                        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource VKContainerLight}, Dark={StaticResource VKContainerDark}}" />
+                                                    </DataTrigger>
+                                                </Border.Triggers>
+                                                <Grid>
+                                                    <!-- Placeholder icons, visible until the image loads -->
+                                                    <Path Fill="Transparent" IsVisible="False"
+                                                          Stroke="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}"
+                                                          StrokeThickness="2" StrokeLineCap="Round" StrokeLineJoin="Round"
+                                                          Aspect="Uniform" WidthRequest="40" HeightRequest="40"
+                                                          HorizontalOptions="Center" VerticalOptions="Center"
+                                                          Data="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71 M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71">
+                                                        <Path.Triggers>
+                                                            <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="unknown">
+                                                                <Setter Property="IsVisible" Value="True" />
+                                                            </DataTrigger>
+                                                        </Path.Triggers>
+                                                    </Path>
+                                                    <Path Fill="Transparent" IsVisible="False"
+                                                          Stroke="{AppThemeBinding Light={StaticResource TikTokLight}, Dark={StaticResource TikTokDark}}"
+                                                          StrokeThickness="2" StrokeLineCap="Round" StrokeLineJoin="Round"
+                                                          Aspect="Uniform" WidthRequest="40" HeightRequest="40"
+                                                          HorizontalOptions="Center" VerticalOptions="Center"
+                                                          Data="M9 18V5l12-2v13 M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0z M21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z">
+                                                        <Path.Triggers>
+                                                            <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="tiktok">
+                                                                <Setter Property="IsVisible" Value="True" />
+                                                            </DataTrigger>
+                                                        </Path.Triggers>
+                                                    </Path>
+                                                    <Path Fill="Transparent" IsVisible="False"
+                                                          Stroke="{AppThemeBinding Light={StaticResource YouTubeLight}, Dark={StaticResource YouTubeDark}}"
+                                                          StrokeThickness="2" StrokeLineCap="Round" StrokeLineJoin="Round"
+                                                          Aspect="Uniform" WidthRequest="40" HeightRequest="40"
+                                                          HorizontalOptions="Center" VerticalOptions="Center"
+                                                          Data="M10 9.5v5l4.5-2.5z">
+                                                        <Path.Triggers>
+                                                            <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="youtube">
+                                                                <Setter Property="IsVisible" Value="True" />
+                                                            </DataTrigger>
+                                                        </Path.Triggers>
+                                                    </Path>
+                                                    <Path Fill="Transparent" IsVisible="False"
+                                                          Stroke="{AppThemeBinding Light={StaticResource SoundCloudLight}, Dark={StaticResource SoundCloudDark}}"
+                                                          StrokeThickness="2.2" StrokeLineCap="Round"
+                                                          Aspect="Uniform" WidthRequest="40" HeightRequest="40"
+                                                          HorizontalOptions="Center" VerticalOptions="Center"
+                                                          Data="M2 13v-2 M5 13V9 M8 13V6 M11 13V8 M14 13v-3">
+                                                        <Path.Triggers>
+                                                            <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="soundcloud">
+                                                                <Setter Property="IsVisible" Value="True" />
+                                                            </DataTrigger>
+                                                        </Path.Triggers>
+                                                    </Path>
+                                                    <Path Fill="Transparent" IsVisible="False"
+                                                          Stroke="{AppThemeBinding Light={StaticResource VKLight}, Dark={StaticResource VKDark}}"
+                                                          StrokeThickness="2" StrokeLineCap="Round" StrokeLineJoin="Round"
+                                                          Aspect="Uniform" WidthRequest="40" HeightRequest="40"
+                                                          HorizontalOptions="Center" VerticalOptions="Center"
+                                                          Data="M8.5 8.5L11 15.5l3.5-7">
+                                                        <Path.Triggers>
+                                                            <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="vk">
+                                                                <Setter Property="IsVisible" Value="True" />
+                                                            </DataTrigger>
+                                                        </Path.Triggers>
+                                                    </Path>
+
+                                                    <!-- Lazy image on top; while it is null, still
+                                                         loading or failed, the placeholder shows through -->
+                                                    <Image Source="{Binding PreviewThumbnailUrl}"
+                                                           Aspect="AspectFill"
+                                                           SemanticProperties.Description="Preview thumbnail" />
+                                                </Grid>
+                                            </Border>
+
+                                            <!-- Title, author, duration, quality -->
+                                            <VerticalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
+                                                <Border Style="{StaticResource ChipStyle}"
+                                                        Padding="10,3" HorizontalOptions="Start"
+                                                        IsVisible="{Binding ShowPlatformBadge}">
+                                                    <Border.Triggers>
+                                                        <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="tiktok">
+                                                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource TikTokContainerLight}, Dark={StaticResource TikTokContainerDark}}" />
+                                                        </DataTrigger>
+                                                        <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="youtube">
+                                                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource YouTubeContainerLight}, Dark={StaticResource YouTubeContainerDark}}" />
+                                                        </DataTrigger>
+                                                        <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="soundcloud">
+                                                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource SoundCloudContainerLight}, Dark={StaticResource SoundCloudContainerDark}}" />
+                                                        </DataTrigger>
+                                                        <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="vk">
+                                                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource VKContainerLight}, Dark={StaticResource VKContainerDark}}" />
+                                                        </DataTrigger>
+                                                    </Border.Triggers>
+                                                    <Label Text="{Binding PlatformName}" FontSize="12" FontAttributes="Bold">
+                                                        <Label.Triggers>
+                                                            <DataTrigger TargetType="Label" Binding="{Binding PlatformKey}" Value="tiktok">
+                                                                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnTikTokContainerLight}, Dark={StaticResource OnTikTokContainerDark}}" />
+                                                            </DataTrigger>
+                                                            <DataTrigger TargetType="Label" Binding="{Binding PlatformKey}" Value="youtube">
+                                                                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnYouTubeContainerLight}, Dark={StaticResource OnYouTubeContainerDark}}" />
+                                                            </DataTrigger>
+                                                            <DataTrigger TargetType="Label" Binding="{Binding PlatformKey}" Value="soundcloud">
+                                                                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSoundCloudContainerLight}, Dark={StaticResource OnSoundCloudContainerDark}}" />
+                                                            </DataTrigger>
+                                                            <DataTrigger TargetType="Label" Binding="{Binding PlatformKey}" Value="vk">
+                                                                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnVKContainerLight}, Dark={StaticResource OnVKContainerDark}}" />
+                                                            </DataTrigger>
+                                                        </Label.Triggers>
+                                                    </Label>
                                                 </Border>
-                                                <Label Text="{Binding PreviewDurationText}"
-                                                       IsVisible="{Binding HasPreviewDuration}"
-                                                       FontSize="12"
-                                                       VerticalOptions="Center"
-                                                       TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
-                                            </HorizontalStackLayout>
-                                        </VerticalStackLayout>
 
-                                        <!-- Loading spinner -->
-                                        <ActivityIndicator Grid.ColumnSpan="2"
-                                                           IsRunning="{Binding IsPreviewLoading}"
-                                                           IsVisible="{Binding IsPreviewLoading}"
-                                                           Color="{AppThemeBinding Light={StaticResource PrimaryLight}, Dark={StaticResource PrimaryDark}}"
-                                                           HorizontalOptions="Center" VerticalOptions="Center" />
+                                                <Label Text="{Binding PreviewTitle}"
+                                                       FontSize="16" FontAttributes="Bold"
+                                                       FontFamily="OpenSansSemibold"
+                                                       MaxLines="2" LineBreakMode="TailTruncation"
+                                                       TextColor="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+                                                <Label Text="{Binding PreviewAuthor}"
+                                                       IsVisible="{Binding HasPreviewAuthor}"
+                                                       FontSize="13" LineBreakMode="TailTruncation"
+                                                       TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
+                                                <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+                                                    <Label Text="{Binding PreviewDurationText}"
+                                                           IsVisible="{Binding HasPreviewDuration}"
+                                                           FontSize="12" FontAttributes="Bold"
+                                                           VerticalOptions="Center"
+                                                           TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
+                                                    <Label Text="{Binding PreviewQuality}"
+                                                           IsVisible="{Binding HasPreviewQuality}"
+                                                           FontSize="12"
+                                                           VerticalOptions="Center"
+                                                           TextColor="{AppThemeBinding Light={StaticResource PrimaryVariantLight}, Dark={StaticResource PrimaryDark}}" />
+                                                </HorizontalStackLayout>
+                                            </VerticalStackLayout>
+                                        </Grid>
+
+                                        <!-- Actions: big download + clear -->
+                                        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                            <Button Text="Download"
+                                                    Command="{Binding DownloadCommand}"
+                                                    IsEnabled="{Binding CanStartDownload}"
+                                                    Style="{StaticResource DownloadButton}"
+                                                    SemanticProperties.Description="Start downloading the media" />
+                                            <Button Grid.Column="1" Text="New"
+                                                    Command="{Binding ClearCommand}"
+                                                    Style="{StaticResource SecondaryButton}"
+                                                    SemanticProperties.Description="Clear the link and start over" />
+                                        </Grid>
                                     </Grid>
                                 </Border>
 
-                                <!-- Soft preview failure note -->
+                                <!-- Preview loading / soft failure note -->
+                                <ActivityIndicator IsRunning="{Binding IsPreviewLoading}"
+                                                   IsVisible="{Binding IsPreviewLoading}"
+                                                   Color="{AppThemeBinding Light={StaticResource PrimaryLight}, Dark={StaticResource PrimaryDark}}"
+                                                   HorizontalOptions="Center" VerticalOptions="Center"
+                                                   HeightRequest="32" WidthRequest="32" />
                                 <Label Text="{Binding PreviewError}"
                                        IsVisible="{Binding ShowPreviewError}"
                                        Style="{StaticResource CaptionLabel}"
@@ -305,100 +431,6 @@
                                     </Grid>
                                 </VerticalStackLayout>
 
-                                <!-- Download -->
-                                <Button Style="{StaticResource DownloadButton}"
-                                        Text="Download"
-                                        ImageSource="{AppThemeBinding Light=download_light.svg, Dark=download_dark.svg}"
-                                        ContentLayout="Left,8"
-                                        IsEnabled="{Binding CanStartDownload}"
-                                        Command="{Binding DownloadCommand}"
-                                        HorizontalOptions="Fill"
-                                        SemanticProperties.Description="Start downloading the media" />
-
-                                <!-- Status message -->
-                                <Border IsVisible="{Binding ShowStatus}"
-                                        BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceContainerLight}, Dark={StaticResource SurfaceContainerDark}}"
-                                        StrokeThickness="0" Padding="16,14"
-                                        StrokeShape="RoundRectangle 14"
-                                        HorizontalOptions="Fill">
-                                    <Border.Triggers>
-                                        <DataTrigger TargetType="Border"
-                                                     Binding="{Binding ShowStatus}" Value="True">
-                                            <DataTrigger.EnterActions>
-                                                <anim:FadeInAction />
-                                            </DataTrigger.EnterActions>
-                                        </DataTrigger>
-                                        <DataTrigger TargetType="Border" Binding="{Binding StatusKind}" Value="success">
-                                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource SuccessContainerLight}, Dark={StaticResource SuccessContainerDark}}" />
-                                        </DataTrigger>
-                                        <DataTrigger TargetType="Border" Binding="{Binding StatusKind}" Value="error">
-                                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource ErrorContainerLight}, Dark={StaticResource ErrorContainerDark}}" />
-                                        </DataTrigger>
-                                        <DataTrigger TargetType="Border" Binding="{Binding StatusKind}" Value="muted">
-                                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource SurfaceVariantLight}, Dark={StaticResource SurfaceVariantDark}}" />
-                                        </DataTrigger>
-                                    </Border.Triggers>
-                                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                                        <!-- Success: check -->
-                                        <Path Grid.Column="0" Fill="Transparent" IsVisible="False"
-                                              Stroke="{AppThemeBinding Light={StaticResource OnSuccessContainerLight}, Dark={StaticResource OnSuccessContainerDark}}"
-                                              StrokeThickness="2.2" StrokeLineCap="Round" StrokeLineJoin="Round"
-                                              Aspect="Uniform" WidthRequest="20" HeightRequest="20"
-                                              VerticalOptions="Center"
-                                              Data="M20 6L9 17l-5-5">
-                                            <Path.Triggers>
-                                                <DataTrigger TargetType="Path" Binding="{Binding StatusKind}" Value="success">
-                                                    <Setter Property="IsVisible" Value="True" />
-                                                </DataTrigger>
-                                            </Path.Triggers>
-                                        </Path>
-                                        <!-- Error: alert -->
-                                        <Path Grid.Column="0" Fill="Transparent" IsVisible="False"
-                                              Stroke="{AppThemeBinding Light={StaticResource OnErrorContainerLight}, Dark={StaticResource OnErrorContainerDark}}"
-                                              StrokeThickness="2.2" StrokeLineCap="Round" StrokeLineJoin="Round"
-                                              Aspect="Uniform" WidthRequest="20" HeightRequest="20"
-                                              VerticalOptions="Center"
-                                              Data="M12 9v4 M12 17h.01 M12 3l9 16a1 1 0 0 1-.87 1.5H3.87a1 1 0 0 1-.87-1.5z">
-                                            <Path.Triggers>
-                                                <DataTrigger TargetType="Path" Binding="{Binding StatusKind}" Value="error">
-                                                    <Setter Property="IsVisible" Value="True" />
-                                                </DataTrigger>
-                                            </Path.Triggers>
-                                        </Path>
-                                        <!-- Cancelled: x -->
-                                        <Path Grid.Column="0" Fill="Transparent" IsVisible="False"
-                                              Stroke="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}"
-                                              StrokeThickness="2.2" StrokeLineCap="Round"
-                                              Aspect="Uniform" WidthRequest="20" HeightRequest="20"
-                                              VerticalOptions="Center"
-                                              Data="M18 6L6 18 M6 6l12 12">
-                                            <Path.Triggers>
-                                                <DataTrigger TargetType="Path" Binding="{Binding StatusKind}" Value="muted">
-                                                    <Setter Property="IsVisible" Value="True" />
-                                                </DataTrigger>
-                                            </Path.Triggers>
-                                        </Path>
-                                        <Label Grid.Column="1"
-                                               Text="{Binding Status}"
-                                               FontSize="14" FontAttributes="Bold"
-                                               TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}"
-                                               VerticalOptions="Center"
-                                               LineBreakMode="WordWrap">
-                                            <Label.Triggers>
-                                                <DataTrigger TargetType="Label" Binding="{Binding StatusKind}" Value="success">
-                                                    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSuccessContainerLight}, Dark={StaticResource OnSuccessContainerDark}}" />
-                                                </DataTrigger>
-                                                <DataTrigger TargetType="Label" Binding="{Binding StatusKind}" Value="error">
-                                                    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnErrorContainerLight}, Dark={StaticResource OnErrorContainerDark}}" />
-                                                </DataTrigger>
-                                                <DataTrigger TargetType="Label" Binding="{Binding StatusKind}" Value="muted">
-                                                    <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
-                                                </DataTrigger>
-                                            </Label.Triggers>
-                                        </Label>
-                                    </Grid>
-                                </Border>
-
                             </VerticalStackLayout>
                         </Border>
                     </VerticalStackLayout>
@@ -406,11 +438,91 @@
             </Grid>
         </ScrollView>
 
+        <!-- ================= Status bar ================= -->
+        <Border Grid.Row="2" IsVisible="{Binding ShowStatus}"
+                BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceContainerLight}, Dark={StaticResource SurfaceContainerDark}}"
+                StrokeThickness="0" Padding="32,12">
+            <Border.Triggers>
+                <DataTrigger TargetType="Border" Binding="{Binding ShowStatus}" Value="True">
+                    <DataTrigger.EnterActions>
+                        <anim:FadeInAction />
+                    </DataTrigger.EnterActions>
+                </DataTrigger>
+                <DataTrigger TargetType="Border" Binding="{Binding StatusKind}" Value="success">
+                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource SuccessContainerLight}, Dark={StaticResource SuccessContainerDark}}" />
+                </DataTrigger>
+                <DataTrigger TargetType="Border" Binding="{Binding StatusKind}" Value="error">
+                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource ErrorContainerLight}, Dark={StaticResource ErrorContainerDark}}" />
+                </DataTrigger>
+                <DataTrigger TargetType="Border" Binding="{Binding StatusKind}" Value="muted">
+                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource SurfaceVariantLight}, Dark={StaticResource SurfaceVariantDark}}" />
+                </DataTrigger>
+            </Border.Triggers>
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                <!-- Success: check -->
+                <Path Grid.Column="0" Fill="Transparent" IsVisible="False"
+                      Stroke="{AppThemeBinding Light={StaticResource OnSuccessContainerLight}, Dark={StaticResource OnSuccessContainerDark}}"
+                      StrokeThickness="2.2" StrokeLineCap="Round" StrokeLineJoin="Round"
+                      Aspect="Uniform" WidthRequest="20" HeightRequest="20"
+                      VerticalOptions="Center"
+                      Data="M20 6L9 17l-5-5">
+                    <Path.Triggers>
+                        <DataTrigger TargetType="Path" Binding="{Binding StatusKind}" Value="success">
+                            <Setter Property="IsVisible" Value="True" />
+                        </DataTrigger>
+                    </Path.Triggers>
+                </Path>
+                <!-- Error: alert -->
+                <Path Grid.Column="0" Fill="Transparent" IsVisible="False"
+                      Stroke="{AppThemeBinding Light={StaticResource OnErrorContainerLight}, Dark={StaticResource OnErrorContainerDark}}"
+                      StrokeThickness="2.2" StrokeLineCap="Round" StrokeLineJoin="Round"
+                      Aspect="Uniform" WidthRequest="20" HeightRequest="20"
+                      VerticalOptions="Center"
+                      Data="M12 9v4 M12 17h.01 M12 3l9 16a1 1 0 0 1-.87 1.5H3.87a1 1 0 0 1-.87-1.5z">
+                    <Path.Triggers>
+                        <DataTrigger TargetType="Path" Binding="{Binding StatusKind}" Value="error">
+                            <Setter Property="IsVisible" Value="True" />
+                        </DataTrigger>
+                    </Path.Triggers>
+                </Path>
+                <!-- Cancelled: x -->
+                <Path Grid.Column="0" Fill="Transparent" IsVisible="False"
+                      Stroke="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}"
+                      StrokeThickness="2.2" StrokeLineCap="Round"
+                      Aspect="Uniform" WidthRequest="20" HeightRequest="20"
+                      VerticalOptions="Center"
+                      Data="M18 6L6 18 M6 6l12 12">
+                    <Path.Triggers>
+                        <DataTrigger TargetType="Path" Binding="{Binding StatusKind}" Value="muted">
+                            <Setter Property="IsVisible" Value="True" />
+                        </DataTrigger>
+                    </Path.Triggers>
+                </Path>
+                <Label Grid.Column="1"
+                       Text="{Binding Status}"
+                       FontSize="14" FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}"
+                       VerticalOptions="Center" LineBreakMode="WordWrap">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label" Binding="{Binding StatusKind}" Value="success">
+                            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSuccessContainerLight}, Dark={StaticResource OnSuccessContainerDark}}" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Label" Binding="{Binding StatusKind}" Value="error">
+                            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnErrorContainerLight}, Dark={StaticResource OnErrorContainerDark}}" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Label" Binding="{Binding StatusKind}" Value="muted">
+                            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+            </Grid>
+        </Border>
+
         <!-- ================= Footer ================= -->
-        <Label Grid.Row="2" Text="{Binding VersionText}"
+        <Label Grid.Row="3" Text="{Binding VersionText}"
                Style="{StaticResource CaptionLabel}"
                FontSize="12"
                HorizontalOptions="Center"
-               Padding="0,12,0,14" />
+               Padding="0,10,0,12" />
     </Grid>
 </ContentPage>

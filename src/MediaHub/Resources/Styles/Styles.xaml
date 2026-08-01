@@ -214,7 +214,7 @@
 
     <!-- ============ Progress ============ -->
     <Style x:Key="ProgressBarStyle" TargetType="ProgressBar">
-        <Setter Property="HeightRequest" Value="10" />
+        <Setter Property="HeightRequest" Value="12" />
         <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource SurfaceVariantLight}, Dark={StaticResource SurfaceVariantDark}}" />
         <Setter Property="ProgressColor" Value="{AppThemeBinding Light={StaticResource PrimaryLight}, Dark={StaticResource PrimaryDark}}" />
     </Style>

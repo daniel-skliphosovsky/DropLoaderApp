@@ -92,6 +92,19 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string _progressText = string.Empty;
 
+    /// <summary>
+    /// True while the downloader reports no percentage (unknown total size),
+    /// in which case the popup shows a spinner instead of a fake percentage.
+    /// </summary>
+    [ObservableProperty]
+    private bool _isIndeterminate;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowDownloadSpeed))]
+    private string _downloadSpeedText = string.Empty;
+
+    public bool ShowDownloadSpeed => !string.IsNullOrEmpty(DownloadSpeedText);
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowStatus))]
     private string _status = string.Empty;
@@ -332,6 +345,10 @@ public partial class MainViewModel : ObservableObject
         IsDownloading = true;
         Progress = 0;
         ProgressText = "Starting...";
+        IsIndeterminate = false;
+        DownloadSpeedText = string.Empty;
+        _lastBytes = 0;
+        _lastSpeedAt = default;
         Status = string.Empty;
         StatusKind = string.Empty;
         DownloadFileName = DeriveDownloadFileName();
@@ -356,8 +373,21 @@ public partial class MainViewModel : ObservableObject
             // marshalled back to the UI context automatically.
             var progress = new Progress<DownloadProgress>(p =>
             {
-                Progress = p.Percentage ?? 0;
+                if (p.Percentage is { } percent)
+                {
+                    Progress = percent;
+                    IsIndeterminate = false;
+                }
+                else
+                {
+                    // No percentage means the total size is unknown; a bar
+                    // stuck at 0% is worse than an honest spinner.
+                    IsIndeterminate = true;
+                }
+
                 ProgressText = FormatProgress(p);
+                UpdateSpeed(p);
+
                 if (!string.IsNullOrWhiteSpace(p.Status))
                     Status = p.Status;
             });
@@ -438,15 +468,63 @@ public partial class MainViewModel : ObservableObject
 
     private static string FormatProgress(DownloadProgress p)
     {
-        var parts = new List<string>(3);
-
-        if (p.TotalBytes is > 0)
-            parts.Add($"{FormatBytes(p.BytesReceived)} of {FormatBytes(p.TotalBytes.Value)}");
+        var parts = new List<string>(2);
 
         if (p.Percentage is { } percent)
             parts.Add($"{percent * 100:F0}%");
 
-        return parts.Count > 0 ? string.Join("  ", parts) : string.Empty;
+        if (p.TotalBytes is > 0)
+            parts.Add($"{FormatBytes(p.BytesReceived)} of {FormatBytes(p.TotalBytes.Value)}");
+
+        return parts.Count > 0 ? string.Join("  ·  ", parts) : string.Empty;
+    }
+
+    private long _lastBytes;
+    private DateTime _lastSpeedAt;
+
+    /// <summary>
+    /// Sliding window speed: samples the byte counter roughly every half
+    /// second and shows "x/s". Skipped when a downloader reports no bytes
+    /// (e.g. TikTok hands out only the fraction, not the byte count).
+    /// </summary>
+    private void UpdateSpeed(DownloadProgress p)
+    {
+        var now = DateTime.UtcNow;
+
+        if (_lastSpeedAt == default)
+        {
+            _lastBytes = p.BytesReceived;
+            _lastSpeedAt = now;
+            return;
+        }
+
+        var elapsed = (now - _lastSpeedAt).TotalSeconds;
+        if (elapsed < 0.5 || p.BytesReceived < _lastBytes)
+            return;
+
+        DownloadSpeedText = $"{FormatBytes((long)((p.BytesReceived - _lastBytes) / elapsed))}/s";
+        _lastBytes = p.BytesReceived;
+        _lastSpeedAt = now;
+    }
+
+    [RelayCommand]
+    private async Task PasteAsync()
+    {
+        var text = await Clipboard.Default.GetTextAsync();
+        if (!string.IsNullOrWhiteSpace(text))
+            Url = text.Trim();
+    }
+
+    /// <summary>
+    /// Clears the URL and the metadata card, so the user can start over.
+    /// </summary>
+    [RelayCommand]
+    private void Clear()
+    {
+        CancelPreview();
+        Url = string.Empty;
+        Status = string.Empty;
+        StatusKind = string.Empty;
     }
 
     private static string FormatBytes(long bytes)

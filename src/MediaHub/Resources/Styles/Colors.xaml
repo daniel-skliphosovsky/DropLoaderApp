@@ -4,7 +4,8 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <!-- Material 3 design tokens, brand primary #6C5CE7 -->
+    <!-- Design tokens. Dark theme is the headline (deep blue surfaces,
+         rose #E11D48 accent, engagement blue #2563EB secondary). -->
 
     <!-- ============ Light Theme ============ -->
     <Color x:Key="BackgroundLight">#F5F5F8</Color>
@@ -12,13 +13,13 @@
     <Color x:Key="SurfaceContainerLight">#F0F0F5</Color>
     <Color x:Key="SurfaceVariantLight">#E9E9F2</Color>
 
-    <Color x:Key="PrimaryLight">#6C5CE7</Color>
-    <Color x:Key="PrimaryVariantLight">#5A4BD1</Color>
-    <Color x:Key="PrimaryContainerLight">#E6E0FF</Color>
-    <Color x:Key="OnPrimaryContainerLight">#312C6B</Color>
+    <Color x:Key="PrimaryLight">#E11D48</Color>
+    <Color x:Key="PrimaryVariantLight">#BE123C</Color>
+    <Color x:Key="PrimaryContainerLight">#FFE3E8</Color>
+    <Color x:Key="OnPrimaryContainerLight">#8E0030</Color>
     <Color x:Key="OnPrimaryLight">#FFFFFF</Color>
 
-    <Color x:Key="SecondaryLight">#00CEC9</Color>
+    <Color x:Key="SecondaryLight">#2563EB</Color>
 
     <Color x:Key="OnSurfaceLight">#1A1A2E</Color>
     <Color x:Key="OnSurfaceVariantLight">#4E4E5C</Color>
@@ -55,47 +56,47 @@
     <Color x:Key="OnVKContainerLight">#00458F</Color>
 
     <!-- ============ Dark Theme ============ -->
-    <Color x:Key="BackgroundDark">#0F0F1A</Color>
-    <Color x:Key="SurfaceDark">#1A1A2E</Color>
-    <Color x:Key="SurfaceContainerDark">#20203A</Color>
-    <Color x:Key="SurfaceVariantDark">#252540</Color>
+    <Color x:Key="BackgroundDark">#0B0F19</Color>
+    <Color x:Key="SurfaceDark">#111827</Color>
+    <Color x:Key="SurfaceContainerDark">#1A2233</Color>
+    <Color x:Key="SurfaceVariantDark">#161F33</Color>
 
-    <Color x:Key="PrimaryDark">#A29BFE</Color>
-    <Color x:Key="PrimaryVariantDark">#6C5CE7</Color>
-    <Color x:Key="PrimaryContainerDark">#3D3480</Color>
-    <Color x:Key="OnPrimaryContainerDark">#DCD5FF</Color>
-    <Color x:Key="OnPrimaryDark">#1A1A2E</Color>
+    <Color x:Key="PrimaryDark">#E11D48</Color>
+    <Color x:Key="PrimaryVariantDark">#BE123C</Color>
+    <Color x:Key="PrimaryContainerDark">#4C1130</Color>
+    <Color x:Key="OnPrimaryContainerDark">#FFD3DE</Color>
+    <Color x:Key="OnPrimaryDark">#FFFFFF</Color>
 
-    <Color x:Key="SecondaryDark">#00CEC9</Color>
+    <Color x:Key="SecondaryDark">#2563EB</Color>
 
-    <Color x:Key="OnSurfaceDark">#EEEEEE</Color>
-    <Color x:Key="OnSurfaceVariantDark">#B0B0BE</Color>
+    <Color x:Key="OnSurfaceDark">#F3F4F6</Color>
+    <Color x:Key="OnSurfaceVariantDark">#9CA3AF</Color>
 
-    <Color x:Key="OutlineDark">#333355</Color>
-    <Color x:Key="DividerDark">#262640</Color>
+    <Color x:Key="OutlineDark">#2A3348</Color>
+    <Color x:Key="DividerDark">#2A3348</Color>
 
-    <Color x:Key="ErrorDark">#FF6B6B</Color>
-    <Color x:Key="ErrorContainerDark">#5C1A1A</Color>
-    <Color x:Key="OnErrorContainerDark">#FFC9C9</Color>
-    <Color x:Key="OnErrorDark">#1A1A2E</Color>
+    <Color x:Key="ErrorDark">#F87171</Color>
+    <Color x:Key="ErrorContainerDark">#3B1116</Color>
+    <Color x:Key="OnErrorContainerDark">#FFC9CE</Color>
+    <Color x:Key="OnErrorDark">#FFFFFF</Color>
 
     <Color x:Key="SuccessDark">#4ADE80</Color>
-    <Color x:Key="SuccessContainerDark">#0F3D24</Color>
+    <Color x:Key="SuccessContainerDark">#0E2E1C</Color>
     <Color x:Key="OnSuccessContainerDark">#A7F3C9</Color>
 
     <Color x:Key="ShadowDark">#000000</Color>
 
     <!-- Platform accents (dark) -->
-    <Color x:Key="TikTokDark">#FF3B5C</Color>
-    <Color x:Key="TikTokContainerDark">#4A0F1D</Color>
+    <Color x:Key="TikTokDark">#FE2C55</Color>
+    <Color x:Key="TikTokContainerDark">#3A0F1C</Color>
     <Color x:Key="OnTikTokContainerDark">#FFC9D4</Color>
 
-    <Color x:Key="YouTubeDark">#FF6B6B</Color>
-    <Color x:Key="YouTubeContainerDark">#4A1414</Color>
-    <Color x:Key="OnYouTubeContainerDark">#FFC9C9</Color>
+    <Color x:Key="YouTubeDark">#FF4D4D</Color>
+    <Color x:Key="YouTubeContainerDark">#3A1414</Color>
+    <Color x:Key="OnYouTubeContainerDark">#FFB3B3</Color>
 
     <Color x:Key="SoundCloudDark">#FF8A3D</Color>
-    <Color x:Key="SoundCloudContainerDark">#4A2410</Color>
+    <Color x:Key="SoundCloudContainerDark">#3A2410</Color>
     <Color x:Key="OnSoundCloudContainerDark">#FFDCC4</Color>
 
     <Color x:Key="VKDark">#4D9BFF</Color>
