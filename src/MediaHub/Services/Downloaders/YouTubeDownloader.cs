@@ -1,5 +1,7 @@
+using MediaHub.Models;
 using MediaHub.Services.Interfaces;
 using YoutubeExplode;
+using YoutubeExplode.Common;
 using YoutubeExplode.Videos.Streams;
 
 namespace MediaHub.Services.Downloaders;
@@ -17,6 +19,41 @@ public sealed class YouTubeDownloader : IDownloader
 
     public bool CanHandle(string url) =>
         UrlHelpers.UrlBelongsTo(url, "youtube.com", "youtu.be");
+
+    public async Task<MediaPreview?> GetPreviewAsync(string url, CancellationToken ct = default)
+    {
+        var video = await _client.Videos.GetAsync(url, ct);
+
+        var thumbnail = video.Thumbnails.TryGetWithHighestResolution();
+        string? quality = null;
+
+        try
+        {
+            // Stream resolution is a nice-to-have; if it fails we still have
+            // the rest of the metadata, so it must not break the preview.
+            var manifest = await _client.Videos.Streams.GetManifestAsync(video.Id, ct);
+            var best = manifest.GetMuxedStreams()
+                .Where(s => s.Container == Container.Mp4)
+                .MaxBy(s => s.VideoQuality);
+
+            quality = best is not null
+                ? $"{best.VideoQuality.Label} MP4"
+                : manifest.GetAudioOnlyStreams().Any() ? "Audio" : null;
+        }
+        catch (Exception)
+        {
+        }
+
+        return new MediaPreview
+        {
+            Title = video.Title,
+            Author = video.Author.ChannelTitle,
+            ThumbnailUrl = thumbnail?.Url,
+            Duration = video.Duration,
+            QualityText = quality,
+            Platform = PlatformName
+        };
+    }
 
     public async Task<DownloadResult> DownloadAsync(
         string url, string outputPath,

@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MediaHub.Models;
 using MediaHub.Services.Downloaders;
 using MediaHub.Services.Interfaces;
 
@@ -15,6 +16,9 @@ public partial class MainViewModel : ObservableObject
     private CancellationTokenSource? _cts;
     private IDownloader? _currentDownloader;
     private string _resolvedDomain = string.Empty;
+
+    private readonly object _previewLock = new();
+    private CancellationTokenSource? _previewCts;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowPlatformBadge))]
@@ -59,7 +63,7 @@ public partial class MainViewModel : ObservableObject
 
     /// <summary>
     /// Stable key for styling the platform chip and input icon:
-    /// "tiktok", "youtube", "soundcloud" or "unknown".
+    /// "tiktok", "youtube", "soundcloud", "vk", "vimeo" or "unknown".
     /// </summary>
     public string PlatformKey
     {
@@ -73,6 +77,10 @@ public partial class MainViewModel : ObservableObject
                 return "youtube";
             if (UrlHelpers.UrlBelongsTo(Url, "soundcloud.com"))
                 return "soundcloud";
+            if (UrlHelpers.UrlBelongsTo(Url, "vk.com", "m.vk.com"))
+                return "vk";
+            if (UrlHelpers.UrlBelongsTo(Url, "vimeo.com"))
+                return "vimeo";
             return "unknown";
         }
     }
@@ -95,6 +103,50 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private int _themeIndex;
 
+    /// <summary>
+    /// Metadata for the "what will be downloaded" card, filled after the URL
+    /// settles and the platform is known.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasPreview))]
+    [NotifyPropertyChangedFor(nameof(ShowPreviewSection))]
+    [NotifyPropertyChangedFor(nameof(PreviewTitle))]
+    [NotifyPropertyChangedFor(nameof(PreviewAuthor))]
+    [NotifyPropertyChangedFor(nameof(HasPreviewAuthor))]
+    [NotifyPropertyChangedFor(nameof(PreviewThumbnailUrl))]
+    [NotifyPropertyChangedFor(nameof(HasPreviewThumbnail))]
+    [NotifyPropertyChangedFor(nameof(PreviewQuality))]
+    [NotifyPropertyChangedFor(nameof(PreviewDurationText))]
+    [NotifyPropertyChangedFor(nameof(HasPreviewDuration))]
+    private MediaPreview? _preview;
+
+    [ObservableProperty]
+    private bool _isPreviewLoading;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowPreviewError))]
+    private string? _previewError;
+
+    public bool HasPreview => Preview is not null;
+
+    /// <summary>
+    /// Keeps the card visible while the preview is being fetched, so the
+    /// spinner has somewhere to live.
+    /// </summary>
+    public bool ShowPreviewSection => HasPreview || IsPreviewLoading;
+
+    public bool ShowPreviewError => !string.IsNullOrEmpty(PreviewError);
+
+    public string PreviewTitle => Preview?.Title ?? string.Empty;
+    public string PreviewAuthor => Preview?.Author ?? string.Empty;
+    public bool HasPreviewAuthor => !string.IsNullOrEmpty(PreviewAuthor);
+    public string PreviewThumbnailUrl => Preview?.ThumbnailUrl ?? string.Empty;
+    public bool HasPreviewThumbnail => !string.IsNullOrEmpty(PreviewThumbnailUrl);
+    public string PreviewQuality => Preview?.QualityText ?? string.Empty;
+    public bool HasPreviewQuality => !string.IsNullOrEmpty(PreviewQuality);
+    public string PreviewDurationText => Preview?.DurationText ?? string.Empty;
+    public bool HasPreviewDuration => !string.IsNullOrEmpty(PreviewDurationText);
+
     public string VersionText => $"MediaHub v{AppInfo.Current.VersionString}  |  daniel-skliphosovsky";
 
     public MainViewModel(DownloaderFactory factory, IFolderPickerService folderPicker, IDialogService dialog)
@@ -115,15 +167,97 @@ public partial class MainViewModel : ObservableObject
         if (string.Equals(domain, _resolvedDomain, StringComparison.Ordinal) && domain.Length > 0)
         {
             OnPropertyChanged(nameof(PlatformKey));
-            return;
+        }
+        else
+        {
+            _resolvedDomain = domain;
+            _currentDownloader = _factory.GetDownloader(value);
+            PlatformName = _currentDownloader?.PlatformName
+                ?? (string.IsNullOrWhiteSpace(value) ? "Auto-detect" : "Unknown");
+
+            OnPropertyChanged(nameof(PlatformKey));
         }
 
-        _resolvedDomain = domain;
-        _currentDownloader = _factory.GetDownloader(value);
-        PlatformName = _currentDownloader?.PlatformName
-            ?? (string.IsNullOrWhiteSpace(value) ? "Auto-detect" : "Unknown");
+        SchedulePreview();
+    }
 
-        OnPropertyChanged(nameof(PlatformKey));
+    /// <summary>
+    /// Debounced preview fetch: cancels any pending request, hides the stale
+    /// card, then loads fresh metadata after the user stops typing.
+    /// </summary>
+    private void SchedulePreview()
+    {
+        lock (_previewLock)
+        {
+            _previewCts?.Cancel();
+            _previewCts?.Dispose();
+            _previewCts = new CancellationTokenSource();
+        }
+
+        Preview = null;
+        PreviewError = null;
+        IsPreviewLoading = false;
+
+        var downloader = _currentDownloader;
+        if (downloader is null || string.IsNullOrWhiteSpace(Url))
+            return;
+
+        var cts = _previewCts;
+        _ = LoadPreviewAfterDebounceAsync(Url, downloader, cts);
+    }
+
+    private async Task LoadPreviewAfterDebounceAsync(string url, IDownloader downloader, CancellationTokenSource cts)
+    {
+        var ct = cts.Token;
+        try
+        {
+            await Task.Delay(650, ct);
+            IsPreviewLoading = true;
+
+            var preview = await downloader.GetPreviewAsync(url, ct);
+            if (ct.IsCancellationRequested)
+                return;
+
+            Preview = preview;
+            PreviewError = preview is null ? "Couldn't load preview" : null;
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception)
+        {
+            if (ct.IsCancellationRequested)
+                return;
+
+            // Preview is best-effort: never block the download because of it.
+            Preview = null;
+            PreviewError = "Couldn't load preview";
+        }
+        finally
+        {
+            // Only the current generation of the preview request may touch the
+            // spinner; an older cancelled one must leave it alone.
+            lock (_previewLock)
+            {
+                if (ReferenceEquals(_previewCts, cts))
+                    IsPreviewLoading = false;
+            }
+        }
+    }
+
+    private void CancelPreview()
+    {
+        lock (_previewLock)
+        {
+            _previewCts?.Cancel();
+            _previewCts?.Dispose();
+            _previewCts = null;
+        }
+
+        // Keep an already-loaded card visible during the download, just stop
+        // any pending fetch and its spinner.
+        IsPreviewLoading = false;
+        PreviewError = null;
     }
 
     [RelayCommand]
@@ -145,6 +279,9 @@ public partial class MainViewModel : ObservableObject
 
         var downloader = _currentDownloader!;
         var cts = new CancellationTokenSource();
+
+        // A download supersedes any in-flight preview request.
+        CancelPreview();
 
         lock (_ctsLock)
         {

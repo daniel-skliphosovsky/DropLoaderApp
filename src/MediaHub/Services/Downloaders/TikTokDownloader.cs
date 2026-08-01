@@ -1,4 +1,5 @@
 using System.Text;
+using MediaHub.Models;
 using MediaHub.Services.Interfaces;
 using TikTokExplode;
 using TikTokExplode.Exceptions;
@@ -18,6 +19,47 @@ public sealed class TikTokDownloader : IDownloader
 
     public bool CanHandle(string url) =>
         UrlHelpers.UrlBelongsTo(url, "tiktok.com", "vm.tiktok.com");
+
+    public async Task<MediaPreview?> GetPreviewAsync(string url, CancellationToken ct = default)
+    {
+        var publication = await _tikTok.Publications.GetAsync(url, ct);
+
+        // Video posts have no cover of their own in the public model, so fall
+        // back to the soundtrack artwork, then the author avatar, and finally
+        // the first photo for image posts.
+        string? thumbnail = null;
+        if (publication.Video is not null)
+        {
+            thumbnail = publication.Soundtrack?.LargeCoverUrl
+                ?? publication.Soundtrack?.MediumCoverUrl
+                ?? publication.Soundtrack?.ThumbCoverUrl
+                ?? publication.Author?.MediumAvatarUrl;
+        }
+        else if (publication.Images is { Count: > 0 })
+        {
+            thumbnail = publication.Images[0].Url;
+        }
+
+        var description = publication.Description?.Trim();
+        if (description is { Length: > 100 })
+            description = description[..100] + "...";
+
+        var quality = publication.Video is not null
+            ? "Video"
+            : publication.Images is { Count: > 0 } images ? $"{images.Count} images" : null;
+
+        return new MediaPreview
+        {
+            Title = description ?? string.Empty,
+            Author = publication.Author?.Nickname ?? string.Empty,
+            ThumbnailUrl = thumbnail,
+            Duration = publication.Video is { Duration: > 0 } video
+                ? TimeSpan.FromMilliseconds(video.Duration)
+                : null,
+            QualityText = quality,
+            Platform = PlatformName
+        };
+    }
 
     public async Task<DownloadResult> DownloadAsync(
         string url, string outputPath,

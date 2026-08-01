@@ -78,6 +78,8 @@ public static class MauiProgram
         builder.Services.AddTransient<IDownloader, TikTokDownloader>();
         builder.Services.AddTransient<IDownloader, YouTubeDownloader>();
         builder.Services.AddTransient<IDownloader, SoundCloudDownloader>();
+        builder.Services.AddTransient<IDownloader, VkDownloader>();
+        builder.Services.AddTransient<IDownloader, VimeoDownloader>();
 
         // ViewModels and Pages
         builder.Services.AddTransient<MainViewModel>();

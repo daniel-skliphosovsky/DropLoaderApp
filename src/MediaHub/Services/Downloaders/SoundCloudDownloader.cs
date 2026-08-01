@@ -1,3 +1,4 @@
+using MediaHub.Models;
 using MediaHub.Services.Interfaces;
 using SoundCloudExplode;
 
@@ -18,6 +19,23 @@ public sealed class SoundCloudDownloader : IDownloader
 
     public bool CanHandle(string url) =>
         UrlHelpers.UrlBelongsTo(url, "soundcloud.com", "on.soundcloud.com");
+
+    public async Task<MediaPreview?> GetPreviewAsync(string url, CancellationToken ct = default)
+    {
+        var track = await _client.Tracks.GetAsync(url, ct);
+        if (track is null)
+            return null;
+
+        return new MediaPreview
+        {
+            Title = track.Title ?? string.Empty,
+            Author = track.User?.Username ?? string.Empty,
+            ThumbnailUrl = track.ArtworkUrl?.ToString(),
+            Duration = track.Duration is { } milliseconds ? TimeSpan.FromMilliseconds(milliseconds) : null,
+            QualityText = "Audio",
+            Platform = PlatformName
+        };
+    }
 
     public async Task<DownloadResult> DownloadAsync(
         string url, string outputPath,
