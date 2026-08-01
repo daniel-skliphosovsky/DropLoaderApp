@@ -340,7 +340,15 @@ public partial class MainViewModel : ObservableObject
         // view model; it is closed when the download finishes, fails or is
         // cancelled (see the finally block below).
         var popup = new DownloadingPopup(this);
-        Shell.Current.ShowPopup(popup);
+        try
+        {
+            Shell.Current.ShowPopup(popup);
+        }
+        catch
+        {
+            // Shell may be unavailable (e.g. during shutdown); the download
+            // still proceeds without the progress popup.
+        }
 
         try
         {
