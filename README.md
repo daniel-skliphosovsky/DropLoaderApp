@@ -1,14 +1,14 @@
-# DropLoader
+# MediaHub
 
 An application that helps you to download media from popular platforms.
 
-Built with .NET MAUI for macOS and Windows. Paste a link from TikTok, YouTube or SoundCloud, pick a folder, and DropLoader takes care of the rest — it detects the platform automatically, downloads the media, and reports progress with the option to cancel at any time.
+Built with .NET MAUI for macOS and Windows. Paste a link from TikTok, YouTube or SoundCloud, pick a folder, and MediaHub takes care of the rest — it detects the platform automatically, downloads the media, and reports progress with the option to cancel at any time.
 
-**v3.0.0** brings a fully redesigned interface: a responsive resizable window (980x640, minimum 780x520), a new app icon and splash screen, platform badges that light up as you type, smoother progress and status feedback, plus the folder picker fix on macOS (cancelling the dialog no longer shows an error).
+**v4.0.0** is a fresh start: the window is bigger and size-constrained (1040x680, minimum 900x620, maximum 1160x760), the download block now floats in the center of the screen, and the whole interface was scaled up — larger fields, buttons and typography, a cleaner single-outline input, the app icon as the header logo, and a moon-only theme toggle.
 
-[![CI](https://img.shields.io/github/actions/workflow/status/daniel-skliphosovsky/DropLoader/ci.yml?style=for-the-badge&label=CI&logo=github)](https://github.com/daniel-skliphosovsky/DropLoader/actions)
-[![Release](https://img.shields.io/github/actions/workflow/status/daniel-skliphosovsky/DropLoader/release.yml?style=for-the-badge&label=Release&logo=github)](https://github.com/daniel-skliphosovsky/DropLoader/actions)
-[![License](https://img.shields.io/badge/License-MIT-6C5CE7?style=for-the-badge)](https://github.com/daniel-skliphosovsky/DropLoader/blob/main/LICENSE)
+[![CI](https://img.shields.io/github/actions/workflow/status/daniel-skliphosovsky/MediaHub/ci.yml?style=for-the-badge&label=CI&logo=github)](https://github.com/daniel-skliphosovsky/MediaHub/actions)
+[![Release](https://img.shields.io/github/actions/workflow/status/daniel-skliphosovsky/MediaHub/release.yml?style=for-the-badge&label=Release&logo=github)](https://github.com/daniel-skliphosovsky/MediaHub/actions)
+[![License](https://img.shields.io/badge/License-MIT-6C5CE7?style=for-the-badge)](https://github.com/daniel-skliphosovsky/MediaHub/blob/main/LICENSE)
 
 # Screenshots
 
@@ -80,11 +80,13 @@ Built with .NET MAUI for macOS and Windows. Paste a link from TikTok, YouTube or
 - TikTok videos and image galleries
 - YouTube videos (best available quality)
 - SoundCloud tracks
+- VK Video — coming soon
 - Automatic platform detection from the URL (short links, www./m. prefixes, any case)
 - Light and Dark theme with one-click switching
-- Progress bar with percentage and byte counts, cancel support
 - Platform badge that updates live while you type the link
-- Responsive resizable window (980x640, minimum 780x520)
+- Progress bar with percentage and byte counts, cancel support
+- Link preview, system tray and notifications
+- Responsive resizable window (1040x680, minimum 900x620, maximum 1160x760)
 - Material Design 3 interface, app icon and splash screen
 
 # Usage
@@ -110,7 +112,7 @@ Also, don't be alarmed if the download doesn't start. This is also related to Ti
 1. **Go to Releases**
    Download the latest version from our GitHub releases page:
 
-   [![Latest Release](https://img.shields.io/badge/Download_Latest_Release-0066CC?style=for-the-badge&logo=github)](https://github.com/daniel-skliphosovsky/DropLoader/releases)
+   [![Latest Release](https://img.shields.io/badge/Download_Latest_Release-0066CC?style=for-the-badge&logo=github)](https://github.com/daniel-skliphosovsky/MediaHub/releases)
 
 2. **Find the latest release**
    Look for the most recent version at the top of the releases page
@@ -128,10 +130,10 @@ Also, don't be alarmed if the download doesn't start. This is also related to Ti
 # Build from Source
 
 ```bash
-git clone https://github.com/daniel-skliphosovsky/DropLoader.git
-cd DropLoader
-dotnet restore src/DropLoader/DropLoader.csproj
-dotnet build src/DropLoader/DropLoader.csproj --configuration Release
+git clone https://github.com/daniel-skliphosovsky/MediaHub.git
+cd MediaHub
+dotnet restore src/MediaHub/MediaHub.csproj
+dotnet build src/MediaHub/MediaHub.csproj --configuration Release
 ```
 
 # License
