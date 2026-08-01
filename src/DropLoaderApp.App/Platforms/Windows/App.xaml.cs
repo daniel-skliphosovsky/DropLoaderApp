@@ -1,6 +1,6 @@
 using Microsoft.UI.Xaml;
 
-namespace DropLoaderApp.App.WinUI;
+namespace DropLoaderApp.WinUI;
 
 public partial class App : MauiWinUIApplication
 {
