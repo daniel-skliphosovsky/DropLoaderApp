@@ -204,7 +204,18 @@ public abstract class ScrapeDownloader : IDownloader
                 RegexOptions.IgnoreCase);
         }
 
-        return match.Success ? WebUtility.HtmlDecode(match.Groups["value"].Value) : null;
+        return match.Success ? DecodeEscapedText(match.Groups["value"].Value) : null;
+    }
+
+    /// <summary>
+    /// Cleans meta content: HTML entities plus any JSON \uXXXX escapes some
+    /// platforms (e.g. VK) embed instead of real characters.
+    /// </summary>
+    private static string DecodeEscapedText(string value)
+    {
+        var decoded = Regex.Replace(value, @"\\u([0-9a-fA-F]{4})",
+            match => ((char)Convert.ToInt32(match.Groups[1].Value, 16)).ToString());
+        return WebUtility.HtmlDecode(decoded);
     }
 
     private static void TryDeleteFile(string? path)

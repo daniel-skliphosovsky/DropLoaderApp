@@ -28,4 +28,11 @@ public sealed class LogEntry
     /// resolved at creation time so the template stays a single Path.
     /// </summary>
     public string IconData { get; init; } = string.Empty;
+
+    /// <summary>
+    /// White inner glyph drawn on top of a filled platform logo (the "VK"
+    /// letters or the YouTube play triangle). Empty for status glyphs and
+    /// stroke-based logos (TikTok, SoundCloud).
+    /// </summary>
+    public string GlyphData { get; init; } = string.Empty;
 }

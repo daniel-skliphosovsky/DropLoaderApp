@@ -1,5 +1,6 @@
 using MediaHub.Models;
 using MediaHub.ViewModels;
+using Microsoft.Maui.ApplicationModel;
 
 namespace MediaHub.Views;
 
@@ -19,6 +20,14 @@ public partial class MainPage : ContentPage
     {
         if (e.Parameter is LogEntry entry && BindingContext is MainViewModel viewModel)
             viewModel.RemoveLogCommand.Execute(entry);
+    }
+
+    /// <summary>
+    /// Opens the MediaHub repository page in the default browser.
+    /// </summary>
+    private async void OnGitHubTapped(object? sender, TappedEventArgs e)
+    {
+        await Launcher.Default.OpenAsync("https://github.com/daniel-skliphosovsky/MediaHub");
     }
 
     protected override void OnDisappearing()

@@ -23,4 +23,21 @@ public partial class MediaHubWindow
         restrictions.MaximumSize = new CGSize(1280, 800);
         restrictions.AllowsFullScreen = false;
     }
+
+    partial void ApplyThemeChrome()
+    {
+        if (Handler?.PlatformView is not UIWindow uiWindow)
+            return;
+
+        // The AppKit titlebar (close/minimize buttons, title) follows the
+        // window's interface style. Without an explicit override it stays
+        // light-on-light when the MAUI theme flips to Light, making the
+        // title text unreadable. The UIKit override propagates to the
+        // titlebar on Catalyst (AppKit types themselves are not exposed in
+        // this workload).
+        var isDark = Application.Current?.UserAppTheme == AppTheme.Dark;
+        uiWindow.OverrideUserInterfaceStyle = isDark
+            ? UIUserInterfaceStyle.Dark
+            : UIUserInterfaceStyle.Light;
+    }
 }

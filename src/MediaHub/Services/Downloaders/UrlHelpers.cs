@@ -46,4 +46,73 @@ internal static class UrlHelpers
 
         return false;
     }
+
+    /// <summary>
+    /// Heuristic: does the URL point at an actual media item (video, track,
+    /// playlist) rather than a bare domain or a profile/search page? A naked
+    /// "youtube.com" must not enable the download button or show a preview
+    /// card, only links that carry a real resource id should. The platform
+    /// libraries still confirm it during parsing; this only gates the early
+    /// UI state.
+    /// </summary>
+    public static bool LooksLikeContentUrl(string url)
+    {
+        var value = string.IsNullOrWhiteSpace(url) ? string.Empty : url.Trim();
+        if (!Uri.TryCreate(value, UriKind.Absolute, out var uri) &&
+            !Uri.TryCreate("https://" + value, UriKind.Absolute, out uri))
+            return false;
+
+        var host = uri.Host.ToLowerInvariant();
+        var path = uri.AbsolutePath.Trim('/');
+
+        // YouTube: youtu.be short links carry the id in the path; watch/shorts/
+        // embed/live pages and playlists (list=...) are real resources.
+        if (host == "youtu.be" || host.EndsWith(".youtu.be", StringComparison.Ordinal))
+            return path.Length > 0;
+
+        if (host == "youtube.com" || host.EndsWith(".youtube.com", StringComparison.Ordinal))
+        {
+            if (path.StartsWith("watch", StringComparison.Ordinal) ||
+                path.StartsWith("shorts/", StringComparison.Ordinal) ||
+                path.StartsWith("embed/", StringComparison.Ordinal) ||
+                path.StartsWith("live/", StringComparison.Ordinal) ||
+                path.StartsWith("playlist", StringComparison.Ordinal))
+                return true;
+
+            return uri.Query.Contains("list=", StringComparison.OrdinalIgnoreCase);
+        }
+
+        // SoundCloud: on.soundcloud.com short links are tracks; full links
+        // need at least two path segments (user/track or user/sets/name).
+        if (host == "on.soundcloud.com" || host.EndsWith(".on.soundcloud.com", StringComparison.Ordinal))
+            return path.Length > 0;
+
+        if (host == "soundcloud.com" || host.EndsWith(".soundcloud.com", StringComparison.Ordinal))
+            return path.Split('/', StringSplitOptions.RemoveEmptyEntries).Length >= 2;
+
+        // TikTok: short links carry the id in the path; full links need a
+        // /@user/video/ or /@user/photo/ resource, a bare profile is not media.
+        if (host == "tiktok.com" || host.EndsWith(".tiktok.com", StringComparison.Ordinal))
+        {
+            if ((host == "vm.tiktok.com" || host == "vt.tiktok.com") && path.Length > 0)
+                return true;
+
+            return path.Contains("/video/", StringComparison.Ordinal) ||
+                   path.Contains("/photo/", StringComparison.Ordinal) ||
+                   path.StartsWith("video/", StringComparison.Ordinal);
+        }
+
+        // VK: /video<oid>_<vid> (and clips) are the media resources; a bare
+        // vk.com or a profile page is not.
+        if (host == "vk.com" || host == "m.vk.com" ||
+            host == "vkvideo.ru" || host == "m.vkvideo.ru" ||
+            host.EndsWith(".vk.com", StringComparison.Ordinal) ||
+            host.EndsWith(".vkvideo.ru", StringComparison.Ordinal))
+        {
+            return path.StartsWith("video", StringComparison.Ordinal) ||
+                   path.StartsWith("clip", StringComparison.Ordinal);
+        }
+
+        return false;
+    }
 }

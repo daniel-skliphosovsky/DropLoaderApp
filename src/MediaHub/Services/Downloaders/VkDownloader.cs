@@ -53,6 +53,12 @@ public sealed class VkDownloader : ScrapeDownloader
     private const string ApiEndpoint = "https://vk.com/al_video.php";
     private const string VideoIdPattern = @"\/video(?<oid>-?\d+)_(?<vid>\d+)";
 
+    // VK embeds non-ASCII text (titles, descriptions, authors) as JSON
+    // \uXXXX escapes in the payload; decode them before display.
+    private static readonly Regex UnicodeEscapeRegex = new(
+        @"\\u(?<hex>[0-9a-fA-F]{4})",
+        RegexOptions.Compiled);
+
     static VkDownloader()
     {
         // VK answers in windows-1251 regardless of the Accept-Charset header.
@@ -172,14 +178,14 @@ public sealed class VkDownloader : ScrapeDownloader
     {
         // First flattened payload entry is the video title.
         string firstLine = html.Split('\n')[0].Trim();
-        return firstLine.Length >= 4 ? firstLine : null;
+        return firstLine.Length >= 4 ? DecodeUnicode(firstLine) : null;
     }
 
     protected override string? ExtractAuthor(string html)
     {
         var match = AuthorRegex.Match(html);
         if (match.Success)
-            return WebUtility.HtmlDecode(match.Groups["author"].Value);
+            return WebUtility.HtmlDecode(DecodeUnicode(match.Groups["author"].Value));
 
         // Older payloads only carry the author id; the channel name is absent.
         return null;
@@ -206,7 +212,7 @@ public sealed class VkDownloader : ScrapeDownloader
         string? best = null;
         foreach (Match match in DescriptionRegex.Matches(html))
         {
-            var text = match.Groups["text"].Value.Trim();
+            var text = DecodeUnicode(match.Groups["text"].Value.Trim());
             if (text.Length > 0 && (best is null || text.Length > best.Length))
                 best = text;
         }
@@ -288,4 +294,12 @@ public sealed class VkDownloader : ScrapeDownloader
 
         return WebUtility.HtmlDecode(value);
     }
+
+    /// <summary>
+    /// Converts JSON \uXXXX escapes into real characters (e.g. "\u041c" to
+    /// Cyrillic "М"). VK serves titles/descriptions/authors escaped this way.
+    /// </summary>
+    private static string DecodeUnicode(string value) =>
+        UnicodeEscapeRegex.Replace(value, match =>
+            ((char)Convert.ToInt32(match.Groups["hex"].Value, 16)).ToString());
 }

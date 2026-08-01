@@ -7,6 +7,7 @@ using MediaHub.Services.Downloaders;
 using MediaHub.Services.Interfaces;
 using MediaHub.Views;
 using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Storage;
 
 namespace MediaHub.ViewModels;
 
@@ -20,6 +21,7 @@ public partial class MainViewModel : ObservableObject
     private CancellationTokenSource? _cts;
     private IDownloader? _currentDownloader;
     private string _resolvedDomain = string.Empty;
+    private bool _resolvedIsContent;
 
     private readonly object _previewLock = new();
     private CancellationTokenSource? _previewCts;
@@ -73,7 +75,10 @@ public partial class MainViewModel : ObservableObject
     {
         get
         {
-            if (string.IsNullOrWhiteSpace(Url))
+            // A bare domain (youtube.com without a video) is not yet a
+            // download; keep the icon and chip "unknown" until a real
+            // resource link is recognized.
+            if (string.IsNullOrWhiteSpace(Url) || !UrlHelpers.LooksLikeContentUrl(Url))
                 return "unknown";
             if (UrlHelpers.UrlBelongsTo(Url, "tiktok.com", "vm.tiktok.com", "vt.tiktok.com", "www.tiktok.com", "m.tiktok.com"))
                 return "tiktok";
@@ -183,20 +188,6 @@ public partial class MainViewModel : ObservableObject
     public string PreviewDurationText => Preview?.DurationText ?? string.Empty;
     public bool HasPreviewDuration => !string.IsNullOrEmpty(PreviewDurationText);
 
-    /// <summary>
-    /// Rows for the expandable "Information" section of the preview card,
-    /// fetched on demand from the platform library/API.
-    /// </summary>
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ShowPreviewDetails))]
-    private IReadOnlyList<ResourceDetail> _previewDetails = [];
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ShowPreviewDetails))]
-    private bool _isDetailsVisible;
-
-    public bool ShowPreviewDetails => IsDetailsVisible && PreviewDetails.Count > 0;
-
     public string VersionText => $"MediaHub v{AppInfo.Current.VersionString}  |  daniel-skliphosovsky";
 
     public MainViewModel(DownloaderFactory factory, IFolderPickerService folderPicker, IDialogService dialog)
@@ -205,23 +196,39 @@ public partial class MainViewModel : ObservableObject
         _folderPicker = folderPicker;
         _dialog = dialog;
 
+        // Remember the last folder the user saved into and restore it as the
+        // default, so downloads land where the user expects them to.
+        var lastPath = Preferences.Default.Get(SavePathKey, string.Empty);
+        if (!string.IsNullOrWhiteSpace(lastPath))
+            OutputPath = lastPath;
+
         // Sync initial theme
         ThemeIndex = Application.Current?.UserAppTheme == AppTheme.Dark ? 1 : 0;
     }
 
+    /// <summary>
+    /// Preferences key holding the last user-picked save folder.
+    /// </summary>
+    private const string SavePathKey = "mediahub.last_save_path";
+
     partial void OnUrlChanged(string value)
     {
-        // Re-resolve the downloader only when the domain actually changes,
-        // not on every keystroke; everything here is cheap.
+        // Re-resolve the downloader only when the domain or the "is this a
+        // real media link" verdict actually changes, not on every keystroke;
+        // everything here is cheap.
         var domain = UrlHelpers.GetDomain(value);
-        if (string.Equals(domain, _resolvedDomain, StringComparison.Ordinal) && domain.Length > 0)
+        var isContent = UrlHelpers.LooksLikeContentUrl(value);
+        if (string.Equals(domain, _resolvedDomain, StringComparison.Ordinal) &&
+            isContent == _resolvedIsContent &&
+            domain.Length > 0)
         {
             OnPropertyChanged(nameof(PlatformKey));
         }
         else
         {
             _resolvedDomain = domain;
-            _currentDownloader = _factory.GetDownloader(value);
+            _resolvedIsContent = isContent;
+            _currentDownloader = isContent ? _factory.GetDownloader(value) : null;
             PlatformName = _currentDownloader?.PlatformName
                 ?? (string.IsNullOrWhiteSpace(value) ? "Auto-detect" : "Unknown");
 
@@ -247,8 +254,6 @@ public partial class MainViewModel : ObservableObject
         Preview = null;
         PreviewError = null;
         IsPreviewLoading = false;
-        PreviewDetails = [];
-        IsDetailsVisible = false;
 
         var downloader = _currentDownloader;
         if (downloader is null || string.IsNullOrWhiteSpace(Url))
@@ -347,7 +352,10 @@ public partial class MainViewModel : ObservableObject
     {
         var path = await _folderPicker.PickFolderAsync();
         if (!string.IsNullOrEmpty(path))
+        {
             OutputPath = path;
+            Preferences.Default.Set(SavePathKey, path);
+        }
     }
 
     [RelayCommand(CanExecute = nameof(CanStartDownloadCore))]
@@ -359,7 +367,16 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        var downloader = _currentDownloader!;
+        var downloader = _currentDownloader;
+        if (downloader is null)
+        {
+            // The button is normally disabled for unsupported links, but the
+            // command can still be invoked programmatically; guard instead of
+            // crashing on a null downloader.
+            await _dialog.ShowErrorAsync("Enter a link to a video or track.", "Unsupported link");
+            return;
+        }
+
         var cts = new CancellationTokenSource();
 
         // A download supersedes any in-flight preview request.
@@ -590,10 +607,22 @@ public partial class MainViewModel : ObservableObject
             Kind = kind,
             PlatformKey = platformKey,
             TimeText = DateTime.Now.ToString("HH:mm:ss"),
-            IconData = GetLogIconData(platformKey, kind)
+            IconData = GetLogIconData(platformKey, kind),
+            GlyphData = GetLogGlyphData(platformKey)
         });
         OnPropertyChanged(nameof(HasLogs));
     }
+
+    /// <summary>
+    /// White inner glyph for the filled platform logos (the "VK" letters and
+    /// the YouTube play triangle); empty for everything else.
+    /// </summary>
+    private static string GetLogGlyphData(string platformKey) => platformKey switch
+    {
+        "youtube" => "M10.6 8.8v6.4l5.4-3.2z",
+        "vk" => "M8.6 8.6l1.9 5 1.9-5h1.6l-2.7 7.2h-1.6L6.9 8.6z",
+        _ => string.Empty
+    };
 
     /// <summary>
     /// Compact SVG path data for the log row icon: the platform logo when the
@@ -602,9 +631,13 @@ public partial class MainViewModel : ObservableObject
     private static string GetLogIconData(string platformKey, string kind) => platformKey switch
     {
         "tiktok" => "M9 18V5l12-2v13 M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0z M21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z",
-        "youtube" => "M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z",
+        // YouTube: red rounded square with the play triangle set inside it
+        // (a margin around the triangle, like the official logo).
+        "youtube" => "M4.5 7A3.5 3.5 0 0 1 8 3.5h8A3.5 3.5 0 0 1 19.5 7v10a3.5 3.5 0 0 1-3.5 3.5H8A3.5 3.5 0 0 1 4.5 17z",
         "soundcloud" => "M2 13v-2 M5 13V9 M8 13V6 M11 13V8 M14 13v-3",
-        "vk" => "M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z M8.5 8.5L11 15.5l3.5-7",
+        // VK: bigger blue rounded square with the "VK" letters inside,
+        // inset from the edges (official proportions).
+        "vk" => "M5.5 5A2.5 2.5 0 0 1 8 2.5h8A2.5 2.5 0 0 1 18.5 5v14a2.5 2.5 0 0 1-2.5 2.5H8A2.5 2.5 0 0 1 5.5 19z",
         _ => kind switch
         {
             "success" => "M20 6L9 17l-5-5",
@@ -615,41 +648,26 @@ public partial class MainViewModel : ObservableObject
     };
 
     /// <summary>
-    /// Loads (once) and toggles the expandable "Information" section of the
-    /// preview card. The extra metadata comes from the platform library/API
-    /// and varies per platform.
+    /// Opens the modal "Information" popup for the current resource. The
+    /// metadata request runs inside the popup (which shows a loading state
+    /// until the platform library answers), not in the card.
     /// </summary>
     [RelayCommand]
-    private async Task ToggleDetailsAsync()
+    private void OpenInfo()
     {
         var downloader = _currentDownloader;
-        if (Preview is null || downloader is null || string.IsNullOrWhiteSpace(Url))
+        if (downloader is null || string.IsNullOrWhiteSpace(Url))
             return;
 
-        if (PreviewDetails.Count == 0)
+        try
         {
-            try
-            {
-                PreviewDetails = await downloader.GetDetailsAsync(Url);
-            }
-            catch (OperationCanceledException)
-            {
-                return;
-            }
-            catch (Exception ex)
-            {
-                AddLog($"Failed to load details: {ex.Message}", "error", PlatformKey);
-                return;
-            }
-
-            if (PreviewDetails.Count == 0)
-            {
-                AddLog("No additional information available for this resource", "muted", PlatformKey);
-                return;
-            }
+            Shell.Current.ShowPopup(new InfoPopup(downloader, Url));
         }
-
-        IsDetailsVisible = !IsDetailsVisible;
+        catch
+        {
+            // Shell may be unavailable (e.g. during shutdown); the popup
+            // simply does not appear in that case.
+        }
     }
 
     private static string FormatBytes(long bytes)

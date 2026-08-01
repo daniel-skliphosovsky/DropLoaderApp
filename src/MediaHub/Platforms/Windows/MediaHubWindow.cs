@@ -17,4 +17,8 @@ public partial class MediaHubWindow
             presenter.IsMinimizable = false;
         }
     }
+
+    // WinUI draws the titlebar from the app theme automatically, so there is
+    // nothing extra to sync here.
+    partial void ApplyThemeChrome() { }
 }
