@@ -22,14 +22,6 @@
         <Setter Property="LineHeight" Value="1.2" />
     </Style>
 
-    <!-- Section heading inside the card -->
-    <Style x:Key="SectionTitleLabel" TargetType="Label">
-        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
-        <Setter Property="FontSize" Value="22" />
-        <Setter Property="FontAttributes" Value="Bold" />
-        <Setter Property="FontFamily" Value="OpenSansSemibold" />
-    </Style>
-
     <!-- Field label above inputs -->
     <Style x:Key="FieldLabel" TargetType="Label">
         <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />

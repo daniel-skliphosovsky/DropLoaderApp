@@ -4,28 +4,28 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <!-- Design tokens. Dark theme is the headline (deep blue surfaces,
-         rose #E11D48 accent, engagement blue #2563EB secondary). -->
+    <!-- Design tokens. Dark theme is the headline (violet-tinted surfaces,
+         deep violet #7C3AED accent, violet #8B5CF6 secondary). -->
 
     <!-- ============ Light Theme ============ -->
-    <Color x:Key="BackgroundLight">#F5F5F8</Color>
+    <Color x:Key="BackgroundLight">#F7F5FC</Color>
     <Color x:Key="SurfaceLight">#FFFFFF</Color>
-    <Color x:Key="SurfaceContainerLight">#F0F0F5</Color>
-    <Color x:Key="SurfaceVariantLight">#E9E9F2</Color>
+    <Color x:Key="SurfaceContainerLight">#F1EDF9</Color>
+    <Color x:Key="SurfaceVariantLight">#EBE6F7</Color>
 
-    <Color x:Key="PrimaryLight">#E11D48</Color>
-    <Color x:Key="PrimaryVariantLight">#BE123C</Color>
-    <Color x:Key="PrimaryContainerLight">#FFE3E8</Color>
-    <Color x:Key="OnPrimaryContainerLight">#8E0030</Color>
+    <Color x:Key="PrimaryLight">#7C3AED</Color>
+    <Color x:Key="PrimaryVariantLight">#6D28D9</Color>
+    <Color x:Key="PrimaryContainerLight">#EDE9FE</Color>
+    <Color x:Key="OnPrimaryContainerLight">#4C1D95</Color>
     <Color x:Key="OnPrimaryLight">#FFFFFF</Color>
 
-    <Color x:Key="SecondaryLight">#2563EB</Color>
+    <Color x:Key="SecondaryLight">#8B5CF6</Color>
 
     <Color x:Key="OnSurfaceLight">#1A1A2E</Color>
     <Color x:Key="OnSurfaceVariantLight">#4E4E5C</Color>
 
-    <Color x:Key="OutlineLight">#D6D6E0</Color>
-    <Color x:Key="DividerLight">#E8E8F0</Color>
+    <Color x:Key="OutlineLight">#D9D4E6</Color>
+    <Color x:Key="DividerLight">#EAE6F4</Color>
 
     <Color x:Key="ErrorLight">#C62828</Color>
     <Color x:Key="ErrorContainerLight">#FFE3E0</Color>
@@ -56,24 +56,24 @@
     <Color x:Key="OnVKContainerLight">#00458F</Color>
 
     <!-- ============ Dark Theme ============ -->
-    <Color x:Key="BackgroundDark">#0B0F19</Color>
-    <Color x:Key="SurfaceDark">#111827</Color>
-    <Color x:Key="SurfaceContainerDark">#1A2233</Color>
-    <Color x:Key="SurfaceVariantDark">#161F33</Color>
+    <Color x:Key="BackgroundDark">#0C0A18</Color>
+    <Color x:Key="SurfaceDark">#141124</Color>
+    <Color x:Key="SurfaceContainerDark">#1C1730</Color>
+    <Color x:Key="SurfaceVariantDark">#191431</Color>
 
-    <Color x:Key="PrimaryDark">#E11D48</Color>
-    <Color x:Key="PrimaryVariantDark">#BE123C</Color>
-    <Color x:Key="PrimaryContainerDark">#4C1130</Color>
-    <Color x:Key="OnPrimaryContainerDark">#FFD3DE</Color>
+    <Color x:Key="PrimaryDark">#8B5CF6</Color>
+    <Color x:Key="PrimaryVariantDark">#7C3AED</Color>
+    <Color x:Key="PrimaryContainerDark">#2E1065</Color>
+    <Color x:Key="OnPrimaryContainerDark">#DDD6FE</Color>
     <Color x:Key="OnPrimaryDark">#FFFFFF</Color>
 
-    <Color x:Key="SecondaryDark">#2563EB</Color>
+    <Color x:Key="SecondaryDark">#A78BFA</Color>
 
     <Color x:Key="OnSurfaceDark">#F3F4F6</Color>
     <Color x:Key="OnSurfaceVariantDark">#9CA3AF</Color>
 
-    <Color x:Key="OutlineDark">#2A3348</Color>
-    <Color x:Key="DividerDark">#2A3348</Color>
+    <Color x:Key="OutlineDark">#2E2742</Color>
+    <Color x:Key="DividerDark">#2E2742</Color>
 
     <Color x:Key="ErrorDark">#F87171</Color>
     <Color x:Key="ErrorContainerDark">#3B1116</Color>

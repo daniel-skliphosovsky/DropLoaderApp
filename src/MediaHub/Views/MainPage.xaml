@@ -57,10 +57,8 @@
                         <Border Style="{StaticResource CardBorder}" Padding="32,26">
                             <VerticalStackLayout Spacing="20">
 
-                                <Label Text="Add a link" Style="{StaticResource SectionTitleLabel}" FontSize="20" />
-
-                                <!-- URL row: input + paste + download -->
-                                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+                                <!-- URL row: input + download -->
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                                     <Border Style="{StaticResource InputContainer}">
                                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
 
@@ -160,14 +158,7 @@
                                         </Grid>
                                     </Border>
 
-                                    <Button Grid.Column="1" Text="Paste"
-                                            Command="{Binding PasteCommand}"
-                                            Style="{StaticResource SecondaryButton}"
-                                            HeightRequest="56" Padding="18,0"
-                                            VerticalOptions="Center"
-                                            SemanticProperties.Description="Paste the link from the clipboard" />
-
-                                    <Button Grid.Column="2" Text="Download"
+                                    <Button Grid.Column="1" Text="Download"
                                             Command="{Binding DownloadCommand}"
                                             IsEnabled="{Binding CanStartDownload}"
                                             Style="{StaticResource DownloadButton}"
@@ -232,100 +223,8 @@
                                     </Border.Triggers>
                                     <Grid RowDefinitions="Auto,Auto" RowSpacing="14">
 
-                                        <Grid ColumnDefinitions="112,*" ColumnSpacing="16">
-
-                                            <!-- Thumbnail: lazy AsyncImage over a platform-tinted
-                                                 placeholder, so the card works without a picture -->
-                                            <Border Grid.Column="0" WidthRequest="112" HeightRequest="112"
-                                                    StrokeThickness="0" StrokeShape="RoundRectangle 12"
-                                                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariantLight}, Dark={StaticResource SurfaceVariantDark}}">
-                                                <Border.Triggers>
-                                                    <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="tiktok">
-                                                        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource TikTokContainerLight}, Dark={StaticResource TikTokContainerDark}}" />
-                                                    </DataTrigger>
-                                                    <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="youtube">
-                                                        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource YouTubeContainerLight}, Dark={StaticResource YouTubeContainerDark}}" />
-                                                    </DataTrigger>
-                                                    <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="soundcloud">
-                                                        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource SoundCloudContainerLight}, Dark={StaticResource SoundCloudContainerDark}}" />
-                                                    </DataTrigger>
-                                                    <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="vk">
-                                                        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource VKContainerLight}, Dark={StaticResource VKContainerDark}}" />
-                                                    </DataTrigger>
-                                                </Border.Triggers>
-                                                <Grid>
-                                                    <!-- Placeholder icons, visible until the image loads -->
-                                                    <Path Fill="Transparent" IsVisible="False"
-                                                          Stroke="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}"
-                                                          StrokeThickness="2" StrokeLineCap="Round" StrokeLineJoin="Round"
-                                                          Aspect="Uniform" WidthRequest="40" HeightRequest="40"
-                                                          HorizontalOptions="Center" VerticalOptions="Center"
-                                                          Data="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71 M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71">
-                                                        <Path.Triggers>
-                                                            <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="unknown">
-                                                                <Setter Property="IsVisible" Value="True" />
-                                                            </DataTrigger>
-                                                        </Path.Triggers>
-                                                    </Path>
-                                                    <Path Fill="Transparent" IsVisible="False"
-                                                          Stroke="{AppThemeBinding Light={StaticResource TikTokLight}, Dark={StaticResource TikTokDark}}"
-                                                          StrokeThickness="2" StrokeLineCap="Round" StrokeLineJoin="Round"
-                                                          Aspect="Uniform" WidthRequest="40" HeightRequest="40"
-                                                          HorizontalOptions="Center" VerticalOptions="Center"
-                                                          Data="M9 18V5l12-2v13 M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0z M21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z">
-                                                        <Path.Triggers>
-                                                            <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="tiktok">
-                                                                <Setter Property="IsVisible" Value="True" />
-                                                            </DataTrigger>
-                                                        </Path.Triggers>
-                                                    </Path>
-                                                    <Path Fill="Transparent" IsVisible="False"
-                                                          Stroke="{AppThemeBinding Light={StaticResource YouTubeLight}, Dark={StaticResource YouTubeDark}}"
-                                                          StrokeThickness="2" StrokeLineCap="Round" StrokeLineJoin="Round"
-                                                          Aspect="Uniform" WidthRequest="40" HeightRequest="40"
-                                                          HorizontalOptions="Center" VerticalOptions="Center"
-                                                          Data="M10 9.5v5l4.5-2.5z">
-                                                        <Path.Triggers>
-                                                            <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="youtube">
-                                                                <Setter Property="IsVisible" Value="True" />
-                                                            </DataTrigger>
-                                                        </Path.Triggers>
-                                                    </Path>
-                                                    <Path Fill="Transparent" IsVisible="False"
-                                                          Stroke="{AppThemeBinding Light={StaticResource SoundCloudLight}, Dark={StaticResource SoundCloudDark}}"
-                                                          StrokeThickness="2.2" StrokeLineCap="Round"
-                                                          Aspect="Uniform" WidthRequest="40" HeightRequest="40"
-                                                          HorizontalOptions="Center" VerticalOptions="Center"
-                                                          Data="M2 13v-2 M5 13V9 M8 13V6 M11 13V8 M14 13v-3">
-                                                        <Path.Triggers>
-                                                            <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="soundcloud">
-                                                                <Setter Property="IsVisible" Value="True" />
-                                                            </DataTrigger>
-                                                        </Path.Triggers>
-                                                    </Path>
-                                                    <Path Fill="Transparent" IsVisible="False"
-                                                          Stroke="{AppThemeBinding Light={StaticResource VKLight}, Dark={StaticResource VKDark}}"
-                                                          StrokeThickness="2" StrokeLineCap="Round" StrokeLineJoin="Round"
-                                                          Aspect="Uniform" WidthRequest="40" HeightRequest="40"
-                                                          HorizontalOptions="Center" VerticalOptions="Center"
-                                                          Data="M8.5 8.5L11 15.5l3.5-7">
-                                                        <Path.Triggers>
-                                                            <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="vk">
-                                                                <Setter Property="IsVisible" Value="True" />
-                                                            </DataTrigger>
-                                                        </Path.Triggers>
-                                                    </Path>
-
-                                                    <!-- Lazy image on top; while it is null, still
-                                                         loading or failed, the placeholder shows through -->
-                                                    <Image Source="{Binding PreviewThumbnailUrl}"
-                                                           Aspect="AspectFill"
-                                                           SemanticProperties.Description="Preview thumbnail" />
-                                                </Grid>
-                                            </Border>
-
-                                            <!-- Title, author, duration, quality -->
-                                            <VerticalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
+                                        <!-- Platform, title, author, duration -->
+                                        <VerticalStackLayout Spacing="8">
                                                 <Border Style="{StaticResource ChipStyle}"
                                                         Padding="10,3" HorizontalOptions="Start"
                                                         IsVisible="{Binding ShowPlatformBadge}">
@@ -383,7 +282,6 @@
                                                            TextColor="{AppThemeBinding Light={StaticResource PrimaryVariantLight}, Dark={StaticResource PrimaryDark}}" />
                                                 </HorizontalStackLayout>
                                             </VerticalStackLayout>
-                                        </Grid>
 
                                         <!-- Actions: big download + clear -->
                                         <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="10">

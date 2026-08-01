@@ -6,30 +6,40 @@
            x:Class="MediaHub.Views.DownloadingPopup"
            x:DataType="vm:MainViewModel"
            CanBeDismissedByTappingOutsideOfPopup="False"
-           Size="440, 240"
            Color="{AppThemeBinding Light={StaticResource BackgroundLight}, Dark={StaticResource BackgroundDark}}">
 
-    <!-- Compact modal card: every row earns its height, the middle row absorbs
-         the slack, so there is no dead space under the Cancel button. -->
+    <!-- Compact modal card: title, then a clear gap, the progress bar, the
+         same gap again, and a full-width Stop button. No percentage text,
+         no empty space at the bottom: the popup sizes to its content. -->
     <Border StrokeThickness="1"
             StrokeShape="RoundRectangle 20"
             Padding="24,22"
             BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}"
             Stroke="{AppThemeBinding Light={StaticResource OutlineLight}, Dark={StaticResource OutlineDark}}">
-        <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="12">
+        <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="24">
 
-            <!-- Header: spinner + title + file name -->
-            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+            <!-- Header: spinner + heading + file name + bytes/speed -->
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
                 <ActivityIndicator IsRunning="True" IsVisible="True"
                                    WidthRequest="20" HeightRequest="20"
                                    Color="{AppThemeBinding Light={StaticResource PrimaryLight}, Dark={StaticResource PrimaryDark}}" />
-                <VerticalStackLayout Grid.Column="1" Spacing="2">
-                    <Label Text="Downloading"
+                <VerticalStackLayout Grid.Column="1" Spacing="3">
+                    <Label Text="{Binding DownloadHeadingText}"
                            FontSize="18" FontAttributes="Bold"
                            TextColor="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
                     <Label Text="{Binding DownloadFileName}"
                            FontSize="13" MaxLines="2" LineBreakMode="TailTruncation"
                            TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
+                    <HorizontalStackLayout Spacing="14">
+                        <Label Text="{Binding ProgressText}"
+                               IsVisible="{Binding ShowProgressText}"
+                               FontSize="12" LineBreakMode="TailTruncation"
+                               TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
+                        <Label Text="{Binding DownloadSpeedText}"
+                               IsVisible="{Binding ShowDownloadSpeed}"
+                               FontSize="12" FontAttributes="Bold"
+                               TextColor="{AppThemeBinding Light={StaticResource PrimaryVariantLight}, Dark={StaticResource PrimaryDark}}" />
+                    </HorizontalStackLayout>
                 </VerticalStackLayout>
             </Grid>
 
@@ -46,29 +56,11 @@
                                    Color="{AppThemeBinding Light={StaticResource PrimaryLight}, Dark={StaticResource PrimaryDark}}" />
             </Grid>
 
-            <!-- Stats: percent + bytes on the left, speed on the right -->
-            <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="12" VerticalOptions="Center">
-                <Label Text="{Binding ProgressText}"
-                       FontSize="13" LineBreakMode="TailTruncation"
-                       VerticalOptions="Center"
-                       TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
-                <Label Grid.Column="1"
-                       Text="{Binding DownloadSpeedText}"
-                       IsVisible="{Binding ShowDownloadSpeed}"
-                       FontSize="13" FontAttributes="Bold"
-                       VerticalOptions="Center"
-                       TextColor="{AppThemeBinding Light={StaticResource PrimaryVariantLight}, Dark={StaticResource PrimaryDark}}" />
-            </Grid>
-
-            <!-- Cancel: compact, pinned to the bottom-right -->
-            <Button Grid.Row="3"
-                    Text="Cancel"
+            <!-- Stop: full width of the popup -->
+            <Button Grid.Row="2"
+                    Text="Stop"
                     Command="{Binding CancelDownloadCommand}"
-                    HorizontalOptions="End"
-                    HeightRequest="38" CornerRadius="10" Padding="22,0"
-                    FontSize="14" FontAttributes="Bold"
-                    BackgroundColor="{AppThemeBinding Light={StaticResource ErrorContainerLight}, Dark={StaticResource ErrorContainerDark}}"
-                    TextColor="{AppThemeBinding Light={StaticResource OnErrorContainerLight}, Dark={StaticResource OnErrorContainerDark}}"
+                    Style="{StaticResource DangerButton}"
                     SemanticProperties.Description="Cancel the current download" />
         </Grid>
     </Border>

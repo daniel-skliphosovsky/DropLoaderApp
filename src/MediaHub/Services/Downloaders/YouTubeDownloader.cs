@@ -20,6 +20,51 @@ public sealed class YouTubeDownloader : IDownloader
     public bool CanHandle(string url) =>
         UrlHelpers.UrlBelongsTo(url, "youtube.com", "youtu.be");
 
+    /// <summary>
+    /// A YouTube URL is a playlist when it carries a "list=" query parameter
+    /// (playlists, mixes, watch-with-list, youtu.be short links).
+    /// </summary>
+    public bool IsPlaylistUrl(string url) => TryGetPlaylistId(url, out _);
+
+    /// <summary>
+    /// Resolves the playlist id from the URL and enumerates its videos in
+    /// play order, each as its own watch URL so the shared single-video
+    /// download path can be reused for every item.
+    /// </summary>
+    public async Task<IReadOnlyList<PlaylistItem>> GetPlaylistItemsAsync(string url, CancellationToken ct = default)
+    {
+        if (!TryGetPlaylistId(url, out var playlistId) || playlistId is null)
+            return [];
+
+        var items = new List<PlaylistItem>();
+        await foreach (var video in _client.Playlists.GetVideosAsync(playlistId, ct))
+            items.Add(new PlaylistItem($"https://www.youtube.com/watch?v={video.Id.Value}", video.Title));
+
+        return items;
+    }
+
+    private static bool TryGetPlaylistId(string url, out string? playlistId)
+    {
+        playlistId = null;
+
+        var value = string.IsNullOrWhiteSpace(url) ? string.Empty : url.Trim();
+        if (!Uri.TryCreate(value, UriKind.Absolute, out var uri) &&
+            !Uri.TryCreate("https://" + value, UriKind.Absolute, out uri))
+            return false;
+
+        foreach (var pair in uri.Query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var kv = pair.Split('=', 2);
+            if (kv.Length == 2 && kv[0].Equals("list", StringComparison.OrdinalIgnoreCase) && kv[1].Length > 0)
+            {
+                playlistId = kv[1];
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public async Task<MediaPreview?> GetPreviewAsync(string url, CancellationToken ct = default)
     {
         var video = await _client.Videos.GetAsync(url, ct);

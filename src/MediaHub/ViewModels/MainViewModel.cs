@@ -90,7 +90,14 @@ public partial class MainViewModel : ObservableObject
     private double _progress;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowProgressText))]
     private string _progressText = string.Empty;
+
+    /// <summary>
+    /// Byte counter line ("12.3 MB of 45.6 MB"); hidden when the downloader
+    /// reports no byte counts.
+    /// </summary>
+    public bool ShowProgressText => !string.IsNullOrEmpty(ProgressText);
 
     /// <summary>
     /// True while the downloader reports no percentage (unknown total size),
@@ -120,6 +127,13 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string _downloadFileName = string.Empty;
 
+    /// <summary>
+    /// Heading of the progress popup: "Downloading" for a single item,
+    /// "Track X of Y" while a playlist is being downloaded.
+    /// </summary>
+    [ObservableProperty]
+    private string _downloadHeadingText = "Downloading";
+
     public bool ShowStatus => !string.IsNullOrEmpty(Status);
 
     [ObservableProperty]
@@ -135,8 +149,6 @@ public partial class MainViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(PreviewTitle))]
     [NotifyPropertyChangedFor(nameof(PreviewAuthor))]
     [NotifyPropertyChangedFor(nameof(HasPreviewAuthor))]
-    [NotifyPropertyChangedFor(nameof(PreviewThumbnailUrl))]
-    [NotifyPropertyChangedFor(nameof(HasPreviewThumbnail))]
     [NotifyPropertyChangedFor(nameof(PreviewQuality))]
     [NotifyPropertyChangedFor(nameof(PreviewDurationText))]
     [NotifyPropertyChangedFor(nameof(HasPreviewDuration))]
@@ -162,8 +174,6 @@ public partial class MainViewModel : ObservableObject
     public string PreviewTitle => Preview?.Title ?? string.Empty;
     public string PreviewAuthor => Preview?.Author ?? string.Empty;
     public bool HasPreviewAuthor => !string.IsNullOrEmpty(PreviewAuthor);
-    public string PreviewThumbnailUrl => Preview?.ThumbnailUrl ?? string.Empty;
-    public bool HasPreviewThumbnail => !string.IsNullOrEmpty(PreviewThumbnailUrl);
     public string PreviewQuality => Preview?.QualityText ?? string.Empty;
     public bool HasPreviewQuality => !string.IsNullOrEmpty(PreviewQuality);
     public string PreviewDurationText => Preview?.DurationText ?? string.Empty;
@@ -351,6 +361,7 @@ public partial class MainViewModel : ObservableObject
         _lastSpeedAt = default;
         Status = string.Empty;
         StatusKind = string.Empty;
+        DownloadHeadingText = "Downloading";
         DownloadFileName = DeriveDownloadFileName();
 
         // The progress lives in a separate modal popup bound to this same
@@ -392,25 +403,61 @@ public partial class MainViewModel : ObservableObject
                     Status = p.Status;
             });
 
-            var result = await downloader.DownloadAsync(Url, OutputPath, progress, cts.Token);
-
-            if (result.Success)
+            // Playlist URLs expand into one target per item, each downloaded
+            // in sequence through the shared single-video download path.
+            var targets = new List<(string Title, string Url)>();
+            if (downloader.IsPlaylistUrl(Url))
             {
-                Status = "Downloaded successfully";
-                StatusKind = "success";
-                await _dialog.ShowAlertAsync("Success", $"Saved to {result.FilePath}");
-            }
-            else if (cts.IsCancellationRequested ||
-                     string.Equals(result.ErrorMessage, "Cancelled", StringComparison.OrdinalIgnoreCase))
-            {
-                Status = "Download cancelled";
-                StatusKind = "muted";
+                var items = await downloader.GetPlaylistItemsAsync(Url, cts.Token);
+                targets.AddRange(items.Select(i => (i.Title, i.Url)));
             }
             else
             {
-                Status = $"Failed: {result.ErrorMessage}";
+                targets.Add((DownloadFileName, Url));
+            }
+
+            if (targets.Count == 0)
+            {
+                Status = "Failed: no items found in playlist";
                 StatusKind = "error";
-                await _dialog.ShowErrorAsync(result.ErrorMessage ?? "Something went wrong while downloading");
+                await _dialog.ShowErrorAsync("Couldn't find any items in this playlist.");
+            }
+            else
+            {
+                for (var i = 0; i < targets.Count; i++)
+                {
+                    cts.Token.ThrowIfCancellationRequested();
+
+                    if (targets.Count > 1)
+                    {
+                        DownloadHeadingText = $"Track {i + 1} of {targets.Count}";
+                        DownloadFileName = targets[i].Title;
+                    }
+
+                    var result = await downloader.DownloadAsync(targets[i].Url, OutputPath, progress, cts.Token);
+
+                    if (result.Success)
+                    {
+                        Status = "Downloaded successfully";
+                        StatusKind = "success";
+                        if (i == targets.Count - 1)
+                            await _dialog.ShowAlertAsync("Success", $"Saved to {result.FilePath}");
+                    }
+                    else if (cts.IsCancellationRequested ||
+                             string.Equals(result.ErrorMessage, "Cancelled", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Status = "Download cancelled";
+                        StatusKind = "muted";
+                        break;
+                    }
+                    else
+                    {
+                        Status = $"Failed: {result.ErrorMessage}";
+                        StatusKind = "error";
+                        await _dialog.ShowErrorAsync(result.ErrorMessage ?? "Something went wrong while downloading");
+                        break;
+                    }
+                }
             }
         }
         catch (OperationCanceledException)
@@ -466,17 +513,16 @@ public partial class MainViewModel : ObservableObject
         return $"{PlatformName} download";
     }
 
+    /// <summary>
+    /// Byte counter only ("12.3 MB of 45.6 MB", or just the received bytes
+    /// when the total is unknown). No percentage anywhere.
+    /// </summary>
     private static string FormatProgress(DownloadProgress p)
     {
-        var parts = new List<string>(2);
-
-        if (p.Percentage is { } percent)
-            parts.Add($"{percent * 100:F0}%");
-
         if (p.TotalBytes is > 0)
-            parts.Add($"{FormatBytes(p.BytesReceived)} of {FormatBytes(p.TotalBytes.Value)}");
+            return $"{FormatBytes(p.BytesReceived)} of {FormatBytes(p.TotalBytes.Value)}";
 
-        return parts.Count > 0 ? string.Join("  ·  ", parts) : string.Empty;
+        return p.BytesReceived > 0 ? FormatBytes(p.BytesReceived) : string.Empty;
     }
 
     private long _lastBytes;
@@ -505,14 +551,6 @@ public partial class MainViewModel : ObservableObject
         DownloadSpeedText = $"{FormatBytes((long)((p.BytesReceived - _lastBytes) / elapsed))}/s";
         _lastBytes = p.BytesReceived;
         _lastSpeedAt = now;
-    }
-
-    [RelayCommand]
-    private async Task PasteAsync()
-    {
-        var text = await Clipboard.Default.GetTextAsync();
-        if (!string.IsNullOrWhiteSpace(text))
-            Url = text.Trim();
     }
 
     /// <summary>
