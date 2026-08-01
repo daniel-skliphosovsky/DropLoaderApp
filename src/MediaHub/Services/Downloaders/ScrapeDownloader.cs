@@ -13,7 +13,7 @@ namespace MediaHub.Services.Downloaders;
 /// </summary>
 public abstract class ScrapeDownloader : IDownloader
 {
-    private const string UserAgent =
+    protected const string UserAgent =
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
 
     protected readonly HttpClient Http;
@@ -84,6 +84,7 @@ public abstract class ScrapeDownloader : IDownloader
             request.Headers.UserAgent.ParseAdd(UserAgent);
             if (Uri.TryCreate(ResolvePageUrl(url), UriKind.Absolute, out var referer))
                 request.Headers.Referrer = referer;
+            ApplyDownloadHeaders(request, url);
 
             using var response = await Http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
             response.EnsureSuccessStatusCode();
@@ -119,7 +120,7 @@ public abstract class ScrapeDownloader : IDownloader
         }
     }
 
-    protected async Task<string> FetchPageAsync(string url, CancellationToken ct)
+    protected virtual async Task<string> FetchPageAsync(string url, CancellationToken ct)
     {
         using var request = new HttpRequestMessage(HttpMethod.Get, EnsureHttps(url));
         request.Headers.UserAgent.ParseAdd(UserAgent);
@@ -127,6 +128,12 @@ public abstract class ScrapeDownloader : IDownloader
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsStringAsync(ct);
     }
+
+    /// <summary>
+    /// Adds downloader-specific headers to the media request (e.g. Origin for
+    /// CDNs that reject requests from unknown referrers).
+    /// </summary>
+    protected virtual void ApplyDownloadHeaders(HttpRequestMessage request, string url) { }
 
     /// <summary>
     /// Upgrades a plain-http URL to https. Page and media requests never go

@@ -1,20 +1,38 @@
 using System.Net;
+using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using MediaHub.Services.Interfaces;
 
 namespace MediaHub.Services.Downloaders;
 
 /// <summary>
-/// VK video scraper. Public videos embed the stream URLs as JSON keys on the
-/// mobile page ("url240".."url2160"); no token needed as long as the video is
-/// public. Private or region-restricted videos simply have no such keys, in
-/// which case a clear error is returned.
+/// VK video downloader. VK stopped embedding stream URLs in the page HTML
+/// (JS-rendered), so this downloader calls the internal al_video.php endpoint
+/// the web player itself uses: a POST with act=show returns the direct
+/// "urlXXX" mp4 links in the payload. No login needed for public videos;
+/// private or region-restricted videos simply have no such keys.
 /// </summary>
 public sealed class VkDownloader : ScrapeDownloader
 {
     private static readonly Regex StreamRegex = new(
         @"""url(?<quality>\d{3,4})""\s*:\s*""(?<url>https?:\\?/\\?/[^""]+)""",
         RegexOptions.Compiled);
+
+    private static readonly Regex AuthorRegex = new(
+        @"""md_author""\s*:\s*""(?<author>[^""]+)""",
+        RegexOptions.Compiled);
+
+    private static readonly Regex DurationRegex = new(
+        @"""duration""\s*:\s*(?<seconds>\d+)",
+        RegexOptions.Compiled);
+
+    private static readonly Regex ThumbnailRegex = new(
+        @"""jpg""\s*:\s*""(?<url>https?:\\?/\\?/[^""]+)""",
+        RegexOptions.Compiled);
+
+    private const string ApiEndpoint = "https://vk.com/al_video.php";
+    private const string VideoIdPattern = @"\/video(?<oid>-?\d+)_(?<vid>\d+)";
 
     public VkDownloader(HttpClient http) : base(http) { }
 
@@ -28,14 +46,68 @@ public sealed class VkDownloader : ScrapeDownloader
 
     protected override string ResolvePageUrl(string url)
     {
-        // The mobile layout is lighter and still embeds the video data.
-        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) &&
-            !Uri.TryCreate("https://" + url, UriKind.Absolute, out uri))
-            return url;
+        // The API call is the same regardless of the domain, so the original
+        // url is used only to extract the video id. Keep it as-is.
+        return url;
+    }
 
-        return uri.Host == "m.vk.com"
-            ? uri.AbsoluteUri
-            : "https://m." + uri.Authority + uri.PathAndQuery;
+    protected override async Task<string> FetchPageAsync(string url, CancellationToken ct)
+    {
+        string? videoId = ExtractVideoId(url);
+        if (videoId is null)
+            return string.Empty;
+
+        var content = new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["act"] = "show",
+            ["video"] = videoId,
+            ["al"] = "1"
+        });
+
+        using var request = new HttpRequestMessage(HttpMethod.Post, ApiEndpoint) { Content = content };
+        request.Headers.UserAgent.ParseAdd(UserAgent);
+        request.Headers.Referrer = new Uri("https://vk.com/");
+        request.Headers.TryAddWithoutValidation("X-Requested-With", "XMLHttpRequest");
+
+        using var response = await Http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
+        response.EnsureSuccessStatusCode();
+
+        byte[] bytes = await response.Content.ReadAsByteArrayAsync(ct);
+        // VK answers in windows-1251 regardless of the Accept-Charset header.
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        string payload = Encoding.GetEncoding("windows-1251").GetString(bytes);
+
+        // The payload is a JSON array: [0, [title, videoBoxHtml, jsTemplates, infoHtml, opts]].
+        // Flatten all parts (the trailing opts object included) so the extractors
+        // can parse one string; the first payload entry is the video title.
+        using var document = JsonDocument.Parse(payload);
+        JsonElement root = document.RootElement;
+
+        if (root.TryGetProperty("payload", out JsonElement payloadArr)
+            && payloadArr.GetArrayLength() > 1
+            && payloadArr[1].ValueKind == JsonValueKind.Array)
+        {
+            var builder = new StringBuilder();
+            foreach (JsonElement part in payloadArr[1].EnumerateArray())
+            {
+                switch (part.ValueKind)
+                {
+                    case JsonValueKind.String:
+                        builder.Append(part.GetString());
+                        break;
+                    case JsonValueKind.Object:
+                    case JsonValueKind.Array:
+                        builder.Append(JsonSerializer.Serialize(part));
+                        break;
+                    default:
+                        continue;
+                }
+                builder.Append('\n');
+            }
+            return builder.ToString();
+        }
+
+        return payload;
     }
 
     protected override IEnumerable<(string Quality, string Url)> ExtractStreams(string html)
@@ -59,6 +131,56 @@ public sealed class VkDownloader : ScrapeDownloader
         return streams;
     }
 
+    protected override string? ExtractTitle(string html)
+    {
+        // First flattened payload entry is the video title.
+        string firstLine = html.Split('\n')[0].Trim();
+        return firstLine.Length >= 4 ? firstLine : null;
+    }
+
+    protected override string? ExtractAuthor(string html)
+    {
+        var match = AuthorRegex.Match(html);
+        if (match.Success)
+            return WebUtility.HtmlDecode(match.Groups["author"].Value);
+
+        // Older payloads only carry the author id; the channel name is absent.
+        return null;
+    }
+
+    protected override long? ExtractDurationSeconds(string html)
+    {
+        // Pick the longest duration value, which is the video itself (the
+        // payload also embeds durations of recommended videos).
+        long? best = null;
+        foreach (Match match in DurationRegex.Matches(html))
+        {
+            if (long.TryParse(match.Groups["seconds"].Value, out long seconds)
+                && (best is null || seconds > best))
+                best = seconds;
+        }
+        return best;
+    }
+
+    protected override string? ExtractThumbnail(string html)
+    {
+        var match = ThumbnailRegex.Match(html);
+        return match.Success ? Unescape(match.Groups["url"].Value) : null;
+    }
+
+    protected override void ApplyDownloadHeaders(HttpRequestMessage request, string url)
+    {
+        // The okcdn CDN only serves the mp4 when the request looks like it
+        // comes from the VK player.
+        request.Headers.TryAddWithoutValidation("Origin", "https://vk.com");
+    }
+
+    private static string? ExtractVideoId(string url)
+    {
+        var match = Regex.Match(url, VideoIdPattern);
+        return match.Success ? match.Groups["oid"].Value + "_" + match.Groups["vid"].Value : null;
+    }
+
     private static bool IsMediaUrl(string? url)
     {
         if (string.IsNullOrWhiteSpace(url) ||
@@ -72,22 +194,8 @@ public sealed class VkDownloader : ScrapeDownloader
                lower.EndsWith(".m3u8") ||
                lower.EndsWith(".webm") ||
                uri.Host.Contains("vkvideocdn") ||
+               uri.Host.Contains("okcdn") ||
                uri.Host.Contains("userapi.com");
-    }
-
-    protected override long? ExtractDurationSeconds(string html)
-    {
-        var match = Regex.Match(html, @"""duration""\s*:\s*(?<seconds>\d+)");
-        return match.Success && long.TryParse(match.Groups["seconds"].Value, out var seconds)
-            ? seconds
-            : null;
-    }
-
-    protected override string? ExtractAuthor(string html)
-    {
-        var match = Regex.Match(html,
-            @"""author""\s*:\s*\{[^}]*?""(?:name|title)""\s*:\s*""(?<name>[^""]+)""");
-        return match.Success ? match.Groups["name"].Value : null;
     }
 
     private static string Unescape(string url)
