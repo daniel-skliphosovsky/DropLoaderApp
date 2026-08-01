@@ -29,6 +29,8 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
+      - name: Select Xcode 26.5
+        run: sudo xcode-select -s /Applications/Xcode_26.5.app
       - name: Install MAUI workload
         run: dotnet workload install maui
       - name: Build macOS
