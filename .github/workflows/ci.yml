@@ -20,10 +20,10 @@ jobs:
       - name: Install MAUI workload
         run: dotnet workload install maui
       - name: Build Windows
-        run: dotnet build src/DropLoaderApp.sln -c Release -f net9.0-windows10.0.19041.0
+        run: dotnet build src/DropLoaderApp.sln -c Release -f net9.0-windows10.0.19041.0 -p:RuntimeIdentifier=win-x64
 
   build-macos:
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
