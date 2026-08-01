@@ -1,7 +1,7 @@
 ﻿using ObjCRuntime;
 using UIKit;
 
-namespace DropLoaderApp.App;
+namespace DropLoaderApp.MacCatalyst;
 
 public class Program
 {

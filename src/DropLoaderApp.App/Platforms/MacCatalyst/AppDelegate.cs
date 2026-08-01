@@ -1,6 +1,6 @@
 ﻿using Foundation;
 
-namespace DropLoaderApp.App;
+namespace DropLoaderApp.MacCatalyst;
 
 [Register("AppDelegate")]
 public class AppDelegate : MauiUIApplicationDelegate
