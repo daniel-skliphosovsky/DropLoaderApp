@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Maui;
-using DropLoaderApp.Converters;
 using DropLoaderApp.Services.Dialogs;
 using DropLoaderApp.Services.Downloaders;
 using DropLoaderApp.Services.Interfaces;
@@ -7,7 +6,7 @@ using DropLoaderApp.Services.Pickers;
 using DropLoaderApp.ViewModels;
 using DropLoaderApp.Views;
 using Microsoft.Extensions.Logging;
-using TikTokExplode.Extensions;
+using TikTokExplode;
 
 namespace DropLoaderApp;
 
@@ -25,29 +24,29 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
-        // Converters
-        builder.Services.AddSingleton<InverseBoolConverter>();
-        builder.Services.AddSingleton<BoolToStringConverter>();
-        builder.Services.AddSingleton<IntToThemeConverter>();
-        builder.Services.AddSingleton<StringNotEmptyConverter>();
+        // Single HttpClient shared by all downloaders and underlying clients.
+        builder.Services.AddSingleton(new HttpClient { Timeout = TimeSpan.FromMinutes(5) });
+
+        // TikTokClient takes ownership of no resources here (it was given the
+        // shared HttpClient), so a plain singleton is fine. The options pin the
+        // timeout to the same 5 minutes, otherwise the library would override it.
+        builder.Services.AddSingleton(sp =>
+            new TikTokClient(
+                sp.GetRequiredService<HttpClient>(),
+                new TikTokClientOptions { TimeoutSeconds = 300 }));
 
         // Services
         builder.Services.AddSingleton<IDialogService, DialogService>();
         builder.Services.AddSingleton<IFolderPickerService, FolderPickerService>();
         builder.Services.AddSingleton<DownloaderFactory>();
 
-        // TikTok — registers ITikTokClient and all infrastructure
-        builder.Services.AddTikTokExplode();
-
-        // Downloaders
+        // Downloaders (transient, resolved through the factory)
         builder.Services.AddTransient<IDownloader, TikTokDownloader>();
         builder.Services.AddTransient<IDownloader, YouTubeDownloader>();
         builder.Services.AddTransient<IDownloader, SoundCloudDownloader>();
 
-        // ViewModels
+        // ViewModels and Pages
         builder.Services.AddTransient<MainViewModel>();
-
-        // Pages
         builder.Services.AddTransient<MainPage>();
 
 #if DEBUG

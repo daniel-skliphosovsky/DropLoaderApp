@@ -11,9 +11,7 @@
             </ResourceDictionary.MergedDictionaries>
 
             <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
-            <converters:BoolToStringConverter x:Key="BoolToStringConverter" />
             <converters:IntToThemeConverter x:Key="IntToThemeConverter" />
-            <converters:StringNotEmptyConverter x:Key="StringNotEmptyConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

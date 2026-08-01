@@ -1,15 +1,23 @@
-using SoundCloudExplode;
 using DropLoaderApp.Services.Interfaces;
+using SoundCloudExplode;
 
 namespace DropLoaderApp.Services.Downloaders;
 
 public sealed class SoundCloudDownloader : IDownloader
 {
     public string PlatformName => "SoundCloud";
-    private readonly SoundCloudClient _client = new();
+
+    private readonly HttpClient _http;
+    private readonly SoundCloudClient _client;
+
+    public SoundCloudDownloader(HttpClient httpClient)
+    {
+        _http = httpClient;
+        _client = new SoundCloudClient(httpClient);
+    }
 
     public bool CanHandle(string url) =>
-        !string.IsNullOrWhiteSpace(url) && url.Contains("soundcloud.com");
+        UrlHelpers.UrlBelongsTo(url, "soundcloud.com", "on.soundcloud.com");
 
     public async Task<DownloadResult> DownloadAsync(
         string url, string outputPath,
@@ -28,10 +36,9 @@ public sealed class SoundCloudDownloader : IDownloader
             if (string.IsNullOrEmpty(streamUrl))
                 return new DownloadResult(false, null, "No stream URL");
 
-            var filePath = Path.Combine(outputPath, $"{SanitizeFileName(track.Title)}.mp3");
+            var filePath = Path.Combine(outputPath, $"{SanitizeFileName(track.Title ?? "track")}.mp3");
 
-            using var httpClient = new HttpClient { Timeout = TimeSpan.FromMinutes(5) };
-            using var response = await httpClient.GetAsync(streamUrl, HttpCompletionOption.ResponseHeadersRead, ct);
+            using var response = await _http.GetAsync(streamUrl, HttpCompletionOption.ResponseHeadersRead, ct);
             response.EnsureSuccessStatusCode();
 
             var totalBytes = response.Content.Headers.ContentLength;
@@ -62,9 +69,7 @@ public sealed class SoundCloudDownloader : IDownloader
         }
     }
 
-    private static string SanitizeFileName(string name)
-    {
-        var invalid = Path.GetInvalidFileNameChars();
-        return string.Join("_", name.Split(invalid, StringSplitOptions.RemoveEmptyEntries));
-    }
+    private static string SanitizeFileName(string name) =>
+        string.Join("_", name.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries))
+            .Trim().TrimEnd('.', ' ');
 }

@@ -1,17 +1,22 @@
+using DropLoaderApp.Services.Interfaces;
 using YoutubeExplode;
 using YoutubeExplode.Videos.Streams;
-using DropLoaderApp.Services.Interfaces;
 
 namespace DropLoaderApp.Services.Downloaders;
 
 public sealed class YouTubeDownloader : IDownloader
 {
     public string PlatformName => "YouTube";
-    private readonly YoutubeClient _client = new();
+
+    private readonly YoutubeClient _client;
+
+    public YouTubeDownloader(HttpClient httpClient)
+    {
+        _client = new YoutubeClient(httpClient);
+    }
 
     public bool CanHandle(string url) =>
-        !string.IsNullOrWhiteSpace(url) &&
-        (url.Contains("youtube.com") || url.Contains("youtu.be"));
+        UrlHelpers.UrlBelongsTo(url, "youtube.com", "youtu.be");
 
     public async Task<DownloadResult> DownloadAsync(
         string url, string outputPath,
@@ -27,7 +32,7 @@ public sealed class YouTubeDownloader : IDownloader
 
             var streamInfo = manifest.GetMuxedStreams()
                 .Where(s => s.Container == Container.Mp4)
-                .MaxBy(s => s.VideoQuality)
+                .MaxBy(s => s.VideoQuality) as IStreamInfo
                 ?? manifest.GetAudioOnlyStreams().FirstOrDefault();
 
             if (streamInfo == null)

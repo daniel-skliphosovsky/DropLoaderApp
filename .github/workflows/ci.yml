@@ -6,8 +6,11 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
-  build:
+  build-windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,7 +19,17 @@ jobs:
           dotnet-version: '9.0.x'
       - name: Install MAUI workload
         run: dotnet workload install maui
-      - name: Restore
-        run: dotnet restore src/DropLoaderApp.App/DropLoaderApp.App.csproj
-      - name: Build
-        run: dotnet build src/DropLoaderApp.App/DropLoaderApp.App.csproj --framework net9.0-windows10.0.19041.0 --configuration Release
+      - name: Build Windows
+        run: dotnet build src/DropLoaderApp.sln -c Release -f net9.0-windows10.0.19041.0
+
+  build-macos:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - name: Install MAUI workload
+        run: dotnet workload install maui
+      - name: Build macOS
+        run: dotnet build src/DropLoaderApp.sln -c Release -f net9.0-maccatalyst

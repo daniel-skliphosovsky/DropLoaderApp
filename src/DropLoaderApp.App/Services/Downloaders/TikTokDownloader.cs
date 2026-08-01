@@ -1,7 +1,7 @@
+using System.Text;
 using DropLoaderApp.Services.Interfaces;
 using TikTokExplode;
-using TikTokExplode.Domain.Entities;
-using TikTokExplode.Domain.Enums;
+using TikTokExplode.Exceptions;
 
 namespace DropLoaderApp.Services.Downloaders;
 
@@ -9,16 +9,15 @@ public sealed class TikTokDownloader : IDownloader
 {
     public string PlatformName => "TikTok";
 
-    private readonly ITikTokClient _tikTok;
+    private readonly TikTokClient _tikTok;
 
-    public TikTokDownloader(ITikTokClient tikTok)
+    public TikTokDownloader(TikTokClient tikTok)
     {
         _tikTok = tikTok;
     }
 
     public bool CanHandle(string url) =>
-        !string.IsNullOrWhiteSpace(url) &&
-        (url.Contains("tiktok.com") || url.Contains("tiktok"));
+        UrlHelpers.UrlBelongsTo(url, "tiktok.com", "vm.tiktok.com");
 
     public async Task<DownloadResult> DownloadAsync(
         string url, string outputPath,
@@ -27,46 +26,35 @@ public sealed class TikTokDownloader : IDownloader
     {
         try
         {
-            Publication publication;
+            progress?.Report(new DownloadProgress(0, null, 0, "Fetching metadata..."));
 
-            try
-            {
-                progress?.Report(new DownloadProgress(0, null, 0, "Fetching metadata..."));
-                publication = await _tikTok.GetPublicationAsync(url, ct);
-            }
-            catch (Exception ex)
-            {
-                return new DownloadResult(false, null, $"Failed to get TikTok data: {ex.Message}");
-            }
+            var publication = await _tikTok.Publications.GetAsync(url, ct);
+            var baseName = SanitizeFileName($"{publication.Author.Nickname}_{publication.Id}");
 
-            if (publication.Type == PublicationType.Video && publication.Video is not null)
+            if (publication.Video is not null)
             {
-                var videoUrl = publication.Video.PlayUrl;
-                var fileName = SanitizeFileName($"{publication.Author.Nickname}_{publication.Id}.mp4");
-                var filePath = Path.Combine(outputPath, fileName);
-
                 progress?.Report(new DownloadProgress(0, null, 0, "Downloading video..."));
 
-                var fileProgress = new Progress<long>(bytes =>
-                    progress?.Report(new DownloadProgress(bytes, null, null, "Downloading video...")));
+                var downloadProgress = new Progress<double>(p =>
+                    progress?.Report(new DownloadProgress(0, null, p, "Downloading video...")));
 
-                await _tikTok.DownloadVideoAsync(videoUrl, filePath, fileProgress, ct);
+                // The library appends the .mp4 extension itself, so the
+                // custom file name is passed without it.
+                await _tikTok.DownloadVideoAsync(publication.Video, outputPath, baseName, downloadProgress, ct);
 
+                var filePath = Path.Combine(outputPath, $"{baseName}.mp4");
                 return new DownloadResult(true, filePath, null);
             }
-            else if (publication.Images is { Count: > 0 })
+
+            if (publication.Images is { Count: > 0 })
             {
-                var dirName = SanitizeFileName($"{publication.Author.Nickname}_{publication.Id}");
-                var dirPath = Path.Combine(outputPath, dirName);
-                Directory.CreateDirectory(dirPath);
+                progress?.Report(new DownloadProgress(0, null, 0, "Downloading images..."));
 
-                progress?.Report(new DownloadProgress(0, publication.Images.Count, 0, "Downloading images..."));
+                var downloadProgress = new Progress<double>(p =>
+                    progress?.Report(new DownloadProgress(0, null, p, "Downloading images...")));
 
-                var imageProgress = new Progress<long>(downloaded =>
-                    progress?.Report(new DownloadProgress(downloaded, publication.Images.Count,
-                        (double)downloaded / publication.Images.Count, "Downloading images...")));
-
-                await _tikTok.DownloadImagesAsync(publication.Images, dirPath, imageProgress, ct);
+                var dirPath = Path.Combine(outputPath, baseName);
+                await _tikTok.DownloadImagesAsync(publication.Images, dirPath, baseName, downloadProgress, ct);
 
                 return new DownloadResult(true, dirPath, null);
             }
@@ -77,6 +65,11 @@ public sealed class TikTokDownloader : IDownloader
         {
             return new DownloadResult(false, null, "Cancelled");
         }
+        catch (TikTokExplodeException ex)
+        {
+            // Clean, library-level error (invalid link, private publication, API failure).
+            return new DownloadResult(false, null, ex.Message);
+        }
         catch (Exception ex)
         {
             return new DownloadResult(false, null, $"TikTok: {ex.Message}");
@@ -85,7 +78,19 @@ public sealed class TikTokDownloader : IDownloader
 
     private static string SanitizeFileName(string fileName)
     {
-        var invalid = Path.GetInvalidFileNameChars();
-        return string.Join("_", fileName.Split(invalid, StringSplitOptions.RemoveEmptyEntries)).TrimEnd('.');
+        // Strip characters invalid on Windows and macOS, plus control
+        // characters, then trim and clamp the length so the file name
+        // stays valid everywhere.
+        var invalid = Path.GetInvalidFileNameChars().ToHashSet();
+
+        var builder = new StringBuilder(fileName.Length);
+        foreach (var c in fileName)
+            builder.Append(invalid.Contains(c) || char.IsControl(c) ? '_' : c);
+
+        const int maxLength = 120;
+        var sanitized = builder.ToString().Trim().TrimEnd('.', ' ');
+        return sanitized.Length <= maxLength
+            ? sanitized
+            : sanitized[..maxLength].TrimEnd('.', ' ');
     }
 }

@@ -407,10 +407,4 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/%
 
-# TikTokExplode DLL (vendored)
-!/lib/
-/lib/*
-!/lib/*.dll
-!/lib/*.xml
-
 

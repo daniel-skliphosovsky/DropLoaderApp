@@ -1,15 +1,16 @@
 using DropLoaderApp.Services.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DropLoaderApp.Services.Downloaders;
 
 public sealed class DownloaderFactory
 {
-    private readonly IEnumerable<IDownloader> _downloaders;
+    private readonly IServiceProvider _services;
 
-    public DownloaderFactory(IEnumerable<IDownloader> downloaders) => _downloaders = downloaders;
+    public DownloaderFactory(IServiceProvider services) => _services = services;
 
     public IDownloader? GetDownloader(string url) =>
-        _downloaders.FirstOrDefault(d => d.CanHandle(url));
+        _services.GetServices<IDownloader>().FirstOrDefault(d => d.CanHandle(url));
 
     public string GetPlatformName(string url)
     {

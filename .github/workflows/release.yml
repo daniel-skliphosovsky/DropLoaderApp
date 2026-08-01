@@ -2,76 +2,94 @@ name: Release
 
 on:
   push:
-    tags: ['v*']
+    branches: [main]
 
 permissions:
   contents: write
 
 jobs:
-  build-macos:
-    runs-on: macos-15
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '9.0.x'
-      - name: Install MAUI
-        run: dotnet workload install maui
-      - name: Restore
-        run: dotnet restore src/DropLoaderApp.App/DropLoaderApp.App.csproj
-      - name: Publish macOS
-        run: |
-          dotnet publish src/DropLoaderApp.App/DropLoaderApp.App.csproj \
-            -f net9.0-maccatalyst -c Release \
-            --self-contained true -o ./publish/macos
-      - name: Zip
-        run: cd publish/macos && zip -r ../DropLoaderApp-macos.zip .
-      - uses: actions/upload-artifact@v4
-        with:
-          name: macos
-          path: publish/DropLoaderApp-macos.zip
-          retention-days: 7
-
   build-windows:
     runs-on: windows-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
-      - name: Install MAUI
+      - name: Install MAUI workload
         run: dotnet workload install maui
-      - name: Restore
-        run: dotnet restore src/DropLoaderApp.App/DropLoaderApp.App.csproj
       - name: Publish Windows
         run: |
           dotnet publish src/DropLoaderApp.App/DropLoaderApp.App.csproj \
-            -f net9.0-windows10.0.19041.0 -c Release \
-            --self-contained true -o ./publish/windows
-      - name: Zip
-        run: |
-          cd publish/windows
-          powershell Compress-Archive -Path . -DestinationPath ../DropLoaderApp-windows.zip
-      - uses: actions/upload-artifact@v4
+            -c Release -f net9.0-windows10.0.19041.0 -r win-x64 \
+            --self-contained true -p:PublishSingleFile=true \
+            -p:PublishTrimmed=false -p:IncludeNativeLibrariesForSelfExtract=true
+      - name: Upload exe
+        uses: actions/upload-artifact@v4
         with:
-          name: windows
-          path: publish/DropLoaderApp-windows.zip
-          retention-days: 7
+          name: DropLoaderApp-exe
+          path: src/DropLoaderApp.App/bin/Release/net9.0-windows10.0.19041.0/win-x64/publish/*.exe
+          if-no-files-found: error
+
+  build-macos:
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - name: Install MAUI workload
+        run: dotnet workload install maui
+      - name: Publish macOS
+        run: |
+          dotnet publish src/DropLoaderApp.App/DropLoaderApp.App.csproj \
+            -c Release -f net9.0-maccatalyst \
+            -p:CreatePackage=false -p:EnableCodeSigning=false -p:CodesignKey=-
+      - name: Package app (pkg preferred, zip fallback)
+        shell: bash
+        run: |
+          set -e
+          APP_PATH=$(ls -d src/DropLoaderApp.App/bin/Release/net9.0-maccatalyst/*.app | head -1)
+          echo "Found app bundle: $APP_PATH"
+          APP_DIR=$(dirname "$APP_PATH")
+          APP_NAME=$(basename "$APP_PATH")
+          mkdir -p artifact
+          if command -v productbuild >/dev/null 2>&1; then
+            productbuild --component "$APP_PATH" /Applications artifact/DropLoaderApp.pkg \
+              && echo "PKG created" \
+              || echo "productbuild FAILED, will fallback to zip"
+          else
+            echo "productbuild not available, will fallback to zip"
+          fi
+          if [ ! -f artifact/DropLoaderApp.pkg ]; then
+            echo "Falling back to zip"
+            (cd "$APP_DIR" && zip -r -q "$GITHUB_WORKSPACE/artifact/DropLoaderApp.zip" "$APP_NAME")
+          fi
+          ls -la artifact/
+      - name: Upload pkg/zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: DropLoaderApp-macos
+          path: artifact/
+          if-no-files-found: error
 
   release:
-    needs: [build-macos, build-windows]
+    needs: [build-windows, build-macos]
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - uses: actions/download-artifact@v4
-      - name: Create Release
-        run: |
-          gh release create "${{ github.ref_name }}" \
-            macos/DropLoaderApp-macos.zip \
-            windows/DropLoaderApp-windows.zip \
-            --generate-notes --title "${{ github.ref_name }}" --latest
+      - name: List artifacts
+        run: find . -type f | sort
+      - name: Delete previous release/tag
+        run: gh release delete v2.1.0 --yes --cleanup-tag 2>/dev/null || true
         env:
           GH_TOKEN: ${{ github.token }}
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v2.1.0
+          files: |
+            DropLoaderApp-exe/*.exe
+            DropLoaderApp-macos/*
+          generate_release_notes: true
