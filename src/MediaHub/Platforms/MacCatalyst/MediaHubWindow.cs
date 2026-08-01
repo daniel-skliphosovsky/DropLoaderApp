@@ -19,8 +19,8 @@ public partial class MediaHubWindow
         // resize and fullscreen controls; the minimize button is a Catalyst
         // limitation - no public API exposes it, AppKit bindings are not
         // shipped in the .NET 9 Catalyst workload.
-        restrictions.MinimumSize = new CGSize(1024, 680);
-        restrictions.MaximumSize = new CGSize(1024, 680);
+        restrictions.MinimumSize = new CGSize(1280, 800);
+        restrictions.MaximumSize = new CGSize(1280, 800);
         restrictions.AllowsFullScreen = false;
     }
 }

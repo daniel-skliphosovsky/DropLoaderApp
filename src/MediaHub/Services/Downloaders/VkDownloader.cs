@@ -2,6 +2,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using MediaHub.Models;
 using MediaHub.Services.Interfaces;
 
 namespace MediaHub.Services.Downloaders;
@@ -25,6 +26,24 @@ public sealed class VkDownloader : ScrapeDownloader
 
     private static readonly Regex DurationRegex = new(
         @"""duration""\s*:\s*(?<seconds>\d+)",
+        RegexOptions.Compiled);
+
+    private static readonly Regex ViewsRegex = new(
+        @"""views""\s*:\s*(?<count>\d+)",
+        RegexOptions.Compiled);
+
+    // The payload carries likes both flat ("likes":123) and as an object
+    // ("likes":{"count":123,"user_likes":0}); try the object form first.
+    private static readonly Regex LikesNestedRegex = new(
+        @"""likes""\s*:\s*\{[^}]*?""count""\s*:\s*(?<count>\d+)",
+        RegexOptions.Compiled);
+
+    private static readonly Regex LikesFlatRegex = new(
+        @"""likes""\s*:\s*(?<count>\d+)",
+        RegexOptions.Compiled);
+
+    private static readonly Regex DescriptionRegex = new(
+        @"""description""\s*:\s*""(?<text>[^""]+)""",
         RegexOptions.Compiled);
 
     private static readonly Regex ThumbnailRegex = new(
@@ -176,6 +195,50 @@ public sealed class VkDownloader : ScrapeDownloader
             if (long.TryParse(match.Groups["seconds"].Value, out long seconds)
                 && (best is null || seconds > best))
                 best = seconds;
+        }
+        return best;
+    }
+
+    protected override string? ExtractDescription(string html)
+    {
+        // The flattened payload carries the video description in a
+        // "description" key; pick the longest match over recommended videos.
+        string? best = null;
+        foreach (Match match in DescriptionRegex.Matches(html))
+        {
+            var text = match.Groups["text"].Value.Trim();
+            if (text.Length > 0 && (best is null || text.Length > best.Length))
+                best = text;
+        }
+        return best ?? base.ExtractDescription(html);
+    }
+
+    protected override IReadOnlyList<ResourceDetail> BuildDetails(string html)
+    {
+        var details = base.BuildDetails(html).ToList();
+
+        // Counts repeat once per recommended video in the payload; the video
+        // itself is the most popular entry, so keep the largest value.
+        var views = MaxCount(ViewsRegex, html);
+        if (views > 0)
+            details.Add(new ResourceDetail("Views", views.ToString("N0")));
+
+        var likes = MaxCount(LikesNestedRegex, html);
+        if (likes == 0)
+            likes = MaxCount(LikesFlatRegex, html);
+        if (likes > 0)
+            details.Add(new ResourceDetail("Likes", likes.ToString("N0")));
+
+        return details;
+    }
+
+    private static ulong MaxCount(Regex regex, string html)
+    {
+        ulong best = 0;
+        foreach (Match match in regex.Matches(html))
+        {
+            if (ulong.TryParse(match.Groups["count"].Value, out ulong value) && value > best)
+                best = value;
         }
         return best;
     }

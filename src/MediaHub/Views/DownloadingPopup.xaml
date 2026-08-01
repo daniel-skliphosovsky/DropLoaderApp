@@ -6,62 +6,57 @@
            x:Class="MediaHub.Views.DownloadingPopup"
            x:DataType="vm:MainViewModel"
            CanBeDismissedByTappingOutsideOfPopup="False"
-           Color="{AppThemeBinding Light={StaticResource BackgroundLight}, Dark={StaticResource BackgroundDark}}">
+           Color="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}">
 
-    <!-- Compact modal card: title, then a clear gap, the progress bar, the
-         same gap again, and a full-width Stop button. No percentage text,
-         no empty space at the bottom: the popup sizes to its content. -->
-    <Border StrokeThickness="1"
-            StrokeShape="RoundRectangle 20"
-            Padding="24,22"
-            BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceLight}, Dark={StaticResource SurfaceDark}}"
-            Stroke="{AppThemeBinding Light={StaticResource OutlineLight}, Dark={StaticResource OutlineDark}}">
-        <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="24">
+    <!-- One integral block: the popup surface IS the card, there is no inner
+         border or nested frame. Title, a clear gap, the progress bar, another
+         gap and a full-width Stop button in the app's accent color. -->
+    <Grid Padding="28,26" MaximumWidthRequest="480" RowDefinitions="Auto,Auto,Auto">
 
-            <!-- Header: spinner + heading + file name + bytes/speed -->
-            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                <ActivityIndicator IsRunning="True" IsVisible="True"
-                                   WidthRequest="20" HeightRequest="20"
-                                   Color="{AppThemeBinding Light={StaticResource PrimaryLight}, Dark={StaticResource PrimaryDark}}" />
-                <VerticalStackLayout Grid.Column="1" Spacing="3">
-                    <Label Text="{Binding DownloadHeadingText}"
-                           FontSize="18" FontAttributes="Bold"
-                           TextColor="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
-                    <Label Text="{Binding DownloadFileName}"
-                           FontSize="13" MaxLines="2" LineBreakMode="TailTruncation"
+        <!-- Header: spinner + heading + file name + bytes/speed -->
+        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+            <ActivityIndicator IsRunning="True" IsVisible="True"
+                               WidthRequest="20" HeightRequest="20"
+                               Color="{AppThemeBinding Light={StaticResource PrimaryLight}, Dark={StaticResource PrimaryDark}}" />
+            <VerticalStackLayout Grid.Column="1" Spacing="3">
+                <Label Text="{Binding DownloadHeadingText}"
+                       FontSize="18" FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+                <Label Text="{Binding DownloadFileName}"
+                       FontSize="13" MaxLines="2" LineBreakMode="TailTruncation"
+                       TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
+                <HorizontalStackLayout Spacing="14">
+                    <Label Text="{Binding ProgressText}"
+                           IsVisible="{Binding ShowProgressText}"
+                           FontSize="12" LineBreakMode="TailTruncation"
                            TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
-                    <HorizontalStackLayout Spacing="14">
-                        <Label Text="{Binding ProgressText}"
-                               IsVisible="{Binding ShowProgressText}"
-                               FontSize="12" LineBreakMode="TailTruncation"
-                               TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
-                        <Label Text="{Binding DownloadSpeedText}"
-                               IsVisible="{Binding ShowDownloadSpeed}"
-                               FontSize="12" FontAttributes="Bold"
-                               TextColor="{AppThemeBinding Light={StaticResource PrimaryVariantLight}, Dark={StaticResource PrimaryDark}}" />
-                    </HorizontalStackLayout>
-                </VerticalStackLayout>
-            </Grid>
-
-            <!-- Progress: determinate bar, or an indeterminate spinner when the
-                 downloader reports no percentage (unknown total size). -->
-            <Grid Grid.Row="1">
-                <ProgressBar Progress="{Binding Progress}"
-                             Style="{StaticResource ProgressBarStyle}"
-                             IsVisible="{Binding IsIndeterminate, Converter={StaticResource InverseBoolConverter}}" />
-                <ActivityIndicator IsRunning="{Binding IsIndeterminate}"
-                                   IsVisible="{Binding IsIndeterminate}"
-                                   HorizontalOptions="Start"
-                                   WidthRequest="24" HeightRequest="24"
-                                   Color="{AppThemeBinding Light={StaticResource PrimaryLight}, Dark={StaticResource PrimaryDark}}" />
-            </Grid>
-
-            <!-- Stop: full width of the popup -->
-            <Button Grid.Row="2"
-                    Text="Stop"
-                    Command="{Binding CancelDownloadCommand}"
-                    Style="{StaticResource DangerButton}"
-                    SemanticProperties.Description="Cancel the current download" />
+                    <Label Text="{Binding DownloadSpeedText}"
+                           IsVisible="{Binding ShowDownloadSpeed}"
+                           FontSize="12" FontAttributes="Bold"
+                           TextColor="{AppThemeBinding Light={StaticResource PrimaryVariantLight}, Dark={StaticResource PrimaryDark}}" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
         </Grid>
-    </Border>
+
+        <!-- Progress: determinate bar, or an indeterminate spinner when the
+             downloader reports no percentage (unknown total size). -->
+        <Grid Grid.Row="1" Margin="0,30,0,0">
+            <ProgressBar Progress="{Binding Progress}"
+                         Style="{StaticResource ProgressBarStyle}"
+                         IsVisible="{Binding IsIndeterminate, Converter={StaticResource InverseBoolConverter}}" />
+            <ActivityIndicator IsRunning="{Binding IsIndeterminate}"
+                               IsVisible="{Binding IsIndeterminate}"
+                               HorizontalOptions="Start"
+                               WidthRequest="24" HeightRequest="24"
+                               Color="{AppThemeBinding Light={StaticResource PrimaryLight}, Dark={StaticResource PrimaryDark}}" />
+        </Grid>
+
+        <!-- Stop: full width, in the app's accent palette -->
+        <Button Grid.Row="2"
+                Text="Stop"
+                Margin="0,28,0,0"
+                Command="{Binding CancelDownloadCommand}"
+                Style="{StaticResource DownloadButton}"
+                SemanticProperties.Description="Cancel the current download" />
+    </Grid>
 </mct:Popup>

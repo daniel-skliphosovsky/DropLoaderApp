@@ -29,6 +29,14 @@ public interface IDownloader
     /// </summary>
     Task<IReadOnlyList<PlaylistItem>> GetPlaylistItemsAsync(string url, CancellationToken ct = default)
         => Task.FromResult<IReadOnlyList<PlaylistItem>>([]);
+
+    /// <summary>
+    /// Full metadata rows for the resource (author, stats, dates, description),
+    /// shown in the preview card's "Information" section. Defaults to nothing
+    /// extra; platforms that expose more metadata override it.
+    /// </summary>
+    Task<IReadOnlyList<ResourceDetail>> GetDetailsAsync(string url, CancellationToken ct = default)
+        => Task.FromResult<IReadOnlyList<ResourceDetail>>([]);
 }
 
 public readonly record struct DownloadResult(bool Success, string? FilePath, string? ErrorMessage);

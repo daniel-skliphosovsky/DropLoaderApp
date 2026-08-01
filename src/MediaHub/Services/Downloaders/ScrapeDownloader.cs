@@ -34,6 +34,7 @@ public abstract class ScrapeDownloader : IDownloader
     protected virtual string? ExtractTitle(string html) => GetMetaProperty(html, "og:title");
     protected virtual string? ExtractThumbnail(string html) => GetMetaProperty(html, "og:image");
     protected virtual string? ExtractAuthor(string html) => null;
+    protected virtual string? ExtractDescription(string html) => GetMetaProperty(html, "og:description");
     protected virtual long? ExtractDurationSeconds(string html) => null;
 
     /// <summary>
@@ -53,11 +54,31 @@ public abstract class ScrapeDownloader : IDownloader
         {
             Title = ExtractTitle(html) ?? string.Empty,
             Author = ExtractAuthor(html) ?? string.Empty,
+            Description = ExtractDescription(html) ?? string.Empty,
             ThumbnailUrl = ExtractThumbnail(html),
             Duration = ExtractDurationSeconds(html) is { } seconds ? TimeSpan.FromSeconds(seconds) : null,
             QualityText = best?.Quality,
             Platform = PlatformName
         };
+    }
+
+    public virtual async Task<IReadOnlyList<ResourceDetail>> GetDetailsAsync(string url, CancellationToken ct = default)
+        => BuildDetails(await FetchPageAsync(ResolvePageUrl(url), ct));
+
+    /// <summary>
+    /// Metadata rows available from a scraped page. Subclasses override it to
+    /// append platform-specific fields (e.g. VK view/like counts) without
+    /// re-fetching the page.
+    /// </summary>
+    protected virtual IReadOnlyList<ResourceDetail> BuildDetails(string html)
+    {
+        var details = new List<ResourceDetail>();
+        ResourceDetail.AddIfPresent(details, "Title", ExtractTitle(html));
+        ResourceDetail.AddIfPresent(details, "Author", ExtractAuthor(html));
+        if (ExtractDurationSeconds(html) is { } seconds)
+            ResourceDetail.AddIfPresent(details, "Duration", MediaPreview.FormatDuration(TimeSpan.FromSeconds(seconds)));
+        ResourceDetail.AddIfPresent(details, "Description", ExtractDescription(html));
+        return details;
     }
 
     public virtual async Task<DownloadResult> DownloadAsync(

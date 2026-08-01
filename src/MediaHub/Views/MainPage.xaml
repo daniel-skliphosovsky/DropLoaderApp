@@ -2,12 +2,114 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:MediaHub.ViewModels"
+             xmlns:models="clr-namespace:MediaHub.Models"
              xmlns:anim="clr-namespace:MediaHub.Animations"
              x:Class="MediaHub.Views.MainPage"
              x:DataType="vm:MainViewModel"
              BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundLight}, Dark={StaticResource BackgroundDark}}"
              Shell.NavBarIsVisible="False"
              Shell.FlyoutBehavior="Disabled">
+
+    <ContentPage.Resources>
+
+        <!-- One row of the bottom activity log: icon + message + time + remove -->
+        <DataTemplate x:Key="LogEntryTemplate" x:DataType="models:LogEntry">
+            <Border Padding="10,7" Margin="0,2"
+                    StrokeThickness="0" StrokeShape="RoundRectangle 10"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariantLight}, Dark={StaticResource SurfaceVariantDark}}">
+                <Border.Triggers>
+                    <DataTrigger TargetType="Border" Binding="{Binding Kind}" Value="success">
+                        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource SuccessContainerLight}, Dark={StaticResource SuccessContainerDark}}" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Border" Binding="{Binding Kind}" Value="error">
+                        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource ErrorContainerLight}, Dark={StaticResource ErrorContainerDark}}" />
+                    </DataTrigger>
+                </Border.Triggers>
+                <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10">
+
+                    <!-- Status/platform icon -->
+                    <Path Grid.Column="0"
+                          Data="{Binding IconData}"
+                          Fill="Transparent"
+                          Stroke="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}"
+                          StrokeThickness="1.8" StrokeLineCap="Round" StrokeLineJoin="Round"
+                          Aspect="Uniform" WidthRequest="16" HeightRequest="16"
+                          VerticalOptions="Center">
+                        <Path.Triggers>
+                            <DataTrigger TargetType="Path" Binding="{Binding Kind}" Value="success">
+                                <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource OnSuccessContainerLight}, Dark={StaticResource OnSuccessContainerDark}}" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Path" Binding="{Binding Kind}" Value="error">
+                                <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource OnErrorContainerLight}, Dark={StaticResource OnErrorContainerDark}}" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="tiktok">
+                                <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource TikTokLight}, Dark={StaticResource TikTokDark}}" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="youtube">
+                                <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource YouTubeLight}, Dark={StaticResource YouTubeDark}}" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="soundcloud">
+                                <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource SoundCloudLight}, Dark={StaticResource SoundCloudDark}}" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="vk">
+                                <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource VKLight}, Dark={StaticResource VKDark}}" />
+                            </DataTrigger>
+                        </Path.Triggers>
+                    </Path>
+
+                    <Label Grid.Column="1"
+                           Text="{Binding Message}"
+                           FontSize="13" MaxLines="1" LineBreakMode="TailTruncation"
+                           VerticalOptions="Center"
+                           TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding Kind}" Value="success">
+                                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSuccessContainerLight}, Dark={StaticResource OnSuccessContainerDark}}" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Label" Binding="{Binding Kind}" Value="error">
+                                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnErrorContainerLight}, Dark={StaticResource OnErrorContainerDark}}" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+
+                    <Label Grid.Column="2"
+                           Text="{Binding TimeText}"
+                           FontSize="11"
+                           VerticalOptions="Center"
+                           TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
+
+                    <!-- Remove row -->
+                    <Border Grid.Column="3" WidthRequest="20" HeightRequest="20"
+                            StrokeThickness="0" StrokeShape="RoundRectangle 6"
+                            BackgroundColor="Transparent" VerticalOptions="Center"
+                            SemanticProperties.Description="Remove this log entry">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnRemoveLogTapped"
+                                                  CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <Path Fill="Transparent"
+                              Stroke="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}"
+                              StrokeThickness="2" StrokeLineCap="Round"
+                              Aspect="Uniform" WidthRequest="10" HeightRequest="10"
+                              VerticalOptions="Center" HorizontalOptions="Center"
+                              Data="M6 6l12 12 M18 6L6 18" />
+                    </Border>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <!-- One labeled row of the expandable "Information" section -->
+        <DataTemplate x:Key="DetailTemplate" x:DataType="models:ResourceDetail">
+            <Grid ColumnDefinitions="120,*" ColumnSpacing="14" Padding="0,3">
+                <Label Text="{Binding Label}" FontSize="12" FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
+                <Label Grid.Column="1" Text="{Binding Value}" FontSize="12"
+                       MaxLines="6" LineBreakMode="WordWrap"
+                       TextColor="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+            </Grid>
+        </DataTemplate>
+
+    </ContentPage.Resources>
 
     <Grid RowDefinitions="Auto,*,Auto,Auto" RowSpacing="0">
 
@@ -89,12 +191,12 @@
                                                         </DataTrigger>
                                                     </Path.Triggers>
                                                 </Path>
-                                                <!-- YouTube: rounded rect + play -->
+                                                <!-- YouTube: play-button logo -->
                                                 <Path Fill="Transparent" IsVisible="False"
                                                       Stroke="{AppThemeBinding Light={StaticResource YouTubeLight}, Dark={StaticResource YouTubeDark}}"
                                                       StrokeThickness="2" StrokeLineCap="Round" StrokeLineJoin="Round"
                                                       Aspect="Uniform"
-                                                      Data="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z">
+                                                      Data="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z">
                                                     <Path.Triggers>
                                                         <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="youtube">
                                                             <Setter Property="IsVisible" Value="True" />
@@ -103,7 +205,7 @@
                                                 </Path>
                                                 <Path Fill="{AppThemeBinding Light={StaticResource YouTubeLight}, Dark={StaticResource YouTubeDark}}" IsVisible="False"
                                                       StrokeThickness="0" Aspect="Uniform"
-                                                      Data="M10 9.5v5l4.5-2.5z">
+                                                      Data="M9.75 15.02 15.5 11.75 9.75 8.48z">
                                                     <Path.Triggers>
                                                         <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="youtube">
                                                             <Setter Property="IsVisible" Value="True" />
@@ -221,9 +323,9 @@
                                             </DataTrigger.EnterActions>
                                         </DataTrigger>
                                     </Border.Triggers>
-                                    <Grid RowDefinitions="Auto,Auto" RowSpacing="14">
+                                    <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="14">
 
-                                        <!-- Platform, title, author, duration -->
+                                        <!-- Platform, title, author, description, duration -->
                                         <VerticalStackLayout Spacing="8">
                                                 <Border Style="{StaticResource ChipStyle}"
                                                         Padding="10,3" HorizontalOptions="Start"
@@ -269,6 +371,10 @@
                                                        IsVisible="{Binding HasPreviewAuthor}"
                                                        FontSize="13" LineBreakMode="TailTruncation"
                                                        TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
+                                                <Label Text="{Binding PreviewDescription}"
+                                                       IsVisible="{Binding HasPreviewDescription}"
+                                                       FontSize="13" MaxLines="3" LineBreakMode="TailTruncation"
+                                                       TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
                                                 <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
                                                     <Label Text="{Binding PreviewDurationText}"
                                                            IsVisible="{Binding HasPreviewDuration}"
@@ -283,18 +389,51 @@
                                                 </HorizontalStackLayout>
                                             </VerticalStackLayout>
 
-                                        <!-- Actions: big download + clear -->
-                                        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="10">
-                                            <Button Text="Download"
-                                                    Command="{Binding DownloadCommand}"
-                                                    IsEnabled="{Binding CanStartDownload}"
-                                                    Style="{StaticResource DownloadButton}"
-                                                    SemanticProperties.Description="Start downloading the media" />
-                                            <Button Grid.Column="1" Text="New"
-                                                    Command="{Binding ClearCommand}"
-                                                    Style="{StaticResource SecondaryButton}"
-                                                    SemanticProperties.Description="Clear the link and start over" />
-                                        </Grid>
+                                        <!-- Information: fetch and show full metadata -->
+                                        <Border Grid.Row="1" HorizontalOptions="Start"
+                                                BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariantLight}, Dark={StaticResource SurfaceVariantDark}}"
+                                                StrokeThickness="0" StrokeShape="RoundRectangle 12"
+                                                Padding="18,0" HeightRequest="44"
+                                                VerticalOptions="Center"
+                                                SemanticProperties.Description="Show full metadata for this resource">
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding ToggleDetailsCommand}" />
+                                            </Border.GestureRecognizers>
+                                            <Border.VisualStateManager.VisualStateGroups>
+                                                <VisualStateGroupList>
+                                                    <VisualStateGroup Name="CommonStates">
+                                                        <VisualState Name="Normal" />
+                                                        <VisualState Name="Pressed">
+                                                            <VisualState.Setters>
+                                                                <Setter Property="Scale" Value="0.97" />
+                                                                <Setter Property="Opacity" Value="0.85" />
+                                                            </VisualState.Setters>
+                                                        </VisualState>
+                                                    </VisualStateGroup>
+                                                </VisualStateGroupList>
+                                            </Border.VisualStateManager.VisualStateGroups>
+                                            <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                                                <Path Fill="Transparent"
+                                                      Stroke="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}"
+                                                      StrokeThickness="1.8" StrokeLineCap="Round" StrokeLineJoin="Round"
+                                                      Aspect="Uniform" WidthRequest="16" HeightRequest="16"
+                                                      VerticalOptions="Center"
+                                                      Data="M12 8h.01 M12 12v4 M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" />
+                                                <Label Text="Information" FontSize="14" FontAttributes="Bold"
+                                                       VerticalOptions="Center"
+                                                       TextColor="{AppThemeBinding Light={StaticResource OnSurfaceLight}, Dark={StaticResource OnSurfaceDark}}" />
+                                            </HorizontalStackLayout>
+                                        </Border>
+
+                                        <!-- Expandable metadata rows -->
+                                        <Border Grid.Row="2" IsVisible="{Binding ShowPreviewDetails}"
+                                                BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariantLight}, Dark={StaticResource SurfaceVariantDark}}"
+                                                StrokeThickness="0" StrokeShape="RoundRectangle 12"
+                                                Padding="14,12">
+                                            <VerticalStackLayout Spacing="0"
+                                                                 BindableLayout.ItemsSource="{Binding PreviewDetails}"
+                                                                 BindableLayout.ItemTemplate="{StaticResource DetailTemplate}" />
+                                        </Border>
                                     </Grid>
                                 </Border>
 
@@ -336,84 +475,25 @@
             </Grid>
         </ScrollView>
 
-        <!-- ================= Status bar ================= -->
-        <Border Grid.Row="2" IsVisible="{Binding ShowStatus}"
+        <!-- ================= Activity log ================= -->
+        <Border Grid.Row="2" IsVisible="{Binding HasLogs}"
                 BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceContainerLight}, Dark={StaticResource SurfaceContainerDark}}"
-                StrokeThickness="0" Padding="32,12">
+                StrokeThickness="0" Padding="32,14,32,16">
             <Border.Triggers>
-                <DataTrigger TargetType="Border" Binding="{Binding ShowStatus}" Value="True">
+                <DataTrigger TargetType="Border" Binding="{Binding HasLogs}" Value="True">
                     <DataTrigger.EnterActions>
                         <anim:FadeInAction />
                     </DataTrigger.EnterActions>
                 </DataTrigger>
-                <DataTrigger TargetType="Border" Binding="{Binding StatusKind}" Value="success">
-                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource SuccessContainerLight}, Dark={StaticResource SuccessContainerDark}}" />
-                </DataTrigger>
-                <DataTrigger TargetType="Border" Binding="{Binding StatusKind}" Value="error">
-                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource ErrorContainerLight}, Dark={StaticResource ErrorContainerDark}}" />
-                </DataTrigger>
-                <DataTrigger TargetType="Border" Binding="{Binding StatusKind}" Value="muted">
-                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource SurfaceVariantLight}, Dark={StaticResource SurfaceVariantDark}}" />
-                </DataTrigger>
             </Border.Triggers>
-            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                <!-- Success: check -->
-                <Path Grid.Column="0" Fill="Transparent" IsVisible="False"
-                      Stroke="{AppThemeBinding Light={StaticResource OnSuccessContainerLight}, Dark={StaticResource OnSuccessContainerDark}}"
-                      StrokeThickness="2.2" StrokeLineCap="Round" StrokeLineJoin="Round"
-                      Aspect="Uniform" WidthRequest="20" HeightRequest="20"
-                      VerticalOptions="Center"
-                      Data="M20 6L9 17l-5-5">
-                    <Path.Triggers>
-                        <DataTrigger TargetType="Path" Binding="{Binding StatusKind}" Value="success">
-                            <Setter Property="IsVisible" Value="True" />
-                        </DataTrigger>
-                    </Path.Triggers>
-                </Path>
-                <!-- Error: alert -->
-                <Path Grid.Column="0" Fill="Transparent" IsVisible="False"
-                      Stroke="{AppThemeBinding Light={StaticResource OnErrorContainerLight}, Dark={StaticResource OnErrorContainerDark}}"
-                      StrokeThickness="2.2" StrokeLineCap="Round" StrokeLineJoin="Round"
-                      Aspect="Uniform" WidthRequest="20" HeightRequest="20"
-                      VerticalOptions="Center"
-                      Data="M12 9v4 M12 17h.01 M12 3l9 16a1 1 0 0 1-.87 1.5H3.87a1 1 0 0 1-.87-1.5z">
-                    <Path.Triggers>
-                        <DataTrigger TargetType="Path" Binding="{Binding StatusKind}" Value="error">
-                            <Setter Property="IsVisible" Value="True" />
-                        </DataTrigger>
-                    </Path.Triggers>
-                </Path>
-                <!-- Cancelled: x -->
-                <Path Grid.Column="0" Fill="Transparent" IsVisible="False"
-                      Stroke="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}"
-                      StrokeThickness="2.2" StrokeLineCap="Round"
-                      Aspect="Uniform" WidthRequest="20" HeightRequest="20"
-                      VerticalOptions="Center"
-                      Data="M18 6L6 18 M6 6l12 12">
-                    <Path.Triggers>
-                        <DataTrigger TargetType="Path" Binding="{Binding StatusKind}" Value="muted">
-                            <Setter Property="IsVisible" Value="True" />
-                        </DataTrigger>
-                    </Path.Triggers>
-                </Path>
-                <Label Grid.Column="1"
-                       Text="{Binding Status}"
-                       FontSize="14" FontAttributes="Bold"
-                       TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}"
-                       VerticalOptions="Center" LineBreakMode="WordWrap">
-                    <Label.Triggers>
-                        <DataTrigger TargetType="Label" Binding="{Binding StatusKind}" Value="success">
-                            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSuccessContainerLight}, Dark={StaticResource OnSuccessContainerDark}}" />
-                        </DataTrigger>
-                        <DataTrigger TargetType="Label" Binding="{Binding StatusKind}" Value="error">
-                            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnErrorContainerLight}, Dark={StaticResource OnErrorContainerDark}}" />
-                        </DataTrigger>
-                        <DataTrigger TargetType="Label" Binding="{Binding StatusKind}" Value="muted">
-                            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
-                        </DataTrigger>
-                    </Label.Triggers>
-                </Label>
-            </Grid>
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Recent activity" FontSize="12" FontAttributes="Bold"
+                       TextColor="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}" />
+                <CollectionView ItemsSource="{Binding Logs}"
+                                ItemTemplate="{StaticResource LogEntryTemplate}"
+                                HeightRequest="148"
+                                SelectionMode="None" />
+            </VerticalStackLayout>
         </Border>
 
         <!-- ================= Footer ================= -->

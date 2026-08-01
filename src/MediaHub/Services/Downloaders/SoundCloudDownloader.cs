@@ -36,11 +36,36 @@ public sealed class SoundCloudDownloader : IDownloader
         {
             Title = track.Title ?? string.Empty,
             Author = track.User?.Username ?? string.Empty,
+            Description = track.Description ?? string.Empty,
             ThumbnailUrl = track.ArtworkUrl?.ToString(),
             Duration = track.Duration is { } milliseconds ? TimeSpan.FromMilliseconds(milliseconds) : null,
             QualityText = "Audio",
             Platform = PlatformName
         };
+    }
+
+    public async Task<IReadOnlyList<ResourceDetail>> GetDetailsAsync(string url, CancellationToken ct = default)
+    {
+        var track = await GetTrackAsync(url, ct);
+        if (track is null)
+            return [];
+
+        var details = new List<ResourceDetail>();
+        ResourceDetail.AddIfPresent(details, "Title", track.Title);
+        ResourceDetail.AddIfPresent(details, "Author", track.User?.Username);
+        if (track.Duration is { } milliseconds)
+            ResourceDetail.AddIfPresent(details, "Duration",
+                MediaPreview.FormatDuration(TimeSpan.FromMilliseconds(milliseconds)));
+        ResourceDetail.AddIfPresent(details, "Genre", track.Genre);
+        ResourceDetail.AddIfPresent(details, "Plays", track.PlaybackCount?.ToString("N0"));
+        ResourceDetail.AddIfPresent(details, "Likes", track.LikesCount?.ToString("N0"));
+        ResourceDetail.AddIfPresent(details, "Comments", track.CommentCount?.ToString("N0"));
+        ResourceDetail.AddIfPresent(details, "Downloads", track.DownloadCount?.ToString("N0"));
+        ResourceDetail.AddIfPresent(details, "Downloadable", track.Downloadable.ToString());
+        ResourceDetail.AddIfPresent(details, "Posted", track.CreatedAt.ToString("d"));
+        ResourceDetail.AddIfPresent(details, "Description", track.Description);
+        ResourceDetail.AddIfPresent(details, "Link", track.PermalinkUrl?.ToString());
+        return details;
     }
 
     public async Task<DownloadResult> DownloadAsync(

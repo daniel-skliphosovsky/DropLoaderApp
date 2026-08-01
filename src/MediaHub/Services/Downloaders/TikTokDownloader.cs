@@ -62,6 +62,46 @@ public sealed class TikTokDownloader : IDownloader
         };
     }
 
+    public async Task<IReadOnlyList<ResourceDetail>> GetDetailsAsync(string url, CancellationToken ct = default)
+    {
+        var publication = await _tikTok.Publications.GetAsync(url, ct);
+        var details = new List<ResourceDetail>();
+        ResourceDetail.AddIfPresent(details, "Description", publication.Description);
+        ResourceDetail.AddIfPresent(details, "Author", publication.Author?.Nickname);
+        ResourceDetail.AddIfPresent(details, "Author ID", publication.Author?.UserId);
+        ResourceDetail.AddIfPresent(details, "Region", publication.Author?.Region);
+        if (publication.Author is { IsVerified: true })
+            details.Add(new ResourceDetail("Verified", "Yes"));
+
+        if (publication.Video is { Duration: > 0 } video)
+            ResourceDetail.AddIfPresent(details, "Duration",
+                MediaPreview.FormatDuration(TimeSpan.FromMilliseconds(video.Duration)));
+
+        if (publication.Statistics is { } stats)
+        {
+            AddCount(details, "Likes", stats.DiggCount);
+            AddCount(details, "Views", stats.PlayCount);
+            AddCount(details, "Comments", stats.CommentCount);
+            AddCount(details, "Shares", stats.ShareCount);
+            AddCount(details, "Downloads", stats.DownloadCount);
+        }
+
+        if (publication.Soundtrack is { } soundtrack &&
+            !string.IsNullOrWhiteSpace(soundtrack.Title) &&
+            !string.IsNullOrWhiteSpace(soundtrack.Author))
+        {
+            details.Add(new ResourceDetail("Sound", $"{soundtrack.Title} - {soundtrack.Author}"));
+        }
+
+        return details;
+    }
+
+    private static void AddCount(List<ResourceDetail> details, string label, ulong count)
+    {
+        if (count > 0)
+            details.Add(new ResourceDetail(label, count.ToString("N0")));
+    }
+
     public async Task<DownloadResult> DownloadAsync(
         string url, string outputPath,
         IProgress<DownloadProgress>? progress = null,

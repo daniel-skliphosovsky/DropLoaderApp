@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Maui.Views;
@@ -112,12 +113,13 @@ public partial class MainViewModel : ObservableObject
 
     public bool ShowDownloadSpeed => !string.IsNullOrEmpty(DownloadSpeedText);
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ShowStatus))]
-    private string _status = string.Empty;
+    /// <summary>
+    /// Bottom activity log: recent download events with their platform and
+    /// status. Cleared whenever a new download starts.
+    /// </summary>
+    public ObservableCollection<LogEntry> Logs { get; } = [];
 
-    [ObservableProperty]
-    private string _statusKind = string.Empty;
+    public bool HasLogs => Logs.Count > 0;
 
     /// <summary>
     /// Name of the file being downloaded, shown as the title of the progress
@@ -134,8 +136,6 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string _downloadHeadingText = "Downloading";
 
-    public bool ShowStatus => !string.IsNullOrEmpty(Status);
-
     [ObservableProperty]
     private int _themeIndex;
 
@@ -149,6 +149,8 @@ public partial class MainViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(PreviewTitle))]
     [NotifyPropertyChangedFor(nameof(PreviewAuthor))]
     [NotifyPropertyChangedFor(nameof(HasPreviewAuthor))]
+    [NotifyPropertyChangedFor(nameof(PreviewDescription))]
+    [NotifyPropertyChangedFor(nameof(HasPreviewDescription))]
     [NotifyPropertyChangedFor(nameof(PreviewQuality))]
     [NotifyPropertyChangedFor(nameof(PreviewDurationText))]
     [NotifyPropertyChangedFor(nameof(HasPreviewDuration))]
@@ -174,10 +176,26 @@ public partial class MainViewModel : ObservableObject
     public string PreviewTitle => Preview?.Title ?? string.Empty;
     public string PreviewAuthor => Preview?.Author ?? string.Empty;
     public bool HasPreviewAuthor => !string.IsNullOrEmpty(PreviewAuthor);
+    public string PreviewDescription => Preview?.Description ?? string.Empty;
+    public bool HasPreviewDescription => !string.IsNullOrEmpty(PreviewDescription);
     public string PreviewQuality => Preview?.QualityText ?? string.Empty;
     public bool HasPreviewQuality => !string.IsNullOrEmpty(PreviewQuality);
     public string PreviewDurationText => Preview?.DurationText ?? string.Empty;
     public bool HasPreviewDuration => !string.IsNullOrEmpty(PreviewDurationText);
+
+    /// <summary>
+    /// Rows for the expandable "Information" section of the preview card,
+    /// fetched on demand from the platform library/API.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowPreviewDetails))]
+    private IReadOnlyList<ResourceDetail> _previewDetails = [];
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowPreviewDetails))]
+    private bool _isDetailsVisible;
+
+    public bool ShowPreviewDetails => IsDetailsVisible && PreviewDetails.Count > 0;
 
     public string VersionText => $"MediaHub v{AppInfo.Current.VersionString}  |  daniel-skliphosovsky";
 
@@ -229,6 +247,8 @@ public partial class MainViewModel : ObservableObject
         Preview = null;
         PreviewError = null;
         IsPreviewLoading = false;
+        PreviewDetails = [];
+        IsDetailsVisible = false;
 
         var downloader = _currentDownloader;
         if (downloader is null || string.IsNullOrWhiteSpace(Url))
@@ -359,10 +379,14 @@ public partial class MainViewModel : ObservableObject
         DownloadSpeedText = string.Empty;
         _lastBytes = 0;
         _lastSpeedAt = default;
-        Status = string.Empty;
-        StatusKind = string.Empty;
         DownloadHeadingText = "Downloading";
         DownloadFileName = DeriveDownloadFileName();
+
+        // A fresh download starts a fresh activity log: old statuses (and
+        // their failures) make way for the new one.
+        Logs.Clear();
+        OnPropertyChanged(nameof(HasLogs));
+        AddLog($"Downloading: {DownloadFileName}", "muted", PlatformKey);
 
         // The progress lives in a separate modal popup bound to this same
         // view model; it is closed when the download finishes, fails or is
@@ -398,9 +422,6 @@ public partial class MainViewModel : ObservableObject
 
                 ProgressText = FormatProgress(p);
                 UpdateSpeed(p);
-
-                if (!string.IsNullOrWhiteSpace(p.Status))
-                    Status = p.Status;
             });
 
             // Playlist URLs expand into one target per item, each downloaded
@@ -418,8 +439,7 @@ public partial class MainViewModel : ObservableObject
 
             if (targets.Count == 0)
             {
-                Status = "Failed: no items found in playlist";
-                StatusKind = "error";
+                AddLog("Failed: no items found in playlist", "error", PlatformKey);
                 await _dialog.ShowErrorAsync("Couldn't find any items in this playlist.");
             }
             else
@@ -438,22 +458,20 @@ public partial class MainViewModel : ObservableObject
 
                     if (result.Success)
                     {
-                        Status = "Downloaded successfully";
-                        StatusKind = "success";
+                        var savedName = Path.GetFileName(result.FilePath?.TrimEnd('/')) ?? DownloadFileName;
+                        AddLog($"Downloaded: {savedName}", "success", PlatformKey);
                         if (i == targets.Count - 1)
                             await _dialog.ShowAlertAsync("Success", $"Saved to {result.FilePath}");
                     }
                     else if (cts.IsCancellationRequested ||
                              string.Equals(result.ErrorMessage, "Cancelled", StringComparison.OrdinalIgnoreCase))
                     {
-                        Status = "Download cancelled";
-                        StatusKind = "muted";
+                        AddLog("Download cancelled", "muted", PlatformKey);
                         break;
                     }
                     else
                     {
-                        Status = $"Failed: {result.ErrorMessage}";
-                        StatusKind = "error";
+                        AddLog($"Failed: {result.ErrorMessage}", "error", PlatformKey);
                         await _dialog.ShowErrorAsync(result.ErrorMessage ?? "Something went wrong while downloading");
                         break;
                     }
@@ -462,13 +480,11 @@ public partial class MainViewModel : ObservableObject
         }
         catch (OperationCanceledException)
         {
-            Status = "Download cancelled";
-            StatusKind = "muted";
+            AddLog("Download cancelled", "muted", PlatformKey);
         }
         catch (Exception ex)
         {
-            Status = $"Failed: {ex.Message}";
-            StatusKind = "error";
+            AddLog($"Failed: {ex.Message}", "error", PlatformKey);
             await _dialog.ShowErrorAsync(ex.Message);
         }
         finally
@@ -554,15 +570,86 @@ public partial class MainViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Clears the URL and the metadata card, so the user can start over.
+    /// Removes a single row from the activity log (the per-row X button).
     /// </summary>
     [RelayCommand]
-    private void Clear()
+    private void RemoveLog(LogEntry entry)
     {
-        CancelPreview();
-        Url = string.Empty;
-        Status = string.Empty;
-        StatusKind = string.Empty;
+        if (Logs.Remove(entry))
+            OnPropertyChanged(nameof(HasLogs));
+    }
+
+    /// <summary>
+    /// Appends an activity row and keeps HasLogs in sync with the collection.
+    /// </summary>
+    private void AddLog(string message, string kind, string platformKey)
+    {
+        Logs.Add(new LogEntry
+        {
+            Message = message,
+            Kind = kind,
+            PlatformKey = platformKey,
+            TimeText = DateTime.Now.ToString("HH:mm:ss"),
+            IconData = GetLogIconData(platformKey, kind)
+        });
+        OnPropertyChanged(nameof(HasLogs));
+    }
+
+    /// <summary>
+    /// Compact SVG path data for the log row icon: the platform logo when the
+    /// event belongs to one, otherwise a status glyph for the kind.
+    /// </summary>
+    private static string GetLogIconData(string platformKey, string kind) => platformKey switch
+    {
+        "tiktok" => "M9 18V5l12-2v13 M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0z M21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z",
+        "youtube" => "M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z",
+        "soundcloud" => "M2 13v-2 M5 13V9 M8 13V6 M11 13V8 M14 13v-3",
+        "vk" => "M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z M8.5 8.5L11 15.5l3.5-7",
+        _ => kind switch
+        {
+            "success" => "M20 6L9 17l-5-5",
+            "error" => "M12 9v4 M12 17h.01 M12 3l9 16a1 1 0 0 1-.87 1.5H3.87a1 1 0 0 1-.87-1.5z",
+            // Compact cancel: a small X inside a circle.
+            _ => "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z M15 9l-6 6 M9 9l6 6"
+        }
+    };
+
+    /// <summary>
+    /// Loads (once) and toggles the expandable "Information" section of the
+    /// preview card. The extra metadata comes from the platform library/API
+    /// and varies per platform.
+    /// </summary>
+    [RelayCommand]
+    private async Task ToggleDetailsAsync()
+    {
+        var downloader = _currentDownloader;
+        if (Preview is null || downloader is null || string.IsNullOrWhiteSpace(Url))
+            return;
+
+        if (PreviewDetails.Count == 0)
+        {
+            try
+            {
+                PreviewDetails = await downloader.GetDetailsAsync(Url);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+            catch (Exception ex)
+            {
+                AddLog($"Failed to load details: {ex.Message}", "error", PlatformKey);
+                return;
+            }
+
+            if (PreviewDetails.Count == 0)
+            {
+                AddLog("No additional information available for this resource", "muted", PlatformKey);
+                return;
+            }
+        }
+
+        IsDetailsVisible = !IsDetailsVisible;
     }
 
     private static string FormatBytes(long bytes)

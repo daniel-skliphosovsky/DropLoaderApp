@@ -93,11 +93,31 @@ public sealed class YouTubeDownloader : IDownloader
         {
             Title = video.Title,
             Author = video.Author.ChannelTitle,
+            Description = video.Description,
             ThumbnailUrl = thumbnail?.Url,
             Duration = video.Duration,
             QualityText = quality,
             Platform = PlatformName
         };
+    }
+
+    public async Task<IReadOnlyList<ResourceDetail>> GetDetailsAsync(string url, CancellationToken ct = default)
+    {
+        var video = await _client.Videos.GetAsync(url, ct);
+        var details = new List<ResourceDetail>();
+        ResourceDetail.AddIfPresent(details, "Title", video.Title);
+        ResourceDetail.AddIfPresent(details, "Author", video.Author.ChannelTitle);
+        ResourceDetail.AddIfPresent(details, "Duration",
+            video.Duration is { } duration ? MediaPreview.FormatDuration(duration) : null);
+        ResourceDetail.AddIfPresent(details, "Uploaded", video.UploadDate.ToString("d"));
+        ResourceDetail.AddIfPresent(details, "Views",
+            video.Engagement.ViewCount > 0 ? video.Engagement.ViewCount.ToString("N0") : null);
+        ResourceDetail.AddIfPresent(details, "Likes",
+            video.Engagement.LikeCount > 0 ? video.Engagement.LikeCount.ToString("N0") : null);
+        ResourceDetail.AddIfPresent(details, "Description", video.Description);
+        ResourceDetail.AddIfPresent(details, "Keywords",
+            video.Keywords is { Count: > 0 } keywords ? string.Join(", ", keywords) : null);
+        return details;
     }
 
     public async Task<DownloadResult> DownloadAsync(

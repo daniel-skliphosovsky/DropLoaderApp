@@ -103,34 +103,6 @@
         </Setter>
     </Style>
 
-    <Style x:Key="DangerButton" TargetType="Button">
-        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource ErrorContainerLight}, Dark={StaticResource ErrorContainerDark}}" />
-        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnErrorContainerLight}, Dark={StaticResource OnErrorContainerDark}}" />
-        <Setter Property="FontFamily" Value="OpenSansSemibold" />
-        <Setter Property="FontSize" Value="15" />
-        <Setter Property="CornerRadius" Value="12" />
-        <Setter Property="HeightRequest" Value="52" />
-        <Setter Property="Padding" Value="22,0" />
-        <Setter Property="VisualStateManager.VisualStateGroups">
-            <VisualStateGroupList>
-                <VisualStateGroup Name="CommonStates">
-                    <VisualState Name="Normal" />
-                    <VisualState Name="Pressed">
-                        <VisualState.Setters>
-                            <Setter Property="Scale" Value="0.97" />
-                            <Setter Property="Opacity" Value="0.85" />
-                        </VisualState.Setters>
-                    </VisualState>
-                    <VisualState Name="Disabled">
-                        <VisualState.Setters>
-                            <Setter Property="Opacity" Value="0.45" />
-                        </VisualState.Setters>
-                    </VisualState>
-                </VisualStateGroup>
-            </VisualStateGroupList>
-        </Setter>
-    </Style>
-
     <!-- Icon-only button (theme toggle) -->
     <Style x:Key="IconButton" TargetType="Border">
         <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource SurfaceVariantLight}, Dark={StaticResource SurfaceVariantDark}}" />

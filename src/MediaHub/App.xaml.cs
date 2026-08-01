@@ -22,12 +22,12 @@ public partial class App : Application
         // the minimize/fullscreen chrome on macOS and Windows.
         return new MediaHubWindow(new AppShell())
         {
-            Width = 1024,
-            Height = 680,
-            MinimumWidth = 1024,
-            MinimumHeight = 680,
-            MaximumWidth = 1024,
-            MaximumHeight = 680
+            Width = 1280,
+            Height = 800,
+            MinimumWidth = 1280,
+            MinimumHeight = 800,
+            MaximumWidth = 1280,
+            MaximumHeight = 800
         };
     }
 
