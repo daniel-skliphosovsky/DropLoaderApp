@@ -1,7 +1,11 @@
+using System.Text.RegularExpressions;
+
 namespace MediaHub.Services.Downloaders;
 
 internal static class UrlHelpers
 {
+    private static readonly Regex VkResourcePath = new(@"^(video|clip)\d+_\d+");
+
     /// <summary>
     /// Returns the lowercased host of the URL, tolerating a missing scheme
     /// (e.g. "tiktok.com/@user/video/123" or "vm.tiktok.com/xyz").
@@ -48,6 +52,25 @@ internal static class UrlHelpers
     }
 
     /// <summary>
+    /// True when the URL query contains the given parameter with a non-empty
+    /// value (e.g. "v=abc" but not a bare "v" or "v=").
+    /// </summary>
+    private static bool HasQueryParam(string query, string name)
+    {
+        if (string.IsNullOrEmpty(query))
+            return false;
+
+        foreach (var pair in query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var eq = pair.IndexOf('=');
+            if (eq > 0 && pair.Length > eq + 1 && pair[..eq] == name)
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// Heuristic: does the URL point at an actual media item (video, track,
     /// playlist) rather than a bare domain or a profile/search page? A naked
     /// "youtube.com" must not enable the download button or show a preview
@@ -72,11 +95,16 @@ internal static class UrlHelpers
 
         if (host == "youtube.com" || host.EndsWith(".youtube.com", StringComparison.Ordinal))
         {
-            if (path.StartsWith("watch", StringComparison.Ordinal) ||
-                path.StartsWith("shorts/", StringComparison.Ordinal) ||
+            if (path.StartsWith("shorts/", StringComparison.Ordinal) ||
                 path.StartsWith("embed/", StringComparison.Ordinal) ||
-                path.StartsWith("live/", StringComparison.Ordinal) ||
-                path.StartsWith("playlist", StringComparison.Ordinal))
+                path.StartsWith("live/", StringComparison.Ordinal))
+                return true;
+
+            // watch/playlist pages only count with their id parameter in the
+            // query: bare "youtube.com/watch" or "youtube.com/playlist" is not
+            // a media resource.
+            if ((path.StartsWith("watch", StringComparison.Ordinal) && HasQueryParam(uri.Query, "v")) ||
+                (path.StartsWith("playlist", StringComparison.Ordinal) && HasQueryParam(uri.Query, "list")))
                 return true;
 
             return uri.Query.Contains("list=", StringComparison.OrdinalIgnoreCase);
@@ -109,8 +137,10 @@ internal static class UrlHelpers
             host.EndsWith(".vk.com", StringComparison.Ordinal) ||
             host.EndsWith(".vkvideo.ru", StringComparison.Ordinal))
         {
-            return path.StartsWith("video", StringComparison.Ordinal) ||
-                   path.StartsWith("clip", StringComparison.Ordinal);
+            // vk.com/video and vkvideo.ru/video are the video section (or the
+            // main page), not media items; only video<oid>_<vid> and
+            // clip<oid>_<vid> paths carry a real resource id.
+            return VkResourcePath.IsMatch(path);
         }
 
         return false;
