@@ -50,23 +50,30 @@ public partial class App : Application
 
         // The dialog is best-effort (the exception may be fatal); the full
         // details always land in the log file.
-        MainThread.BeginInvokeOnMainThread(() =>
+        try
         {
-            try
+            MainThread.BeginInvokeOnMainThread(() =>
             {
-                var page = Current?.Windows.FirstOrDefault()?.Page;
-                if (page is not null)
+                try
                 {
-                    _ = page.DisplayAlert(
-                        "Unexpected error",
-                        $"Something went wrong: {exception.Message}\nDetails were written to the log file.",
-                        "OK");
+                    var page = Current?.Windows.FirstOrDefault()?.Page;
+                    if (page is not null)
+                    {
+                        _ = page.DisplayAlert(
+                            "Unexpected error",
+                            $"Something went wrong: {exception.Message}\nDetails were written to the log file.",
+                            "OK");
+                    }
                 }
-            }
-            catch
-            {
-                // Never throw from an error handler.
-            }
-        });
+                catch
+                {
+                    // Never throw from an error handler.
+                }
+            });
+        }
+        catch
+        {
+            // Never throw from an error handler.
+        }
     }
 }

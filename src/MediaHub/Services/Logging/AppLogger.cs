@@ -1,3 +1,5 @@
+using Microsoft.Maui.Storage;
+
 namespace MediaHub.Services.Logging;
 
 /// <summary>
@@ -10,7 +12,7 @@ public static class AppLogger
     private static readonly object Sync = new();
     private static string? _logPath;
 
-    /// <summary>Resolved path of the log file, e.g. .../MediaHub/logs/error.log.</summary>
+    /// <summary>Resolved path of the log file, e.g. .../logs/error.log.</summary>
     public static string LogFilePath => _logPath ??= ResolvePath();
 
     /// <summary>
@@ -47,7 +49,6 @@ public static class AppLogger
 
     private static string ResolvePath()
     {
-        var baseDirectory = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        return Path.Combine(baseDirectory, "MediaHub", "logs", "error.log");
+        return Path.Combine(FileSystem.AppDataDirectory, "logs", "error.log");
     }
 }
