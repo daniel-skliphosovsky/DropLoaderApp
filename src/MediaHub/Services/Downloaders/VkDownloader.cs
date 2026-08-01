@@ -50,7 +50,7 @@ public sealed class VkDownloader : ScrapeDownloader
 
         // Fall back to og:video / og:video:url meta tags. VK drops them on
         // some pages (especially vkvideo.ru), but when present they carry the
-        // direct mp4, which beats the embedded-json sources above. Only trust
+        // direct mp4, used only when embedded sources are absent. Only trust
         // them when they point at an actual media file, not at a page.
         var ogUrl = GetMetaProperty(html, "og:video") ?? GetMetaProperty(html, "og:video:url");
         if (IsMediaUrl(ogUrl))
@@ -62,10 +62,11 @@ public sealed class VkDownloader : ScrapeDownloader
     private static bool IsMediaUrl(string? url)
     {
         if (string.IsNullOrWhiteSpace(url) ||
-            !url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+            !url.StartsWith("http", StringComparison.OrdinalIgnoreCase) ||
+            !Uri.TryCreate(url, UriKind.Absolute, out var uri) ||
+            uri.Scheme is not ("http" or "https"))
             return false;
 
-        var uri = new Uri(url, UriKind.Absolute);
         var lower = uri.AbsolutePath.ToLowerInvariant();
         return lower.EndsWith(".mp4") ||
                lower.EndsWith(".m3u8") ||

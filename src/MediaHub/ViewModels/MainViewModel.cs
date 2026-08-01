@@ -499,7 +499,7 @@ public partial class MainViewModel : ObservableObject
         }
 
         var elapsed = (now - _lastSpeedAt).TotalSeconds;
-        if (elapsed < 0.5 || p.BytesReceived < _lastBytes)
+        if (elapsed < 0.5 || p.BytesReceived == 0 || p.BytesReceived < _lastBytes)
             return;
 
         DownloadSpeedText = $"{FormatBytes((long)((p.BytesReceived - _lastBytes) / elapsed))}/s";
