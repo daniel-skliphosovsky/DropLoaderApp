@@ -177,14 +177,14 @@ public sealed class VkDownloader : ScrapeDownloader
     {
         // First flattened payload entry is the video title.
         string firstLine = html.Split('\n')[0].Trim();
-        return firstLine.Length >= 4 ? DecodeUnicode(firstLine) : null;
+        return firstLine.Length >= 4 ? CleanHtmlText(firstLine) : null;
     }
 
     protected override string? ExtractAuthor(string html)
     {
         var match = AuthorRegex.Match(html);
         if (match.Success)
-            return WebUtility.HtmlDecode(DecodeUnicode(match.Groups["author"].Value));
+            return CleanHtmlText(match.Groups["author"].Value);
 
         // Older payloads only carry the author id; the channel name is absent.
         return null;
@@ -211,7 +211,7 @@ public sealed class VkDownloader : ScrapeDownloader
         string? best = null;
         foreach (Match match in DescriptionRegex.Matches(html))
         {
-            var text = DecodeUnicode(match.Groups["text"].Value.Trim());
+            var text = CleanHtmlText(match.Groups["text"].Value);
             if (text.Length > 0 && (best is null || text.Length > best.Length))
                 best = text;
         }
@@ -301,4 +301,18 @@ public sealed class VkDownloader : ScrapeDownloader
     private static string DecodeUnicode(string value) =>
         UnicodeEscapeRegex.Replace(value, match =>
             ((char)Convert.ToInt32(match.Groups["hex"].Value, 16)).ToString());
+
+    /// <summary>
+    /// Cleans VK metadata text for display: decodes JSON \uXXXX escapes and
+    /// HTML entities, turns &lt;br&gt; / &lt;br/&gt; / &lt;br /&gt; into line
+    /// breaks and strips any remaining HTML tags (e.g. &lt;p&gt;).
+    /// </summary>
+    private static string CleanHtmlText(string value)
+    {
+        var text = DecodeUnicode(value);
+        text = WebUtility.HtmlDecode(text);
+        text = Regex.Replace(text, @"<\s*br\s*/?>", "\n", RegexOptions.IgnoreCase);
+        text = Regex.Replace(text, @"<[^>]+>", string.Empty);
+        return text.Trim();
+    }
 }

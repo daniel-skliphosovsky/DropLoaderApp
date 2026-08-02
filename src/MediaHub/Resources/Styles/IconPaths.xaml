@@ -6,38 +6,44 @@
 
     <!-- SVG path data shared by the Path elements across the app. Kept in one
          dictionary so the icon shapes live next to the color tokens instead of
-         being duplicated inline in every XAML file. -->
+         being duplicated inline in every XAML file.
+
+         Icons are declared as PathGeometry (not x:String): Path.Data expects a
+         Geometry, and MAUI only converts a path-markup string to Geometry when
+         it is written inline or parsed at XAML compile time. A StaticResource
+         pointing at a plain string is never converted (see dotnet/maui#20552)
+         and the icon silently does not render in Release builds. -->
 
     <!-- Generic link (unknown platform) -->
-    <x:String x:Key="IconLinkPath">M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71 M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71</x:String>
+    <PathGeometry x:Key="IconLinkPath" Figures="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71 M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
 
     <!-- TikTok music note -->
-    <x:String x:Key="IconTikTokPath">M9 18V5l12-2v13 M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0z M21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z</x:String>
+    <PathGeometry x:Key="IconTikTokPath" Figures="M9 18V5l12-2v13 M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0z M21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
 
     <!-- YouTube: wide red rounded rectangle (ratio ~1.7:1) with the play
          triangle inset from the edges (official proportions) -->
-    <x:String x:Key="IconYouTubePath">M2.5 10a3.5 3.5 0 0 1 3.5-3.5h12A3.5 3.5 0 0 1 21.5 10v4a3.5 3.5 0 0 1-3.5 3.5H6A3.5 3.5 0 0 1 2.5 14z</x:String>
+    <PathGeometry x:Key="IconYouTubePath" Figures="M2.5 10a3.5 3.5 0 0 1 3.5-3.5h12A3.5 3.5 0 0 1 21.5 10v4a3.5 3.5 0 0 1-3.5 3.5H6A3.5 3.5 0 0 1 2.5 14z" />
 
     <!-- White play triangle, centered and inset inside the YouTube rect -->
-    <x:String x:Key="IconYouTubeGlyph">M9.6 9v6l4.8-3z</x:String>
+    <PathGeometry x:Key="IconYouTubeGlyph" Figures="M9.6 9v6l4.8-3z" />
 
     <!-- SoundCloud sound waves -->
-    <x:String x:Key="IconSoundCloudPath">M2 13v-2 M5 13V9 M8 13V6 M11 13V8 M14 13v-3</x:String>
+    <PathGeometry x:Key="IconSoundCloudPath" Figures="M2 13v-2 M5 13V9 M8 13V6 M11 13V8 M14 13v-3" />
 
     <!-- VK: blue rounded square with the "VK" letters inset (official
          proportions) -->
-    <x:String x:Key="IconVkPath">M5.5 5A2.5 2.5 0 0 1 8 2.5h8A2.5 2.5 0 0 1 18.5 5v14a2.5 2.5 0 0 1-2.5 2.5H8A2.5 2.5 0 0 1 5.5 19z</x:String>
+    <PathGeometry x:Key="IconVkPath" Figures="M5.5 5A2.5 2.5 0 0 1 8 2.5h8A2.5 2.5 0 0 1 18.5 5v14a2.5 2.5 0 0 1-2.5 2.5H8A2.5 2.5 0 0 1 5.5 19z" />
 
     <!-- White "VK" letters inset inside the VK square -->
-    <x:String x:Key="IconVkGlyph">M8.6 8.6l1.9 5 1.9-5h1.6l-2.7 7.2h-1.6L6.9 8.6z</x:String>
+    <PathGeometry x:Key="IconVkGlyph" Figures="M8.6 8.6l1.9 5 1.9-5h1.6l-2.7 7.2h-1.6L6.9 8.6z" />
 
     <!-- GitHub octocat -->
-    <x:String x:Key="IconGitHubPath">M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.72-1.54-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 5.74 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.58.23 2.75.11 3.04.73.81 1.18 1.83 1.18 3.09 0 4.41-2.69 5.38-5.25 5.67.41.35.77 1.05.77 2.12 0 1.53-.01 2.76-.01 3.14 0 .3.2.67.8.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z</x:String>
+    <PathGeometry x:Key="IconGitHubPath" Figures="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.27-.01-1.17-.02-2.12-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.68-1.28-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.72-1.54-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.18a10.9 10.9 0 0 1 5.74 0c2.19-1.49 3.15-1.18 3.15-1.18.62 1.58.23 2.75.11 3.04.73.81 1.18 1.83 1.18 3.09 0 4.41-2.69 5.38-5.25 5.67.41.35.77 1.05.77 2.12 0 1.53-.01 2.76-.01 3.14 0 .3.2.67.8.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z" />
 
     <!-- Information (circle with an i) -->
-    <x:String x:Key="IconInfoPath">M12 8h.01 M12 12v4 M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z</x:String>
+    <PathGeometry x:Key="IconInfoPath" Figures="M12 8h.01 M12 12v4 M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" />
 
     <!-- Theme toggle moon -->
-    <x:String x:Key="IconThemeMoonPath">M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z</x:String>
+    <PathGeometry x:Key="IconThemeMoonPath" Figures="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
 
 </ResourceDictionary>

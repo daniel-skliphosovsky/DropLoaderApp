@@ -92,7 +92,7 @@
         <ScrollView Grid.Row="1" SizeChanged="OnScrollViewSizeChanged">
             <Grid x:Name="ContentHost">
                 <VerticalStackLayout Padding="36,36,36,24" Spacing="0"
-                                     MaximumWidthRequest="860"
+                                     MaximumWidthRequest="960"
                                      HorizontalOptions="Center" VerticalOptions="Center">
                     <VerticalStackLayout Spacing="20">
 
@@ -247,18 +247,13 @@
                                     </Label>
                                 </Border>
 
-                                <!-- Metadata card: what will be downloaded -->
+                                <!-- Metadata card: what will be downloaded. Fixed
+                                     layout on the full content width: no fade-in
+                                     animation, so it never appears to expand. -->
                                 <Border IsVisible="{Binding ShowPreviewSection}"
                                         BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceContainerLight}, Dark={StaticResource SurfaceContainerDark}}"
-                                        StrokeThickness="0" StrokeShape="RoundRectangle 14" Padding="18">
-                                    <Border.Triggers>
-                                        <DataTrigger TargetType="Border"
-                                                     Binding="{Binding ShowPreviewSection}" Value="True">
-                                            <DataTrigger.EnterActions>
-                                                <anim:FadeInAction />
-                                            </DataTrigger.EnterActions>
-                                        </DataTrigger>
-                                    </Border.Triggers>
+                                        StrokeThickness="0" StrokeShape="RoundRectangle 14" Padding="18"
+                                        MinimumHeightRequest="120">
                                     <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="16">
 
                                         <!-- Platform, title, author, description, duration -->
