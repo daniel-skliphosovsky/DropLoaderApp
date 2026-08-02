@@ -275,13 +275,14 @@ public sealed class VkDownloader : ScrapeDownloader
             uri.Scheme is not ("http" or "https"))
             return false;
 
+        var host = uri.Host.ToLowerInvariant();
         var lower = uri.AbsolutePath.ToLowerInvariant();
         return lower.EndsWith(".mp4") ||
                lower.EndsWith(".m3u8") ||
                lower.EndsWith(".webm") ||
-               uri.Host.Contains("vkvideocdn") ||
-               uri.Host.Contains("okcdn") ||
-               uri.Host.Contains("userapi.com");
+               host == "vkvideocdn.ru" || host.EndsWith(".vkvideocdn.ru", StringComparison.Ordinal) ||
+               host == "okcdn.ru" || host.EndsWith(".okcdn.ru", StringComparison.Ordinal) ||
+               host == "userapi.com" || host.EndsWith(".userapi.com", StringComparison.Ordinal);
     }
 
     private static string Unescape(string url)

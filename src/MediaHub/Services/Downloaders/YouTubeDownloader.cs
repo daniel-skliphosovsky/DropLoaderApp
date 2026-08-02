@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using MediaHub.Models;
 using MediaHub.Services.Interfaces;
 using YoutubeExplode;
@@ -85,8 +86,11 @@ public sealed class YouTubeDownloader : IDownloader
                 ? $"{best.VideoQuality.Label} MP4"
                 : manifest.GetAudioOnlyStreams().Any() ? Loc.Get(LocKeys.QualityAudio) : null;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            // Manifest fetch is best-effort: a failure must not break the
+            // preview, but it should be visible in debug builds.
+            Debug.WriteLine($"Failed to fetch stream manifest: {ex}");
         }
 
         return new MediaPreview
@@ -125,6 +129,7 @@ public sealed class YouTubeDownloader : IDownloader
         IProgress<DownloadProgress>? progress = null,
         CancellationToken ct = default)
     {
+        string? filePath = null;
         try
         {
             progress?.Report(new DownloadProgress(0, null, 0, Loc.Get(LocKeys.ProgressFetching)));
@@ -140,7 +145,7 @@ public sealed class YouTubeDownloader : IDownloader
             if (streamInfo == null)
                 return new DownloadResult(false, null, Loc.Get(LocKeys.ErrNoStream));
 
-            var filePath = Path.Combine(outputPath, $"{video.Id}.{streamInfo.Container.Name}");
+            filePath = Path.Combine(outputPath, $"{video.Id}.{streamInfo.Container.Name}");
             var fileProgress = new Progress<double>(p =>
                 progress?.Report(new DownloadProgress(0, null, p, Loc.Get(LocKeys.ProgressDownloadingFile, video.Title))));
 
@@ -149,11 +154,34 @@ public sealed class YouTubeDownloader : IDownloader
         }
         catch (OperationCanceledException)
         {
+            TryDeleteFile(filePath);
             return new DownloadResult(false, null, Loc.Get(LocKeys.ErrCancelled));
         }
         catch (Exception ex)
         {
+            // A network or disk error mid-download leaves a partial file behind; clean it up.
+            TryDeleteFile(filePath);
             return new DownloadResult(false, null, Loc.Get(LocKeys.ErrPlatformPrefix, PlatformName, ex.Message));
+        }
+    }
+
+    private static void TryDeleteFile(string? path)
+    {
+        try
+        {
+            if (path is null)
+                return;
+
+            if (Directory.Exists(path))
+                Directory.Delete(path, true);
+            else
+                File.Delete(path);
+        }
+        catch (IOException)
+        {
+        }
+        catch (UnauthorizedAccessException)
+        {
         }
     }
 }

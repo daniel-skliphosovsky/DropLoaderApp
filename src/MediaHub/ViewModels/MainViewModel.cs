@@ -4,6 +4,7 @@ using CommunityToolkit.Maui.Views;
 using MediaHub.Models;
 using MediaHub.Services.Downloaders;
 using MediaHub.Services.Interfaces;
+using MediaHub.Services.Logging;
 using MediaHub.Views;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Storage;
@@ -456,8 +457,9 @@ public partial class MainViewModel : ObservableObject
                 popup = new DownloadingPopup(this);
                 Shell.Current.ShowPopup(popup);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                AppLogger.Log(ex);
                 await _dialog.ShowErrorAsync(Loc.Get(LocKeys.DialogPopupError), Loc.Get(LocKeys.DialogError));
                 return;
             }
@@ -555,8 +557,9 @@ public partial class MainViewModel : ObservableObject
         }
         catch (Exception ex)
         {
+            AppLogger.Log(ex);
             resultTitle = LocKeys.DialogError;
-            resultMessage = ex.Message;
+            resultMessage = Loc.Get(LocKeys.DialogGenericError);
         }
         finally
         {

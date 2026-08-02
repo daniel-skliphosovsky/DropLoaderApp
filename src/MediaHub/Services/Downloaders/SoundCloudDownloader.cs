@@ -129,6 +129,8 @@ public sealed class SoundCloudDownloader : IDownloader
         }
         catch (Exception ex)
         {
+            // A network or disk error mid-download leaves a partial file behind; clean it up.
+            TryDeleteFile(filePath);
             return new DownloadResult(false, null, Loc.Get(LocKeys.ErrPlatformPrefix, PlatformName, ex.Message));
         }
     }
@@ -213,10 +215,18 @@ public sealed class SoundCloudDownloader : IDownloader
     {
         try
         {
-            if (path is not null)
+            if (path is null)
+                return;
+
+            if (Directory.Exists(path))
+                Directory.Delete(path, true);
+            else
                 File.Delete(path);
         }
         catch (IOException)
+        {
+        }
+        catch (UnauthorizedAccessException)
         {
         }
     }

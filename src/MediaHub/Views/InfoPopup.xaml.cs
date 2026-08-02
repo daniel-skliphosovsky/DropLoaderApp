@@ -17,6 +17,7 @@ public partial class InfoPopup : Popup
 {
     private readonly IDownloader _downloader;
     private readonly string _url;
+    private readonly CancellationTokenSource _cts = new();
 
     private bool _isLoading = true;
     private string _statusMessage = string.Empty;
@@ -30,7 +31,11 @@ public partial class InfoPopup : Popup
         CloseCommand = new RelayCommand(() => Close());
         BindingContext = this;
 
-        _ = LoadDetailsAsync();
+        // Closing the popup aborts any in-flight metadata request so the
+        // underlying HTTP call does not outlive the dialog.
+        Closed += (_, _) => _cts.Cancel();
+
+        _ = LoadDetailsAsync(_cts.Token);
     }
 
     public ObservableCollection<ResourceDetail> Details { get; } = [];
@@ -66,11 +71,11 @@ public partial class InfoPopup : Popup
 
     public IRelayCommand CloseCommand { get; }
 
-    private async Task LoadDetailsAsync()
+    private async Task LoadDetailsAsync(CancellationToken ct)
     {
         try
         {
-            var details = await _downloader.GetDetailsAsync(_url);
+            var details = await _downloader.GetDetailsAsync(_url, ct);
             await MainThread.InvokeOnMainThreadAsync(() =>
             {
                 foreach (var detail in details)

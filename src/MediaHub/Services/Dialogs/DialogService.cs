@@ -1,5 +1,5 @@
 using MediaHub.Services.Interfaces;
-using System.Diagnostics;
+using MediaHub.Services.Logging;
 
 namespace MediaHub.Services.Dialogs;
 
@@ -17,7 +17,7 @@ public sealed class DialogService : IDialogService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Failed to show alert: {ex}");
+            AppLogger.Log(ex);
         }
     }
 
@@ -36,7 +36,7 @@ public sealed class DialogService : IDialogService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Failed to show confirmation dialog: {ex}");
+            AppLogger.Log(ex);
             return false;
         }
     }

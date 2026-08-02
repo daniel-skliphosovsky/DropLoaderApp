@@ -138,6 +138,7 @@ public sealed class TikTokDownloader : IDownloader
                     progress?.Report(new DownloadProgress(0, null, p, Loc.Get(LocKeys.ProgressDownloadingImages))));
 
                 var dirPath = Path.Combine(outputPath, baseName);
+                filePath = dirPath;
                 await _tikTok.DownloadImagesAsync(publication.Images, dirPath, baseName, downloadProgress, ct);
 
                 return new DownloadResult(true, dirPath, null);
@@ -153,10 +154,14 @@ public sealed class TikTokDownloader : IDownloader
         catch (TikTokExplodeException ex)
         {
             // Clean, library-level error (invalid link, private publication, API failure).
+            TryDeleteFile(filePath);
             return new DownloadResult(false, null, ex.Message);
         }
         catch (Exception ex)
         {
+            // A network or disk error mid-download leaves a partial file or
+            // image directory behind; clean it up.
+            TryDeleteFile(filePath);
             return new DownloadResult(false, null, Loc.Get(LocKeys.ErrPlatformPrefix, PlatformName, ex.Message));
         }
     }
@@ -165,10 +170,18 @@ public sealed class TikTokDownloader : IDownloader
     {
         try
         {
-            if (path is not null)
+            if (path is null)
+                return;
+
+            if (Directory.Exists(path))
+                Directory.Delete(path, true);
+            else
                 File.Delete(path);
         }
         catch (IOException)
+        {
+        }
+        catch (UnauthorizedAccessException)
         {
         }
     }

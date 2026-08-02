@@ -1,6 +1,6 @@
 using CommunityToolkit.Maui.Storage;
 using MediaHub.Services.Interfaces;
-using System.Diagnostics;
+using MediaHub.Services.Logging;
 
 namespace MediaHub.Services.Pickers;
 
@@ -36,7 +36,7 @@ public sealed class FolderPickerService : IFolderPickerService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Folder picker failed: {ex}");
+            AppLogger.Log(ex);
             await _dialog.ShowErrorAsync(ex.Message, Loc.Get(LocKeys.DialogPickFolderError));
             return null;
         }

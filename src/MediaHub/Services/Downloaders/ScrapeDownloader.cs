@@ -221,10 +221,18 @@ public abstract class ScrapeDownloader : IDownloader
     {
         try
         {
-            if (path is not null)
+            if (path is null)
+                return;
+
+            if (Directory.Exists(path))
+                Directory.Delete(path, true);
+            else
                 File.Delete(path);
         }
         catch (IOException)
+        {
+        }
+        catch (UnauthorizedAccessException)
         {
         }
     }
