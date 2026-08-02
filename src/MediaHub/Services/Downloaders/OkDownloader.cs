@@ -33,7 +33,8 @@ public sealed class OkDownloader : ScrapeDownloader
         ["low"] = 30,
         ["sd"] = 40,
         ["hd"] = 50,
-        ["fullhd"] = 60
+        ["fullhd"] = 60,
+        ["full"] = 70
     };
 
     public OkDownloader(HttpClient http) : base(http) { }
@@ -279,13 +280,26 @@ public sealed class OkDownloader : ScrapeDownloader
             !Uri.TryCreate(url, UriKind.Absolute, out var uri))
             return false;
 
-        // Direct progressive mp4s are served from signed okcdn URLs
-        // (vd*.okcdn.ru/?expires=...&sig=...) with no .mp4 extension, so match
-        // on the CDN host as well as the file extension.
         var host = uri.Host.ToLowerInvariant();
+        var path = uri.AbsolutePath.ToLowerInvariant();
+
+        // Some payloads put plain image/text URLs next to the streams (the
+        // video collage sprite, the login endpoint, subtitle tracks). A path
+        // with these markers is never a playable movie, so drop it before the
+        // host check lets it through.
+        if (path.Contains("videopreview") || path.Contains("usr_login") ||
+            path.EndsWith(".jpg") || path.EndsWith(".jpeg") || path.EndsWith(".png") ||
+            path.EndsWith(".webp") || path.EndsWith(".gif") || path.EndsWith(".vtt") ||
+            path.EndsWith(".srt"))
+            return false;
+
+        // Direct progressive mp4s are served from signed CDN URLs
+        // (vd*.okcdn.ru or ok*-*.vkuser.net/?expires=...&sig=...) with no .mp4
+        // extension, so match on the CDN host as well as the file extension.
         return host == "okcdn.ru" || host.EndsWith(".okcdn.ru", StringComparison.Ordinal) ||
                host == "mycdn.me" || host.EndsWith(".mycdn.me", StringComparison.Ordinal) ||
-               uri.AbsolutePath.ToLowerInvariant().EndsWith(".mp4");
+               host == "vkuser.net" || host.EndsWith(".vkuser.net", StringComparison.Ordinal) ||
+               path.EndsWith(".mp4");
     }
 
     /// <summary>
