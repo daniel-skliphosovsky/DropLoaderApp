@@ -2,9 +2,9 @@
 
 An application that helps you to download media from popular platforms.
 
-Built with .NET MAUI for macOS and Windows. Paste a link from TikTok, YouTube, SoundCloud, VK, OK.ru, Dailymotion or Vimeo, pick a folder, and MediaHub takes care of the rest — it detects the platform automatically, downloads the media, and reports progress with the option to cancel at any time.
+Built with .NET MAUI for macOS and Windows. Paste a link from TikTok, YouTube, SoundCloud, VK or OK.ru, pick a folder, and MediaHub takes care of the rest — it detects the platform automatically, downloads the media, and reports progress with the option to cancel at any time.
 
-**v4.1.0** adds new downloaders for OK.ru, Dailymotion and Vimeo, plus a friendly SoundCloud error message and platform logos as SVG. The window opens at a compact size (900x620, resizable up to 1160x760), the download block floats in the center of the screen, and the whole interface was scaled up — larger fields, buttons and typography, a cleaner single-outline input, the app icon as the header logo, and a moon-only theme toggle.
+**v4.1.0** adds a new downloader for OK.ru, a friendly SoundCloud error message and platform logos as SVG. The window opens at a compact size (900x620, resizable up to 1160x760), the download block floats in the center of the screen, and the whole interface was scaled up — larger fields, buttons and typography, a cleaner single-outline input, the app icon as the header logo, and a moon-only theme toggle.
 
 [![CI](https://img.shields.io/github/actions/workflow/status/daniel-skliphosovsky/MediaHub/ci.yml?style=for-the-badge&label=CI&logo=github)](https://github.com/daniel-skliphosovsky/MediaHub/actions)
 [![Release](https://img.shields.io/github/actions/workflow/status/daniel-skliphosovsky/MediaHub/release.yml?style=for-the-badge&label=Release&logo=github)](https://github.com/daniel-skliphosovsky/MediaHub/actions)
@@ -82,8 +82,6 @@ Built with .NET MAUI for macOS and Windows. Paste a link from TikTok, YouTube, S
 - SoundCloud tracks
 - VK videos
 - OK.ru videos
-- Dailymotion videos
-- Vimeo videos
 - Automatic platform detection from the URL (short links, www./m. prefixes, any case)
 - Light and Dark theme with one-click switching
 - Platform badge that updates live while you type the link
@@ -94,7 +92,7 @@ Built with .NET MAUI for macOS and Windows. Paste a link from TikTok, YouTube, S
 
 # Usage
 1. Open App
-2. Paste the media link into the link field (TikTok, YouTube, SoundCloud, VK, OK.ru, Dailymotion, Vimeo)
+2. Paste the media link into the link field (TikTok, YouTube, SoundCloud, VK, OK.ru)
 3. Select the path where the file will be saved
 4. Click the Download Button to start downloading
 5. Track the progress, cancel anytime if needed

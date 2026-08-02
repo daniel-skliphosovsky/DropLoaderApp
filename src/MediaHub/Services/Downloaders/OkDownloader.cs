@@ -5,17 +5,15 @@ using System.Text.RegularExpressions;
 namespace MediaHub.Services.Downloaders;
 
 /// <summary>
-/// OK.ru (Odnoklassniki) video downloader. The desktop page embeds a JSON
-/// data-options attribute carrying a metadataUrl; a plain GET to that URL
-/// returns the movie JSON with direct MP4 links on the mycdn CDN (up to
-/// 1080p). No login or cookies needed for public videos.
+/// OK.ru (Odnoklassniki) video downloader. The desktop page embeds the full
+/// movie JSON (title, author, direct MP4 links) as a string in
+/// flashvars.metadata inside the HTML-escaped data-options attribute; a plain
+/// GET to the old metadataUrl now returns DASH MPD XML instead of JSON, so
+/// the metadata is read from the page itself. No login or cookies needed for
+/// public videos.
 /// </summary>
 public sealed class OkDownloader : ScrapeDownloader
 {
-    private static readonly Regex MetadataUrlRegex = new(
-        @"metadataUrl""\s*:\s*""(?<url>https?:\\?/\\?/[^""]+)""",
-        RegexOptions.Compiled);
-
     // The data-options attribute is HTML-escaped, so its JSON carries no
     // literal quotes and the lazy match stops safely at the closing one.
     private static readonly Regex DataOptionsRegex = new(
@@ -26,6 +24,17 @@ public sealed class OkDownloader : ScrapeDownloader
     private static readonly Regex DataVideoRegex = new(
         @"data-video=""(?<json>[^""]+)""",
         RegexOptions.Compiled);
+
+    // Progressive MP4 labels the CDN publishes, in ascending quality order.
+    private static readonly Dictionary<string, int> QualityRank = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["mobile"] = 10,
+        ["lowest"] = 20,
+        ["low"] = 30,
+        ["sd"] = 40,
+        ["hd"] = 50,
+        ["fullhd"] = 60
+    };
 
     public OkDownloader(HttpClient http) : base(http) { }
 
@@ -38,55 +47,35 @@ public sealed class OkDownloader : ScrapeDownloader
 
     protected override async Task<string> FetchPageAsync(string url, CancellationToken ct)
     {
-        var html = await base.FetchPageAsync(url, ct);
-
-        // The metadataUrl lives inside the escaped data-options JSON; try the
-        // raw page first (some variants are not escaped) and the decoded
-        // attribute second.
-        var metadataMatch = MetadataUrlRegex.Match(html);
-        if (!metadataMatch.Success)
+        string html;
+        try
         {
-            var optionsMatch = DataOptionsRegex.Match(html);
-            if (optionsMatch.Success)
-                metadataMatch = MetadataUrlRegex.Match(WebUtility.HtmlDecode(optionsMatch.Groups["json"].Value));
+            html = await base.FetchPageAsync(url, ct);
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            // The video page itself is gone: deleted or private video.
+            throw new HttpRequestException(Loc.Get(LocKeys.ErrVideoNotFound), ex, HttpStatusCode.NotFound);
         }
 
-        if (metadataMatch.Success)
+        // Primary path: the desktop page carries the full movie JSON as a
+        // string in flashvars.metadata inside the escaped data-options
+        // attribute. HtmlDecode turns \&quot; into \" (valid JSON escaping),
+        // the parser then resolves it into a real JSON string. The page has
+        // several data-options attributes, so try each of them.
+        foreach (Match optionsMatch in DataOptionsRegex.Matches(html))
         {
-            var metadataUrl = Unescape(metadataMatch.Groups["url"].Value);
-            if (!IsAllowedMetadataHost(metadataUrl))
-                throw new HttpRequestException(Loc.Get(LocKeys.ErrVideoNotFound), null, HttpStatusCode.NotFound);
-
-            try
-            {
-                using var request = new HttpRequestMessage(HttpMethod.Get, metadataUrl);
-                request.Headers.UserAgent.ParseAdd(UserAgent);
-                if (Uri.TryCreate(url, UriKind.Absolute, out var referer))
-                    request.Headers.Referrer = referer;
-
-                using var response = await Http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
-                response.EnsureSuccessStatusCode();
-                return await response.Content.ReadAsStringAsync(ct);
-            }
-            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
-            {
-                // 404 from the metadata endpoint: no payload for this video,
-                // fall through to the inline data-video payload.
-            }
-            catch (HttpRequestException ex)
-            {
-                // 403/5xx metadata failures are not "video not found"; surface
-                // them instead of silently falling back.
-                throw new HttpRequestException(Loc.Get(LocKeys.ErrOkNoStream), ex, ex.StatusCode);
-            }
+            if (TryReadMetadataJson(WebUtility.HtmlDecode(optionsMatch.Groups["json"].Value)) is { } metadata)
+                return metadata;
         }
 
+        // Fallback: mobile pages embed the movie JSON directly in data-video.
         var dataVideo = DataVideoRegex.Match(html);
         if (dataVideo.Success)
             return WebUtility.HtmlDecode(dataVideo.Groups["json"].Value);
 
-        // Nothing usable: keep the page HTML; stream extraction fails with the
-        // platform no-stream error instead of a raw HTML error.
+        // Nothing usable: stream extraction fails with the platform no-stream
+        // error instead of a raw HTML error.
         return html;
     }
 
@@ -135,6 +124,18 @@ public sealed class OkDownloader : ScrapeDownloader
             foreach (var item in element.EnumerateArray())
                 WalkStreams(item, parentKey, streams);
         }
+    }
+
+    /// <summary>
+    /// OK.ru names its streams ("mobile", "sd", "hd", "fullhd") instead of
+    /// using resolutions; map them to an ascending rank so the best available
+    /// quality is picked instead of the first one listed.
+    /// </summary>
+    protected override int ParseQuality(string quality)
+    {
+        if (QualityRank.TryGetValue(quality.Trim(), out var rank))
+            return rank;
+        return base.ParseQuality(quality);
     }
 
     protected override string? ExtractTitle(string html) => FindString(html, "title");
@@ -267,28 +268,42 @@ public sealed class OkDownloader : ScrapeDownloader
             !Uri.TryCreate(url, UriKind.Absolute, out var uri))
             return false;
 
-        var path = uri.AbsolutePath.ToLowerInvariant();
-        return path.EndsWith(".mp4") || uri.Host.Contains("mycdn.me", StringComparison.OrdinalIgnoreCase);
+        // Direct progressive mp4s are served from signed okcdn URLs
+        // (vd*.okcdn.ru/?expires=...&sig=...) with no .mp4 extension, so match
+        // on the CDN host as well as the file extension.
+        var host = uri.Host.ToLowerInvariant();
+        return host == "okcdn.ru" || host.EndsWith(".okcdn.ru", StringComparison.Ordinal) ||
+               host == "mycdn.me" || host.EndsWith(".mycdn.me", StringComparison.Ordinal) ||
+               uri.AbsolutePath.ToLowerInvariant().EndsWith(".mp4");
     }
 
-    private static string Unescape(string url) =>
-        WebUtility.HtmlDecode(url
-            .Replace("\\/", "/")
-            .Replace("\\u0026", "&")
-            .Replace("\\x26", "&"));
-
     /// <summary>
-    /// The metadata endpoint may only live on ok.ru or the ok CDNs; a tampered
-    /// page must not point the client at an arbitrary host.
+    /// Reads flashvars.metadata out of a decoded data-options JSON. The
+    /// metadata is normally a JSON string; some pages embed it as an object
+    /// directly.
     /// </summary>
-    private static bool IsAllowedMetadataHost(string url)
+    private static string? TryReadMetadataJson(string dataOptionsJson)
     {
-        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
-            return false;
-        var host = uri.Host.ToLowerInvariant();
-        return host is "ok.ru" or "mycdn.me" or "okcdn.ru" ||
-               host.EndsWith(".ok.ru", StringComparison.Ordinal) ||
-               host.EndsWith(".mycdn.me", StringComparison.Ordinal) ||
-               host.EndsWith(".okcdn.ru", StringComparison.Ordinal);
+        try
+        {
+            using var doc = JsonDocument.Parse(dataOptionsJson);
+            var root = doc.RootElement;
+            if (root.ValueKind == JsonValueKind.Object &&
+                root.TryGetProperty("flashvars", out var flashvars) &&
+                flashvars.ValueKind == JsonValueKind.Object &&
+                flashvars.TryGetProperty("metadata", out var metadata))
+            {
+                return metadata.ValueKind == JsonValueKind.String
+                    ? metadata.GetString()
+                    : metadata.ValueKind == JsonValueKind.Object
+                        ? metadata.GetRawText()
+                        : null;
+            }
+        }
+        catch (JsonException)
+        {
+        }
+
+        return null;
     }
 }

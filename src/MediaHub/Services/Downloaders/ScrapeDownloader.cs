@@ -164,7 +164,7 @@ public abstract class ScrapeDownloader : IDownloader
             ? "https://" + url[7..]
             : url;
 
-    protected static (string Quality, string Url)? PickBest(IEnumerable<(string Quality, string Url)> streams)
+    protected (string Quality, string Url)? PickBest(IEnumerable<(string Quality, string Url)> streams)
     {
         (string Quality, string Url)? best = null;
         var bestQuality = -1;
@@ -185,7 +185,7 @@ public abstract class ScrapeDownloader : IDownloader
         return best;
     }
 
-    protected static int ParseQuality(string quality)
+    protected virtual int ParseQuality(string quality)
     {
         var match = Regex.Match(quality, @"\d+");
         return match.Success && int.TryParse(match.Value, out var value) ? value : 0;

@@ -97,10 +97,6 @@ public partial class MainViewModel : ObservableObject
                 return "vk";
             if (UrlHelpers.UrlBelongsTo(Url, "ok.ru", "m.ok.ru"))
                 return "ok";
-            if (UrlHelpers.UrlBelongsTo(Url, "dailymotion.com", "dai.ly"))
-                return "dailymotion";
-            if (UrlHelpers.UrlBelongsTo(Url, "vimeo.com", "player.vimeo.com"))
-                return "vimeo";
             return "unknown";
         }
     }

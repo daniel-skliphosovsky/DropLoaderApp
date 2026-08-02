@@ -121,7 +121,7 @@
                                                     </Path.Triggers>
                                                 </Path>
                                                 <!-- TikTok: music note -->
-                                                <Image Source="logo_tiktok.svg" IsVisible="False"
+                                                <Image Source="logo_tiktok.png" IsVisible="False"
                                                        Aspect="AspectFit"
                                                        HorizontalOptions="Fill" VerticalOptions="Fill">
                                                     <Image.Triggers>
@@ -132,7 +132,7 @@
                                                 </Image>
                                                 <!-- YouTube: wide red rounded rectangle with a
                                                      small play triangle inset from the edges -->
-                                                <Image Source="logo_youtube.svg" IsVisible="False"
+                                                <Image Source="logo_youtube.png" IsVisible="False"
                                                        Aspect="AspectFit"
                                                        HorizontalOptions="Fill" VerticalOptions="Fill">
                                                     <Image.Triggers>
@@ -142,7 +142,7 @@
                                                     </Image.Triggers>
                                                 </Image>
                                                 <!-- SoundCloud: sound waves -->
-                                                <Image Source="logo_soundcloud.svg" IsVisible="False"
+                                                <Image Source="logo_soundcloud.png" IsVisible="False"
                                                        Aspect="AspectFit"
                                                        HorizontalOptions="Fill" VerticalOptions="Fill">
                                                     <Image.Triggers>
@@ -153,7 +153,7 @@
                                                 </Image>
                                                 <!-- VK: wide blue rounded rectangle with small
                                                      "VK" letters centered -->
-                                                <Image Source="logo_vk.svg" IsVisible="False"
+                                                <Image Source="logo_vk.png" IsVisible="False"
                                                        Aspect="AspectFit"
                                                        HorizontalOptions="Fill" VerticalOptions="Fill">
                                                     <Image.Triggers>
@@ -163,31 +163,11 @@
                                                     </Image.Triggers>
                                                 </Image>
                                                 <!-- OK.ru: orange rounded square with "OK" -->
-                                                <Image Source="logo_ok.svg" IsVisible="False"
+                                                <Image Source="logo_ok.png" IsVisible="False"
                                                        Aspect="AspectFit"
                                                        HorizontalOptions="Fill" VerticalOptions="Fill">
                                                     <Image.Triggers>
                                                         <DataTrigger TargetType="Image" Binding="{Binding PlatformKey}" Value="ok">
-                                                            <Setter Property="IsVisible" Value="True" />
-                                                        </DataTrigger>
-                                                    </Image.Triggers>
-                                                </Image>
-                                                <!-- Dailymotion: dark square with a white "d" -->
-                                                <Image Source="logo_dailymotion.svg" IsVisible="False"
-                                                       Aspect="AspectFit"
-                                                       HorizontalOptions="Fill" VerticalOptions="Fill">
-                                                    <Image.Triggers>
-                                                        <DataTrigger TargetType="Image" Binding="{Binding PlatformKey}" Value="dailymotion">
-                                                            <Setter Property="IsVisible" Value="True" />
-                                                        </DataTrigger>
-                                                    </Image.Triggers>
-                                                </Image>
-                                                <!-- Vimeo: blue "V" -->
-                                                <Image Source="logo_vimeo.svg" IsVisible="False"
-                                                       Aspect="AspectFit"
-                                                       HorizontalOptions="Fill" VerticalOptions="Fill">
-                                                    <Image.Triggers>
-                                                        <DataTrigger TargetType="Image" Binding="{Binding PlatformKey}" Value="vimeo">
                                                             <Setter Property="IsVisible" Value="True" />
                                                         </DataTrigger>
                                                     </Image.Triggers>
@@ -245,12 +225,6 @@
                                                     <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="ok">
                                                         <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource OKContainerLight}, Dark={StaticResource OKContainerDark}}" />
                                                     </DataTrigger>
-                                                    <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="dailymotion">
-                                                        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource DailymotionContainerLight}, Dark={StaticResource DailymotionContainerDark}}" />
-                                                    </DataTrigger>
-                                                    <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="vimeo">
-                                                        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource VimeoContainerLight}, Dark={StaticResource VimeoContainerDark}}" />
-                                                    </DataTrigger>
                                                 </Border.Triggers>
                                                 <Label Text="{Binding PlatformName}" FontSize="12" FontAttributes="Bold">
                                                     <Label.Triggers>
@@ -268,12 +242,6 @@
                                                         </DataTrigger>
                                                         <DataTrigger TargetType="Label" Binding="{Binding PlatformKey}" Value="ok">
                                                             <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnOKContainerLight}, Dark={StaticResource OnOKContainerDark}}" />
-                                                        </DataTrigger>
-                                                        <DataTrigger TargetType="Label" Binding="{Binding PlatformKey}" Value="dailymotion">
-                                                            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnDailymotionContainerLight}, Dark={StaticResource OnDailymotionContainerDark}}" />
-                                                        </DataTrigger>
-                                                        <DataTrigger TargetType="Label" Binding="{Binding PlatformKey}" Value="vimeo">
-                                                            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnVimeoContainerLight}, Dark={StaticResource OnVimeoContainerDark}}" />
                                                         </DataTrigger>
                                                     </Label.Triggers>
                                                 </Label>

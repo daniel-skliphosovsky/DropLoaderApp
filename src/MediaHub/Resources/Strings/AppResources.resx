@@ -13,7 +13,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="App.Subtitle" xml:space="preserve">
-    <value>Download from TikTok, YouTube, SoundCloud and VK</value>
+    <value>Download from YouTube, TikTok, SoundCloud, VK and OK.ru</value>
   </data>
   <data name="Github.Hint" xml:space="preserve">
     <value>Open the MediaHub repository on GitHub</value>
@@ -216,23 +216,8 @@
   <data name="Err.OkNoStream" xml:space="preserve">
     <value>could not extract a video link. The video may be private or unavailable in your region.</value>
   </data>
-  <data name="Err.DailymotionNoStream" xml:space="preserve">
-    <value>could not extract a video link. The video may be private or unavailable in your region.</value>
-  </data>
-  <data name="Err.VimeoNoStream" xml:space="preserve">
-    <value>could not extract a video link. The video may be private or unavailable in your region.</value>
-  </data>
-  <data name="Err.VimeoRateLimited" xml:space="preserve">
-    <value>requests are being rate limited, try again in a minute</value>
-  </data>
   <data name="Platform.Ok" xml:space="preserve">
     <value>OK.ru</value>
-  </data>
-  <data name="Platform.Dailymotion" xml:space="preserve">
-    <value>Dailymotion</value>
-  </data>
-  <data name="Platform.Vimeo" xml:space="preserve">
-    <value>Vimeo</value>
   </data>
   <data name="Quality.Audio" xml:space="preserve">
     <value>Audio</value>

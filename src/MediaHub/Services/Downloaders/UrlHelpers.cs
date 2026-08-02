@@ -150,39 +150,6 @@ internal static class UrlHelpers
         if (host == "ok.ru" || host.EndsWith(".ok.ru", StringComparison.Ordinal))
             return path.StartsWith("video/", StringComparison.Ordinal) && path.Length > "video/".Length;
 
-        // Dailymotion: dai.ly short links carry the id in the path; full
-        // links need /video/ or /embed/video/ (or /player/video/).
-        if (host == "dai.ly" || host.EndsWith(".dai.ly", StringComparison.Ordinal))
-            return path.Length > 0;
-
-        if (host == "dailymotion.com" || host.EndsWith(".dailymotion.com", StringComparison.Ordinal))
-            return path.StartsWith("video/", StringComparison.Ordinal) ||
-                   path.StartsWith("embed/video/", StringComparison.Ordinal);
-
-        // Vimeo: only numeric video ids count; user/channel/album pages are
-        // not media. player.vimeo.com uses /video/<id>.
-        if (host == "vimeo.com" || host == "player.vimeo.com" ||
-            host.EndsWith(".vimeo.com", StringComparison.Ordinal))
-        {
-            var segments = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
-            if (segments.Length == 0)
-                return false;
-
-            if (segments[0] == "video")
-                return segments.Length > 1 && IsNumeric(segments[1]);
-            return IsNumeric(segments[0]);
-        }
-
         return false;
-    }
-
-    private static bool IsNumeric(string value)
-    {
-        foreach (var c in value)
-        {
-            if (!char.IsDigit(c))
-                return false;
-        }
-        return value.Length > 0;
     }
 }
