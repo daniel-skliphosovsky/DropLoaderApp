@@ -48,12 +48,14 @@ public static class MauiProgram
             return http;
         });
 
-        // TikTokClient takes ownership of no resources here (it was given the
-        // shared HttpClient), so a plain singleton is fine. The options pin the
-        // timeout to the same 5 minutes, otherwise the library would override it.
+        // TikTokClient takes ownership of a dedicated HttpClient (no
+        // ForcedUserAgentHandler): TikTokExplode rotates a fresh random
+        // User-Agent on every API retry to get past api22 rate limiting, and
+        // the shared forced-agent handler would stamp one fixed UA on all 30
+        // attempts, making every request hit the 429 rate limit.
         builder.Services.AddSingleton(sp =>
             new TikTokClient(
-                sp.GetRequiredService<HttpClient>(),
+                new HttpClient { Timeout = TimeSpan.FromMinutes(5) },
                 new TikTokClientOptions { TimeoutSeconds = 300 }));
 
         // Services
