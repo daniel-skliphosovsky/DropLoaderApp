@@ -11,8 +11,8 @@ public sealed class TikTokDownloader : IDownloader
 {
     public string PlatformName => "TikTok";
 
-    // Preview hits the API once; transient failures (rate limit, 5xx,
-    // network blips) are retried a few times with a short delay so the
+    // Preview hits the API once; network blips that escape the library's
+    // own retry loop are retried a few times with a short delay so the
     // preview succeeds on the second try. Invalid links fail fast.
     private const int PreviewMaxAttempts = 4;
     private const int PreviewRetryDelayMs = 400;
@@ -81,16 +81,13 @@ public sealed class TikTokDownloader : IDownloader
     }
 
     /// <summary>
-    /// True for rate limiting and server-side failures (the same set the
-    /// library itself retries: 408, 425, 429, 5xx) plus network-level
-    /// failures that surface as HttpRequestException or a timeout. Invalid
-    /// links, private publications and client-side 4xx are not transient,
-    /// so they fail fast without burning the retry budget.
+    /// True for network-level failures that surface as HttpRequestException
+    /// or a timeout. The library already retries rate limiting and 5xx
+    /// internally, so retrying them here too would duplicate the budget.
+    /// Invalid links, private publications and API 4xx fail fast.
     /// </summary>
     private static bool IsTransient(Exception ex, CancellationToken ct)
     {
-        if (ex is ApiException api)
-            return api.StatusCode is 408 or 425 or 429 or >= 500;
         if (ex is HttpRequestException)
             return true;
         if (ex is TikTokExplodeException tikTok)
