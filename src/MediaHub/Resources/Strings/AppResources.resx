@@ -210,6 +210,33 @@
   <data name="Err.VkNoStream" xml:space="preserve">
     <value>could not extract a video link. The video may be private, age-restricted, or unavailable in your region.</value>
   </data>
+  <data name="Err.VideoNotFound" xml:space="preserve">
+    <value>Video not found</value>
+  </data>
+  <data name="Err.VideoInfo" xml:space="preserve">
+    <value>Failed to load video info</value>
+  </data>
+  <data name="Err.OkNoStream" xml:space="preserve">
+    <value>could not extract a video link. The video may be private or unavailable in your region.</value>
+  </data>
+  <data name="Err.DailymotionNoStream" xml:space="preserve">
+    <value>could not extract a video link. The video may be private or unavailable in your region.</value>
+  </data>
+  <data name="Err.VimeoNoStream" xml:space="preserve">
+    <value>could not extract a video link. The video may be private or unavailable in your region.</value>
+  </data>
+  <data name="Err.VimeoRateLimited" xml:space="preserve">
+    <value>requests are being rate limited, try again in a minute</value>
+  </data>
+  <data name="Platform.Ok" xml:space="preserve">
+    <value>OK.ru</value>
+  </data>
+  <data name="Platform.Dailymotion" xml:space="preserve">
+    <value>Dailymotion</value>
+  </data>
+  <data name="Platform.Vimeo" xml:space="preserve">
+    <value>Vimeo</value>
+  </data>
   <data name="Quality.Audio" xml:space="preserve">
     <value>Audio</value>
   </data>

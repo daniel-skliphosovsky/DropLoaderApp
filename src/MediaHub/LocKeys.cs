@@ -80,6 +80,17 @@ public static class LocKeys
     public const string ErrPlatformPrefix = "Err.PlatformPrefix";
     public const string ErrScrapeNoStream = "Err.ScrapeNoStream";
     public const string ErrVkNoStream = "Err.VkNoStream";
+    public const string ErrVideoNotFound = "Err.VideoNotFound";
+    public const string ErrVideoInfo = "Err.VideoInfo";
+    public const string ErrOkNoStream = "Err.OkNoStream";
+    public const string ErrDailymotionNoStream = "Err.DailymotionNoStream";
+    public const string ErrVimeoNoStream = "Err.VimeoNoStream";
+    public const string ErrVimeoRateLimited = "Err.VimeoRateLimited";
+
+    // Platform names
+    public const string PlatformOk = "Platform.Ok";
+    public const string PlatformDailymotion = "Platform.Dailymotion";
+    public const string PlatformVimeo = "Platform.Vimeo";
 
     // Quality labels
     public const string QualityAudio = "Quality.Audio";

@@ -55,6 +55,18 @@
     <Color x:Key="VKContainerLight">#E0EFFF</Color>
     <Color x:Key="OnVKContainerLight">#00458F</Color>
 
+    <Color x:Key="OKLight">#EE8208</Color>
+    <Color x:Key="OKContainerLight">#FFE9D6</Color>
+    <Color x:Key="OnOKContainerLight">#8A4A00</Color>
+
+    <Color x:Key="DailymotionLight">#0D0D0D</Color>
+    <Color x:Key="DailymotionContainerLight">#ECECEC</Color>
+    <Color x:Key="OnDailymotionContainerLight">#141414</Color>
+
+    <Color x:Key="VimeoLight">#1AB7EA</Color>
+    <Color x:Key="VimeoContainerLight">#D8EEF7</Color>
+    <Color x:Key="OnVimeoContainerLight">#005E84</Color>
+
     <!-- ============ Dark Theme ============ -->
     <Color x:Key="BackgroundDark">#0C0A18</Color>
     <Color x:Key="SurfaceDark">#141124</Color>
@@ -102,5 +114,17 @@
     <Color x:Key="VKDark">#4D9BFF</Color>
     <Color x:Key="VKContainerDark">#0A2A55</Color>
     <Color x:Key="OnVKContainerDark">#C9E2FF</Color>
+
+    <Color x:Key="OKDark">#F59E0B</Color>
+    <Color x:Key="OKContainerDark">#3A2810</Color>
+    <Color x:Key="OnOKContainerDark">#FFD9A8</Color>
+
+    <Color x:Key="DailymotionDark">#8A8A8A</Color>
+    <Color x:Key="DailymotionContainerDark">#2A2A2A</Color>
+    <Color x:Key="OnDailymotionContainerDark">#E8E8E8</Color>
+
+    <Color x:Key="VimeoDark">#4DC7F0</Color>
+    <Color x:Key="VimeoContainerDark">#0A2A3A</Color>
+    <Color x:Key="OnVimeoContainerDark">#A8E2FF</Color>
 
 </ResourceDictionary>
