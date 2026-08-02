@@ -1,3 +1,4 @@
+using System.Net.Http;
 using System.Text;
 using MediaHub.Models;
 using MediaHub.Services.Interfaces;
@@ -9,6 +10,12 @@ namespace MediaHub.Services.Downloaders;
 public sealed class TikTokDownloader : IDownloader
 {
     public string PlatformName => "TikTok";
+
+    // Preview hits the API once; transient failures (rate limit, 5xx,
+    // network blips) are retried a few times with a short delay so the
+    // preview succeeds on the second try. Invalid links fail fast.
+    private const int PreviewMaxAttempts = 4;
+    private const int PreviewRetryDelayMs = 400;
 
     private readonly TikTokClient _tikTok;
 
@@ -23,43 +30,74 @@ public sealed class TikTokDownloader : IDownloader
 
     public async Task<MediaPreview?> GetPreviewAsync(string url, CancellationToken ct = default)
     {
-        var publication = await _tikTok.Publications.GetAsync(url, ct);
-
-        // Video posts have no cover of their own in the public model, so fall
-        // back to the soundtrack artwork, then the author avatar, and finally
-        // the first photo for image posts.
-        string? thumbnail = null;
-        if (publication.Video is not null)
+        for (var attempt = 0; ; attempt++)
         {
-            thumbnail = publication.Soundtrack?.LargeCoverUrl
-                ?? publication.Soundtrack?.MediumCoverUrl
-                ?? publication.Soundtrack?.ThumbCoverUrl
-                ?? publication.Author?.MediumAvatarUrl;
+            ct.ThrowIfCancellationRequested();
+            try
+            {
+                var publication = await _tikTok.Publications.GetAsync(url, ct);
+
+                // Video posts have no cover of their own in the public model, so fall
+                // back to the soundtrack artwork, then the author avatar, and finally
+                // the first photo for image posts.
+                string? thumbnail = null;
+                if (publication.Video is not null)
+                {
+                    thumbnail = publication.Soundtrack?.LargeCoverUrl
+                        ?? publication.Soundtrack?.MediumCoverUrl
+                        ?? publication.Soundtrack?.ThumbCoverUrl
+                        ?? publication.Author?.MediumAvatarUrl;
+                }
+                else if (publication.Images is { Count: > 0 })
+                {
+                    thumbnail = publication.Images[0].Url;
+                }
+
+                var description = publication.Description?.Trim();
+                if (description is { Length: > 100 })
+                    description = description[..100] + "...";
+
+                var quality = publication.Video is not null
+                    ? Loc.Get(LocKeys.QualityVideo)
+                    : publication.Images is { Count: > 0 } images ? Loc.Get(LocKeys.QualityImages, images.Count) : null;
+
+                return new MediaPreview
+                {
+                    Title = description ?? string.Empty,
+                    Author = publication.Author?.Nickname ?? string.Empty,
+                    ThumbnailUrl = thumbnail,
+                    Duration = publication.Video is { Duration: > 0 } video
+                        ? TimeSpan.FromMilliseconds(video.Duration)
+                        : null,
+                    QualityText = quality,
+                    Platform = PlatformName
+                };
+            }
+            catch (Exception ex) when (attempt < PreviewMaxAttempts - 1 && IsTransient(ex, ct))
+            {
+                await Task.Delay(PreviewRetryDelayMs, ct);
+            }
         }
-        else if (publication.Images is { Count: > 0 })
-        {
-            thumbnail = publication.Images[0].Url;
-        }
+    }
 
-        var description = publication.Description?.Trim();
-        if (description is { Length: > 100 })
-            description = description[..100] + "...";
-
-        var quality = publication.Video is not null
-            ? Loc.Get(LocKeys.QualityVideo)
-            : publication.Images is { Count: > 0 } images ? Loc.Get(LocKeys.QualityImages, images.Count) : null;
-
-        return new MediaPreview
-        {
-            Title = description ?? string.Empty,
-            Author = publication.Author?.Nickname ?? string.Empty,
-            ThumbnailUrl = thumbnail,
-            Duration = publication.Video is { Duration: > 0 } video
-                ? TimeSpan.FromMilliseconds(video.Duration)
-                : null,
-            QualityText = quality,
-            Platform = PlatformName
-        };
+    /// <summary>
+    /// True for rate limiting and server-side failures (the same set the
+    /// library itself retries: 408, 425, 429, 5xx) plus network-level
+    /// failures that surface as HttpRequestException or a timeout. Invalid
+    /// links, private publications and client-side 4xx are not transient,
+    /// so they fail fast without burning the retry budget.
+    /// </summary>
+    private static bool IsTransient(Exception ex, CancellationToken ct)
+    {
+        if (ex is ApiException api)
+            return api.StatusCode is 408 or 425 or 429 or >= 500;
+        if (ex is HttpRequestException)
+            return true;
+        if (ex is TikTokExplodeException tikTok)
+            return tikTok.InnerException is HttpRequestException;
+        // A timeout cancels the library's internal request without the
+        // caller's token; a real cancellation must propagate immediately.
+        return ex is OperationCanceledException && !ct.IsCancellationRequested;
     }
 
     public async Task<IReadOnlyList<ResourceDetail>> GetDetailsAsync(string url, CancellationToken ct = default)
