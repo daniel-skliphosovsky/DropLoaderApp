@@ -13,70 +13,39 @@ Built with .NET MAUI for macOS and Windows. Paste a link from TikTok, YouTube, S
 # Screenshots
 
 #### Downloading Page
-<table>
-  <tr>
-    <td><img src="images/MacOS/DownloadingPage_LightTheme.png" width="300" alt="Light Theme Page"></td>
-    <td><img src="images/MacOS/DownloadingPage_DarkTheme.png" width="300" alt="Dark Theme Page"></td>
-  </tr>
-  <tr>
-    <td align="center">Light Theme</td>
-    <td align="center">Dark Theme</td>
-  </tr>
-  <tr>
-    <td><img src="images/Windows/DownloadingPage_LightTheme.jpg" width="300" alt="Light Theme Page"></td>
-    <td><img src="images/Windows/DownloadingPage_DarkTheme.jpg" width="300" alt="Dark Theme Page"></td>
-  </tr>
-</table>
+
+| | |
+|---|---|
+| <img src="images/MacOS/DownloadingPage_LightTheme.png" width="300" alt="Light Theme Page"> | <img src="images/MacOS/DownloadingPage_DarkTheme.png" width="300" alt="Dark Theme Page"> |
+| <p align="center">Light Theme</p> | <p align="center">Dark Theme</p> |
+| <img src="images/Windows/DownloadingPage_LightTheme.jpg" width="300" alt="Light Theme Page"> | <img src="images/Windows/DownloadingPage_DarkTheme.jpg" width="300" alt="Dark Theme Page"> |
 
 #### Downloading Process
-<table>
-  <tr>
-    <td><img src="images/MacOS/DownloadingContext_LightTheme.png" width="300" alt="Light Theme Context"></td>
-    <td><img src="images/MacOS/DownloadingContext_DarkTheme.png" width="300" alt="Dark Theme Context"></td>
-  </tr>
-  <tr>
-    <td align="center">Light Theme</td>
-    <td align="center">Dark Theme</td>
-  </tr>
-  <tr>
-    <td><img src="images/Windows/DownloadingContext_LightTheme.jpg" width="300" alt="Light Theme Context"></td>
-    <td><img src="images/Windows/DownloadingContext_DarkTheme.jpg" width="300" alt="Dark Theme Context"></td>
-  </tr>
-</table>
+
+| | |
+|---|---|
+| <img src="images/MacOS/DownloadingContext_LightTheme.png" width="300" alt="Light Theme Context"> | <img src="images/MacOS/DownloadingContext_DarkTheme.png" width="300" alt="Dark Theme Context"> |
+| <p align="center">Light Theme</p> | <p align="center">Dark Theme</p> |
+| <img src="images/Windows/DownloadingContext_LightTheme.jpg" width="300" alt="Light Theme Context"> | <img src="images/Windows/DownloadingContext_DarkTheme.jpg" width="300" alt="Dark Theme Context"> |
 
 #### Possible downloading completions
-<table>
-  <tr>
-    <td><img src="images/MacOS/DownloadingCanceled.png" width="300" alt="Downloading Canceled"></td>
-    <td><img src="images/MacOS/DownloadingFinished.png" width="300" alt="Downloading Finished"></td>
-  </tr>
-  <tr>
-    <td align="center">Downloading Canceled</td>
-    <td align="center">Downloading Finished</td>
-  </tr>
-  <tr>
-    <td><img src="images/Windows/DownloadingCanceled.jpg" width="300" alt="Downloading Canceled"></td>
-    <td><img src="images/Windows/DownloadingFinished.jpg" width="300" alt="Downloading Finished"></td>
-  </tr>
-</table>
+
+| | |
+|---|---|
+| <img src="images/MacOS/DownloadingCanceled.png" width="300" alt="Downloading Canceled"> | <img src="images/MacOS/DownloadingFinished.png" width="300" alt="Downloading Finished"> |
+| <p align="center">Downloading Canceled</p> | <p align="center">Downloading Finished</p> |
+| <img src="images/Windows/DownloadingCanceled.jpg" width="300" alt="Downloading Canceled"> | <img src="images/Windows/DownloadingFinished.jpg" width="300" alt="Downloading Finished"> |
 
 #### Possible Errors
-<table>
-  <tr>
-    <td><img src="images/MacOS/ErrorType_EmptyFields.png" width="300" alt="Empty Fields Error"></td>
-    <td><img src="images/MacOS/ErrorType_IncorrectLink.png" width="300" alt="Incorrect Link Error"></td>
-  </tr>
-  <tr>
-    <td align="center">Empty Fields</td>
-    <td align="center">Incorrect Links</td>
-  </tr>
-  <tr>
-    <td><img src="images/Windows/ErrorType_EmptyFields.jpg" width="300" alt="Empty Fields Error"></td>
-    <td><img src="images/Windows/ErrorType_IncorrectLink.jpg" width="300" alt="Incorrect Link Error"></td>
-  </tr>
-</table>
+
+| | |
+|---|---|
+| <img src="images/MacOS/ErrorType_EmptyFields.png" width="300" alt="Empty Fields Error"> | <img src="images/MacOS/ErrorType_IncorrectLink.png" width="300" alt="Incorrect Link Error"> |
+| <p align="center">Empty Fields</p> | <p align="center">Incorrect Links</p> |
+| <img src="images/Windows/ErrorType_EmptyFields.jpg" width="300" alt="Empty Fields Error"> | <img src="images/Windows/ErrorType_IncorrectLink.jpg" width="300" alt="Incorrect Link Error"> |
 
 # Features
+
 - TikTok videos and image galleries
 - YouTube videos (best available quality)
 - SoundCloud tracks
@@ -91,6 +60,7 @@ Built with .NET MAUI for macOS and Windows. Paste a link from TikTok, YouTube, S
 - Material Design 3 interface, app icon and splash screen
 
 # Usage
+
 1. Open App
 2. Paste the media link into the link field (TikTok, YouTube, SoundCloud, VK, OK.ru)
 3. Select the path where the file will be saved
@@ -139,6 +109,22 @@ dotnet restore src/MediaHub/MediaHub.csproj
 dotnet build src/MediaHub/MediaHub.csproj --configuration Release
 ```
 
-# License
+# Tech Stack
 
-This project is licensed under the MIT License.
+- .NET MAUI
+- CommunityToolkit.Mvvm
+- CommunityToolkit.Maui
+- YoutubeExplode
+- SoundCloudExplode
+- Microsoft.Extensions.Logging.Debug
+- Microsoft.Maui.Controls
+- TikTokExplode (self-contained reference library)
+
+# Links
+
+- [Releases](https://github.com/daniel-skliphosovsky/MediaHub/releases)
+- [Contributing](CONTRIBUTING.md)
+
+# Support
+
+For bug reports and feature requests, please use the GitHub issue tracker.

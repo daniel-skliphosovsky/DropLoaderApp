@@ -1,0 +1,73 @@
+name: Bug Report
+about: Create a bug report to help us improve MediaHub
+title: "Bug: "
+labels: "bug"
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: What version of MediaHub are you using?
+      placeholder: e.g., v4.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Windows
+        - macOS
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Please provide any relevant system information
+      placeholder: e.g., OS version, .NET version, etc.
+    validations:
+      required: false
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Please provide clear, numbered steps that lead to the bug
+      placeholder: 1. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: What should happen?
+      placeholder: e.g., The download should start successfully
+    validations:
+      required: true
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual behavior
+      description: What actually happens?
+      placeholder: e.g., The download fails with an error
+    validations:
+      required: true
+  - type: textarea
+    id: additional-details
+    attributes:
+      label: Additional details
+      description: Screenshots, error messages, or any other helpful information
+      placeholder: e.g., Error logs, screenshots, etc.
+    validations:
+      required: false
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - type: checkbox
+          label: I have searched for existing issues and found none related to this bug
+        - type: checkbox
+          label: I have verified the bug exists in the latest version
+        - type: checkbox
+          label: I have tested the steps to reproduce the bug
