@@ -4,6 +4,14 @@ All notable changes to MediaHub will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [4.2.1] - 2026-08-02
+
+### Fixed
+
+- OK.ru download quality (new CDN vkuser.net, collageInfo JPG truncation, quality full=70)
+- Platform icons size (22 -> 34, closer to entry)
+- TikTok preview retry (only network errors, library already retries 30 times)
+
 ## [4.2.0] - 2026-08-02
 
 ### Added

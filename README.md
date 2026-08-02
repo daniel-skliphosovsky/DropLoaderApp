@@ -4,7 +4,7 @@ An application that helps you to download media from popular platforms.
 
 Built with .NET MAUI for macOS and Windows. Paste a link from TikTok, YouTube, SoundCloud, VK or OK.ru, pick a folder, and MediaHub takes care of the rest — it detects the platform automatically, downloads the media, and reports progress with the option to cancel at any time.
 
-**v4.2.0** fixes the SVG platform icons and the OK.ru downloader (metadata, error mapping), removes the Dailymotion and Vimeo downloaders, and adds fault tolerance with partial file cleanup and better logging on failed downloads. The repository now ships professional docs — README, LICENSE, CONTRIBUTING, issue and pull request templates, SECURITY, CODE_OF_CONDUCT and CHANGELOG.
+**v4.2.1** fixes the OK.ru download quality (new CDN vkuser.net, broken 200KB mp4), enlarges platform icons and adds network-only retries for the TikTok preview. **v4.2.0** fixed the SVG platform icons and the OK.ru downloader (metadata, error mapping), removed the Dailymotion and Vimeo downloaders, and added fault tolerance with partial file cleanup and better logging on failed downloads.
 
 [![CI](https://img.shields.io/github/actions/workflow/status/daniel-skliphosovsky/MediaHub/ci.yml?style=for-the-badge&label=CI&logo=github)](https://github.com/daniel-skliphosovsky/MediaHub/actions)
 [![Release](https://img.shields.io/github/actions/workflow/status/daniel-skliphosovsky/MediaHub/release.yml?style=for-the-badge&label=Release&logo=github)](https://github.com/daniel-skliphosovsky/MediaHub/actions)

@@ -4,7 +4,7 @@ MediaHub follows responsible disclosure practices for security vulnerabilities.
 
 ## Supported Versions
 
-- Current stable version: v4.2.0
+- Current stable version: v4.2.1
 - Previous versions: v4.0.9, v4.0.8, v4.0.7, v4.0.6, v4.0.5, v4.0.4, v4.0.3, v4.0.2, v4.0.1, v4.0.0
 
 ## Reporting Security Issues
