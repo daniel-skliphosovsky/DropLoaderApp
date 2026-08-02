@@ -33,7 +33,7 @@
 
     <!-- VK: wide blue rounded rectangle (ratio ~1.6:1) with the "VK" letters
          small and centered (V slightly smaller than K, official style) -->
-    <PathGeometry x:Key="IconVkPath" Figures="M7 7A3 3 0 0 1 10 4h7A3 3 0 0 1 20 7v10a3 3 0 0 1-3 3h-7a3 3 0 0 1-3-3z" />
+    <PathGeometry x:Key="IconVkPath" Figures="M7 7h10a3 3 0 0 1 3 3v4a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-4a3 3 0 0 1 3-3z" />
 
     <!-- White "VK" letters, small and centered inside the VK rectangle -->
     <PathGeometry x:Key="IconVkGlyph" Figures="M8.3 10.2 L10 13.8 L11.7 10.2 Z M12.1 10.0 L13.1 10.0 L13.1 10.8 L15.9 9.9 L15.9 10.8 L13.1 12.0 L15.9 12.9 L15.9 13.8 L13.1 13.2 L13.1 14.0 L12.1 14.0 Z" />
