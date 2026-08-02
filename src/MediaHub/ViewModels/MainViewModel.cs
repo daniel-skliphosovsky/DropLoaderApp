@@ -164,6 +164,7 @@ public partial class MainViewModel : ObservableObject
     public string LocGithubHint => Loc.Get(LocKeys.GithubHint);
     public string LocThemeHint => Loc.Get(LocKeys.ThemeToggleHint);
     public string LocLangHint => Loc.Get(LocKeys.LangHint);
+    public string LocUrlLabel => Loc.Get(LocKeys.UrlLabel);
     public string LocUrlPlaceholder => Loc.Get(LocKeys.UrlPlaceholder);
     public string LocUrlHint => Loc.Get(LocKeys.UrlHint);
     public string LocDownload => Loc.Get(LocKeys.DownloadButton);

@@ -2,7 +2,6 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:MediaHub.ViewModels"
-             xmlns:anim="clr-namespace:MediaHub.Animations"
              x:Class="MediaHub.Views.MainPage"
              x:DataType="vm:MainViewModel"
              BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundLight}, Dark={StaticResource BackgroundDark}}"
@@ -92,15 +91,17 @@
         <ScrollView Grid.Row="1" SizeChanged="OnScrollViewSizeChanged">
             <Grid x:Name="ContentHost">
                 <VerticalStackLayout Padding="36,36,36,24" Spacing="0"
-                                     MaximumWidthRequest="960"
+                                     WidthRequest="1140"
                                      HorizontalOptions="Center" VerticalOptions="Center">
                     <VerticalStackLayout Spacing="20">
 
                         <Border Style="{StaticResource CardBorder}" Padding="32,26">
                             <VerticalStackLayout Spacing="20">
 
-                                <!-- URL row: input + download -->
-                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                <!-- URL input: label + row -->
+                                <VerticalStackLayout Spacing="8">
+                                    <Label Text="{Binding LocUrlLabel}" Style="{StaticResource FieldLabel}" />
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                                     <Border Style="{StaticResource InputContainer}">
                                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
 
@@ -131,8 +132,8 @@
                                                         </DataTrigger>
                                                     </Path.Triggers>
                                                 </Path>
-                                                <!-- YouTube: wide red rounded rectangle with the play
-                                                     triangle inset from the edges (official proportions) -->
+                                                <!-- YouTube: wide red rounded rectangle with a
+                                                     small play triangle inset from the edges -->
                                                 <Path Fill="{AppThemeBinding Light={StaticResource YouTubeLight}, Dark={StaticResource YouTubeDark}}" IsVisible="False"
                                                       StrokeThickness="0" Aspect="Uniform"
                                                       Data="{StaticResource IconYouTubePath}">
@@ -163,8 +164,8 @@
                                                         </DataTrigger>
                                                     </Path.Triggers>
                                                 </Path>
-                                                <!-- VK: blue rounded square with the "VK" letters inset
-                                                     from the edges (official proportions) -->
+                                                <!-- VK: wide blue rounded rectangle with small
+                                                     "VK" letters centered -->
                                                 <Path Fill="{AppThemeBinding Light={StaticResource VKLight}, Dark={StaticResource VKDark}}" IsVisible="False"
                                                       StrokeThickness="0" Aspect="Uniform"
                                                       Data="{StaticResource IconVkPath}">
@@ -204,48 +205,7 @@
                                             VerticalOptions="Center"
                                             SemanticProperties.Description="{Binding LocDownloadHint}" />
                                 </Grid>
-
-                                <!-- Platform chip -->
-                                <Border Style="{StaticResource ChipStyle}"
-                                        IsVisible="{Binding ShowPlatformBadge}"
-                                        HorizontalOptions="Start">
-                                    <Border.Triggers>
-                                        <DataTrigger TargetType="Border"
-                                                     Binding="{Binding ShowPlatformBadge}" Value="True">
-                                            <DataTrigger.EnterActions>
-                                                <anim:FadeInAction />
-                                            </DataTrigger.EnterActions>
-                                        </DataTrigger>
-                                        <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="tiktok">
-                                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource TikTokContainerLight}, Dark={StaticResource TikTokContainerDark}}" />
-                                        </DataTrigger>
-                                        <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="youtube">
-                                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource YouTubeContainerLight}, Dark={StaticResource YouTubeContainerDark}}" />
-                                        </DataTrigger>
-                                        <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="soundcloud">
-                                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource SoundCloudContainerLight}, Dark={StaticResource SoundCloudContainerDark}}" />
-                                        </DataTrigger>
-                                        <DataTrigger TargetType="Border" Binding="{Binding PlatformKey}" Value="vk">
-                                            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource VKContainerLight}, Dark={StaticResource VKContainerDark}}" />
-                                        </DataTrigger>
-                                    </Border.Triggers>
-                                    <Label Text="{Binding PlatformName}" FontSize="13" FontAttributes="Bold" VerticalOptions="Center">
-                                        <Label.Triggers>
-                                            <DataTrigger TargetType="Label" Binding="{Binding PlatformKey}" Value="tiktok">
-                                                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnTikTokContainerLight}, Dark={StaticResource OnTikTokContainerDark}}" />
-                                            </DataTrigger>
-                                            <DataTrigger TargetType="Label" Binding="{Binding PlatformKey}" Value="youtube">
-                                                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnYouTubeContainerLight}, Dark={StaticResource OnYouTubeContainerDark}}" />
-                                            </DataTrigger>
-                                            <DataTrigger TargetType="Label" Binding="{Binding PlatformKey}" Value="soundcloud">
-                                                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnSoundCloudContainerLight}, Dark={StaticResource OnSoundCloudContainerDark}}" />
-                                            </DataTrigger>
-                                            <DataTrigger TargetType="Label" Binding="{Binding PlatformKey}" Value="vk">
-                                                <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource OnVKContainerLight}, Dark={StaticResource OnVKContainerDark}}" />
-                                            </DataTrigger>
-                                        </Label.Triggers>
-                                    </Label>
-                                </Border>
+                                </VerticalStackLayout>
 
                                 <!-- Metadata card: what will be downloaded. Fixed
                                      layout on the full content width: no fade-in

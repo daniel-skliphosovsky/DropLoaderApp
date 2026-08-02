@@ -30,6 +30,9 @@
   <data name="Lang.CodeRu" xml:space="preserve">
     <value>RU</value>
   </data>
+  <data name="Url.Label" xml:space="preserve">
+    <value>Введите ссылку</value>
+  </data>
   <data name="Url.Placeholder" xml:space="preserve">
     <value>Введите ссылку...</value>
   </data>

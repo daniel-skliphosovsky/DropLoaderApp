@@ -16,6 +16,7 @@ public static class LocKeys
     public const string LangCodeRu = "Lang.CodeRu";
 
     // URL input
+    public const string UrlLabel = "Url.Label";
     public const string UrlPlaceholder = "Url.Placeholder";
     public const string UrlHint = "Url.Hint";
 
