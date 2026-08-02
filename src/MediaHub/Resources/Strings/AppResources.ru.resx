@@ -213,9 +213,6 @@
   <data name="Err.VideoNotFound" xml:space="preserve">
     <value>Видео не найдено</value>
   </data>
-  <data name="Err.VideoInfo" xml:space="preserve">
-    <value>Не удалось загрузить информацию о видео</value>
-  </data>
   <data name="Err.OkNoStream" xml:space="preserve">
     <value>не удалось извлечь ссылку на видео. Видео может быть приватным или недоступным в вашем регионе.</value>
   </data>

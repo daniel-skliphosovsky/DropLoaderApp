@@ -81,7 +81,6 @@ public static class LocKeys
     public const string ErrScrapeNoStream = "Err.ScrapeNoStream";
     public const string ErrVkNoStream = "Err.VkNoStream";
     public const string ErrVideoNotFound = "Err.VideoNotFound";
-    public const string ErrVideoInfo = "Err.VideoInfo";
     public const string ErrOkNoStream = "Err.OkNoStream";
     public const string ErrDailymotionNoStream = "Err.DailymotionNoStream";
     public const string ErrVimeoNoStream = "Err.VimeoNoStream";

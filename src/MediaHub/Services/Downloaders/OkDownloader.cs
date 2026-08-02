@@ -54,6 +54,9 @@ public sealed class OkDownloader : ScrapeDownloader
         if (metadataMatch.Success)
         {
             var metadataUrl = Unescape(metadataMatch.Groups["url"].Value);
+            if (!IsAllowedMetadataHost(metadataUrl))
+                throw new HttpRequestException(Loc.Get(LocKeys.ErrVideoNotFound), null, HttpStatusCode.NotFound);
+
             try
             {
                 using var request = new HttpRequestMessage(HttpMethod.Get, metadataUrl);
@@ -62,14 +65,19 @@ public sealed class OkDownloader : ScrapeDownloader
                     request.Headers.Referrer = referer;
 
                 using var response = await Http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
-                if (response.StatusCode == HttpStatusCode.NotFound)
-                    throw new HttpRequestException(Loc.Get(LocKeys.ErrVideoNotFound), null, HttpStatusCode.NotFound);
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadAsStringAsync(ct);
             }
-            catch (HttpRequestException ex) when (ex.StatusCode != HttpStatusCode.NotFound)
+            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
-                // Metadata endpoint unreachable; fall through to the inline payload.
+                // 404 from the metadata endpoint: no payload for this video,
+                // fall through to the inline data-video payload.
+            }
+            catch (HttpRequestException ex)
+            {
+                // 403/5xx metadata failures are not "video not found"; surface
+                // them instead of silently falling back.
+                throw new HttpRequestException(Loc.Get(LocKeys.ErrOkNoStream), ex, ex.StatusCode);
             }
         }
 
@@ -268,4 +276,19 @@ public sealed class OkDownloader : ScrapeDownloader
             .Replace("\\/", "/")
             .Replace("\\u0026", "&")
             .Replace("\\x26", "&"));
+
+    /// <summary>
+    /// The metadata endpoint may only live on ok.ru or the ok CDNs; a tampered
+    /// page must not point the client at an arbitrary host.
+    /// </summary>
+    private static bool IsAllowedMetadataHost(string url)
+    {
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
+            return false;
+        var host = uri.Host.ToLowerInvariant();
+        return host is "ok.ru" or "mycdn.me" or "okcdn.ru" ||
+               host.EndsWith(".ok.ru", StringComparison.Ordinal) ||
+               host.EndsWith(".mycdn.me", StringComparison.Ordinal) ||
+               host.EndsWith(".okcdn.ru", StringComparison.Ordinal);
+    }
 }
