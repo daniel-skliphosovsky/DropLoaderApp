@@ -34,11 +34,13 @@ public static class MauiProgram
             handler.PlatformView.BorderStyle = UIKit.UITextBorderStyle.None);
 #endif
 
-        // Single HttpClient shared by all downloaders and underlying clients.
-        // The modern browser User-Agent is forced on every request here, not
-        // just set as a default: Explode libraries stamp their own stale UA
-        // onto the request headers during SendAsync, which would otherwise
-        // beat the DefaultRequestHeaders value.
+        // Single HttpClient (with ForcedUserAgentHandler) shared by the
+        // YouTube, SoundCloud, VK and Scrape downloaders. The modern browser
+        // User-Agent is forced on every request here, not just set as a
+        // default: Explode libraries stamp their own stale UA onto the
+        // request headers during SendAsync, which would otherwise beat the
+        // DefaultRequestHeaders value. TikTok is excluded: it registers its
+        // own clean HttpClient below.
         builder.Services.AddSingleton(_ =>
         {
             var http = new HttpClient(new ForcedUserAgentHandler())

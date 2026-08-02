@@ -39,19 +39,15 @@
     <Color x:Key="ShadowLight">#000000</Color>
 
     <!-- Platform accents (light) -->
-    <Color x:Key="TikTokLight">#FE2C55</Color>
     <Color x:Key="TikTokContainerLight">#FFE7EE</Color>
     <Color x:Key="OnTikTokContainerLight">#8E0025</Color>
 
-    <Color x:Key="YouTubeLight">#FF0000</Color>
     <Color x:Key="YouTubeContainerLight">#FFE5E5</Color>
     <Color x:Key="OnYouTubeContainerLight">#8E0000</Color>
 
-    <Color x:Key="SoundCloudLight">#FF6A00</Color>
     <Color x:Key="SoundCloudContainerLight">#FFF0E0</Color>
     <Color x:Key="OnSoundCloudContainerLight">#7A3300</Color>
 
-    <Color x:Key="VKLight">#0077FF</Color>
     <Color x:Key="VKContainerLight">#E0EFFF</Color>
     <Color x:Key="OnVKContainerLight">#00458F</Color>
 
@@ -99,19 +95,15 @@
     <Color x:Key="ShadowDark">#000000</Color>
 
     <!-- Platform accents (dark) -->
-    <Color x:Key="TikTokDark">#FE2C55</Color>
     <Color x:Key="TikTokContainerDark">#3A0F1C</Color>
     <Color x:Key="OnTikTokContainerDark">#FFC9D4</Color>
 
-    <Color x:Key="YouTubeDark">#FF4D4D</Color>
     <Color x:Key="YouTubeContainerDark">#3A1414</Color>
     <Color x:Key="OnYouTubeContainerDark">#FFB3B3</Color>
 
-    <Color x:Key="SoundCloudDark">#FF8A3D</Color>
     <Color x:Key="SoundCloudContainerDark">#3A2410</Color>
     <Color x:Key="OnSoundCloudContainerDark">#FFDCC4</Color>
 
-    <Color x:Key="VKDark">#4D9BFF</Color>
     <Color x:Key="VKContainerDark">#0A2A55</Color>
     <Color x:Key="OnVKContainerDark">#C9E2FF</Color>
 
