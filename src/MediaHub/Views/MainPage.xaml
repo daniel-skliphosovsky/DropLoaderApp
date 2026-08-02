@@ -121,69 +121,47 @@
                                                     </Path.Triggers>
                                                 </Path>
                                                 <!-- TikTok: music note -->
-                                                <Path Fill="Transparent" IsVisible="False"
-                                                      Stroke="{AppThemeBinding Light={StaticResource TikTokLight}, Dark={StaticResource TikTokDark}}"
-                                                      StrokeThickness="2" StrokeLineCap="Round" StrokeLineJoin="Round"
-                                                      Aspect="Uniform"
-                                                      Data="{StaticResource IconTikTokPath}">
-                                                    <Path.Triggers>
-                                                        <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="tiktok">
+                                                <Image Source="logo_tiktok.svg" IsVisible="False"
+                                                       Aspect="AspectFit"
+                                                       HorizontalOptions="Fill" VerticalOptions="Fill">
+                                                    <Image.Triggers>
+                                                        <DataTrigger TargetType="Image" Binding="{Binding PlatformKey}" Value="tiktok">
                                                             <Setter Property="IsVisible" Value="True" />
                                                         </DataTrigger>
-                                                    </Path.Triggers>
-                                                </Path>
+                                                    </Image.Triggers>
+                                                </Image>
                                                 <!-- YouTube: wide red rounded rectangle with a
                                                      small play triangle inset from the edges -->
-                                                <Path Fill="{AppThemeBinding Light={StaticResource YouTubeLight}, Dark={StaticResource YouTubeDark}}" IsVisible="False"
-                                                      StrokeThickness="0" Aspect="Uniform"
-                                                      Data="{StaticResource IconYouTubePath}">
-                                                    <Path.Triggers>
-                                                        <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="youtube">
+                                                <Image Source="logo_youtube.svg" IsVisible="False"
+                                                       Aspect="AspectFit"
+                                                       HorizontalOptions="Fill" VerticalOptions="Fill">
+                                                    <Image.Triggers>
+                                                        <DataTrigger TargetType="Image" Binding="{Binding PlatformKey}" Value="youtube">
                                                             <Setter Property="IsVisible" Value="True" />
                                                         </DataTrigger>
-                                                    </Path.Triggers>
-                                                </Path>
-                                                <Path Fill="White" IsVisible="False"
-                                                      StrokeThickness="0" Aspect="Uniform"
-                                                      Data="{StaticResource IconYouTubeGlyph}">
-                                                    <Path.Triggers>
-                                                        <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="youtube">
-                                                            <Setter Property="IsVisible" Value="True" />
-                                                        </DataTrigger>
-                                                    </Path.Triggers>
-                                                </Path>
+                                                    </Image.Triggers>
+                                                </Image>
                                                 <!-- SoundCloud: sound waves -->
-                                                <Path Fill="Transparent" IsVisible="False"
-                                                      Stroke="{AppThemeBinding Light={StaticResource SoundCloudLight}, Dark={StaticResource SoundCloudDark}}"
-                                                      StrokeThickness="2.2" StrokeLineCap="Round"
-                                                      Aspect="Uniform"
-                                                      Data="{StaticResource IconSoundCloudPath}">
-                                                    <Path.Triggers>
-                                                        <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="soundcloud">
+                                                <Image Source="logo_soundcloud.svg" IsVisible="False"
+                                                       Aspect="AspectFit"
+                                                       HorizontalOptions="Fill" VerticalOptions="Fill">
+                                                    <Image.Triggers>
+                                                        <DataTrigger TargetType="Image" Binding="{Binding PlatformKey}" Value="soundcloud">
                                                             <Setter Property="IsVisible" Value="True" />
                                                         </DataTrigger>
-                                                    </Path.Triggers>
-                                                </Path>
+                                                    </Image.Triggers>
+                                                </Image>
                                                 <!-- VK: wide blue rounded rectangle with small
                                                      "VK" letters centered -->
-                                                <Path Fill="{AppThemeBinding Light={StaticResource VKLight}, Dark={StaticResource VKDark}}" IsVisible="False"
-                                                      StrokeThickness="0" Aspect="Uniform"
-                                                      Data="{StaticResource IconVkPath}">
-                                                    <Path.Triggers>
-                                                        <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="vk">
+                                                <Image Source="logo_vk.svg" IsVisible="False"
+                                                       Aspect="AspectFit"
+                                                       HorizontalOptions="Fill" VerticalOptions="Fill">
+                                                    <Image.Triggers>
+                                                        <DataTrigger TargetType="Image" Binding="{Binding PlatformKey}" Value="vk">
                                                             <Setter Property="IsVisible" Value="True" />
                                                         </DataTrigger>
-                                                    </Path.Triggers>
-                                                </Path>
-                                                <Path Fill="White" IsVisible="False"
-                                                      StrokeThickness="0" Aspect="Uniform"
-                                                      Data="{StaticResource IconVkGlyph}">
-                                                    <Path.Triggers>
-                                                        <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="vk">
-                                                            <Setter Property="IsVisible" Value="True" />
-                                                        </DataTrigger>
-                                                    </Path.Triggers>
-                                                </Path>
+                                                    </Image.Triggers>
+                                                </Image>
                                             </Grid>
 
                                             <Entry Grid.Column="1"

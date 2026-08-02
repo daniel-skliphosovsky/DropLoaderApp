@@ -141,6 +141,9 @@
   <data name="Dialog.SavedTo" xml:space="preserve">
     <value>Сохранено в {0}</value>
   </data>
+  <data name="Dialog.SomeFailed" xml:space="preserve">
+    <value>Не удалось скачать {0} из {1} треков</value>
+  </data>
   <data name="Dialog.GenericError" xml:space="preserve">
     <value>Что-то пошло не так при скачивании</value>
   </data>
@@ -189,14 +192,14 @@
   <data name="Err.TrackNotFound" xml:space="preserve">
     <value>Трек не найден</value>
   </data>
-  <data name="Err.NoStreamUrl" xml:space="preserve">
-    <value>Нет ссылки на поток</value>
-  </data>
   <data name="Err.NoContent" xml:space="preserve">
     <value>Скачиваемый контент не найден</value>
   </data>
   <data name="Err.Cancelled" xml:space="preserve">
     <value>Отменено</value>
+  </data>
+  <data name="Err.SoundCloudNotDownloadable" xml:space="preserve">
+    <value>Этот трек недоступен для скачивания</value>
   </data>
   <data name="Err.PlatformPrefix" xml:space="preserve">
     <value>{0}: {1}</value>

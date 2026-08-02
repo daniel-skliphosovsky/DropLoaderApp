@@ -141,6 +141,9 @@
   <data name="Dialog.SavedTo" xml:space="preserve">
     <value>Saved to {0}</value>
   </data>
+  <data name="Dialog.SomeFailed" xml:space="preserve">
+    <value>Failed to download {0} of {1} tracks</value>
+  </data>
   <data name="Dialog.GenericError" xml:space="preserve">
     <value>Something went wrong while downloading</value>
   </data>
@@ -189,14 +192,14 @@
   <data name="Err.TrackNotFound" xml:space="preserve">
     <value>Track not found</value>
   </data>
-  <data name="Err.NoStreamUrl" xml:space="preserve">
-    <value>No stream URL</value>
-  </data>
   <data name="Err.NoContent" xml:space="preserve">
     <value>No downloadable content found</value>
   </data>
   <data name="Err.Cancelled" xml:space="preserve">
     <value>Cancelled</value>
+  </data>
+  <data name="Err.SoundCloudNotDownloadable" xml:space="preserve">
+    <value>This track is not available for download</value>
   </data>
   <data name="Err.PlatformPrefix" xml:space="preserve">
     <value>{0}: {1}</value>

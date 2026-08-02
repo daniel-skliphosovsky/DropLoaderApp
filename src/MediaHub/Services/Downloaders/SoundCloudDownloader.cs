@@ -82,9 +82,14 @@ public sealed class SoundCloudDownloader : IDownloader
             if (track == null)
                 return new DownloadResult(false, null, Loc.Get(LocKeys.ErrTrackNotFound));
 
+            // A track can exist but have downloads disabled by its author.
+            // Surface that as a friendly message instead of a raw HTTP error.
+            if (track.Downloadable == false)
+                return new DownloadResult(false, null, Loc.Get(LocKeys.ErrSoundCloudNotDownloadable));
+
             var streamUrl = await GetDownloadUrlAsync(track, ct);
             if (string.IsNullOrEmpty(streamUrl))
-                return new DownloadResult(false, null, Loc.Get(LocKeys.ErrNoStreamUrl));
+                return new DownloadResult(false, null, Loc.Get(LocKeys.ErrSoundCloudNotDownloadable));
 
             filePath = Path.Combine(outputPath, $"{SanitizeFileName(track.Title ?? "track")}.mp3");
 
@@ -113,6 +118,14 @@ public sealed class SoundCloudDownloader : IDownloader
         {
             TryDeleteFile(filePath);
             return new DownloadResult(false, null, Loc.Get(LocKeys.ErrCancelled));
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            // SoundCloud answers 404 both for tracks with downloads disabled
+            // and for expired stream URLs; no raw request dump, just a clear
+            // message. Other errors still fall through to the generic handler.
+            TryDeleteFile(filePath);
+            return new DownloadResult(false, null, Loc.Get(LocKeys.ErrSoundCloudNotDownloadable));
         }
         catch (Exception ex)
         {

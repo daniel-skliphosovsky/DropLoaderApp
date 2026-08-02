@@ -499,6 +499,7 @@ public partial class MainViewModel : ObservableObject
             }
             else
             {
+                var failedCount = 0;
                 for (var i = 0; i < targets.Count; i++)
                 {
                     cts.Token.ThrowIfCancellationRequested();
@@ -513,7 +514,7 @@ public partial class MainViewModel : ObservableObject
 
                     if (result.Success)
                     {
-                        if (i == targets.Count - 1)
+                        if (i == targets.Count - 1 && failedCount == 0)
                         {
                             resultTitle = LocKeys.DialogSuccess;
                             resultMessage = Loc.Get(LocKeys.DialogSavedTo, result.FilePath);
@@ -525,12 +526,25 @@ public partial class MainViewModel : ObservableObject
                         // The user pressed Stop; no result dialog needed.
                         break;
                     }
-                    else
+                    else if (targets.Count == 1)
                     {
                         resultTitle = LocKeys.DialogError;
                         resultMessage = result.ErrorMessage ?? Loc.Get(LocKeys.DialogGenericError);
                         break;
                     }
+                    else
+                    {
+                        // A failed item (e.g. a SoundCloud track with downloads
+                        // disabled) must not abort the rest of the playlist;
+                        // keep going and summarize the failures at the end.
+                        failedCount++;
+                    }
+                }
+
+                if (targets.Count > 1 && failedCount > 0 && !cts.IsCancellationRequested && resultTitle is null)
+                {
+                    resultTitle = LocKeys.DialogError;
+                    resultMessage = Loc.Get(LocKeys.DialogSomeFailed, failedCount, targets.Count);
                 }
             }
         }

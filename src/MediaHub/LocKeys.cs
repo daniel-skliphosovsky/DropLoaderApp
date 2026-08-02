@@ -63,6 +63,7 @@ public static class LocKeys
     public const string DialogUnsupportedMessage = "Dialog.UnsupportedMessage";
     public const string DialogEmptyPlaylist = "Dialog.EmptyPlaylist";
     public const string DialogSavedTo = "Dialog.SavedTo";
+    public const string DialogSomeFailed = "Dialog.SomeFailed";
     public const string DialogGenericError = "Dialog.GenericError";
     public const string DialogUnexpectedTitle = "Dialog.UnexpectedTitle";
     public const string DialogUnexpectedMessage = "Dialog.UnexpectedMessage";
@@ -73,9 +74,9 @@ public static class LocKeys
     // Downloader errors
     public const string ErrNoStream = "Err.NoStream";
     public const string ErrTrackNotFound = "Err.TrackNotFound";
-    public const string ErrNoStreamUrl = "Err.NoStreamUrl";
     public const string ErrNoContent = "Err.NoContent";
     public const string ErrCancelled = "Err.Cancelled";
+    public const string ErrSoundCloudNotDownloadable = "Err.SoundCloudNotDownloadable";
     public const string ErrPlatformPrefix = "Err.PlatformPrefix";
     public const string ErrScrapeNoStream = "Err.ScrapeNoStream";
     public const string ErrVkNoStream = "Err.VkNoStream";

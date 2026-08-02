@@ -44,6 +44,12 @@
     <MauiImage Include="Resources\Images\*" />
   </ItemGroup>
 
+  <!-- Platform logos, kept as editable SVG files so they can be tweaked by
+       hand and re-rasterized by Resizetizer on the next build. -->
+  <ItemGroup>
+    <MauiImage Include="Resources\Logos\*.svg" />
+  </ItemGroup>
+
   <!-- App Icon and Splash Screen -->
   <ItemGroup>
     <MauiIcon Include="Resources\AppIcon\appicon.svg"

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <!-- YouTube: wide red rounded rectangle with a small play triangle -->
+  <path d="M2.5 10a3.5 3.5 0 0 1 3.5-3.5h12A3.5 3.5 0 0 1 21.5 10v4a3.5 3.5 0 0 1-3.5 3.5H6A3.5 3.5 0 0 1 2.5 14z" fill="#FF0000"/>
+  <path d="M10.3 9.8v4.4l3.4-2.2z" fill="#FFFFFF"/>
+</svg>
