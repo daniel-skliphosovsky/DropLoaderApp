@@ -57,6 +57,17 @@ public sealed class OkDownloader : ScrapeDownloader
             // The video page itself is gone: deleted or private video.
             throw new HttpRequestException(Loc.Get(LocKeys.ErrVideoNotFound), ex, HttpStatusCode.NotFound);
         }
+        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.Forbidden)
+        {
+            // Private or region-locked video: the page is reachable but the
+            // video is off-limits, report it like a missing video.
+            throw new HttpRequestException(Loc.Get(LocKeys.ErrVideoNotFound), ex, HttpStatusCode.Forbidden);
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode is { } status && (int)status >= 500)
+        {
+            // Server-side failure: nothing playable can be extracted right now.
+            throw new HttpRequestException(Loc.Get(LocKeys.ErrOkNoStream), ex, ex.StatusCode);
+        }
 
         // Primary path: the desktop page carries the full movie JSON as a
         // string in flashvars.metadata inside the escaped data-options
