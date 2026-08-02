@@ -4,22 +4,22 @@ All notable changes to MediaHub will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [4.2.0] - 2026-08-02
 
 ### Added
 
-- New downloader for OK.ru
-- Friendly SoundCloud error message
-- Platform logos as SVG
+- Fault tolerance with partial file cleanup on failed downloads
+- Professional repository documentation (README, LICENSE, CONTRIBUTING, issue and PR templates, SECURITY, CODE_OF_CONDUCT)
 
-### Changed
+### Fixed
 
-- Window opens at compact size (900x620, resizable up to 1160x760)
-- Download block floats in the center of the screen
-- Interface scaled up — larger fields, buttons and typography
-- Cleaner single-outline input
-- App icon as the header logo
-- Moon-only theme toggle
+- SVG platform icons
+- OK.ru downloader metadata and error mapping
+- Logging
+
+### Removed
+
+- Dailymotion and Vimeo downloaders
 
 ## [4.1.0] - 2025-08-02
 
