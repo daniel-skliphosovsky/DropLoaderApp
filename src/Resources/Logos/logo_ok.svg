@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <path d="M 7 5 L 17 5 C 18.105 5 19 5.896 19 7 L 19 17 C 19 18.105 18.105 19 17 19 L 7 19 C 5.895 19 5 18.105 5 17 L 5 7 C 5 5.896 5.895 5 7 5 Z" fill="#EE8208"/>
+  <g transform="matrix(1, 0, 0, 1, 0, 0.689601)">
+    <g transform="matrix(1, 0, 0, 1, 0, -0.192704)">
+      <g>
+        <g>
+          <circle cx="12.377" cy="9.673" r="1.6" fill="#FFFFFF" style="" transform="matrix(1.271151, 0, 0, 1.287122, -3.733036, -3.236731)"/>
+        </g>
+        <path d="M 13.791 12.488 L 10.32 12.483 M 12.055 12.486 L 13.679 15.852 M 12.055 12.486 L 10.208 15.847" fill="none" stroke="#FFFFFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="transform-origin: 11.999px 14.168px;"/>
+      </g>
+      <ellipse style="fill: rgb(238, 130, 8);" cx="12" cy="9.261" rx="0.82" ry="0.82"/>
+    </g>
+  </g>
+</svg>

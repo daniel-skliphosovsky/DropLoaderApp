@@ -19,12 +19,12 @@ jobs:
       - name: Install MAUI workload
         run: dotnet workload install maui
       - name: Publish Windows
-        run: dotnet publish src/MediaHub/MediaHub.csproj -c Release -f net9.0-windows10.0.19041.0 -r win-x64 --self-contained true -p:WindowsPackageType=None -p:PublishSingleFile=true -p:PublishTrimmed=false -p:IncludeNativeLibrariesForSelfExtract=true -p:UseMonoRuntime=false -p:PublishReadyToRun=false
+        run: dotnet publish src/MediaHub.csproj -c Release -f net9.0-windows10.0.19041.0 -r win-x64 --self-contained true -p:WindowsPackageType=None -p:PublishSingleFile=true -p:PublishTrimmed=false -p:IncludeNativeLibrariesForSelfExtract=true -p:UseMonoRuntime=false -p:PublishReadyToRun=false
       - name: Upload exe
         uses: actions/upload-artifact@v7
         with:
           name: MediaHub-exe
-          path: src/MediaHub/bin/Release/net9.0-windows10.0.19041.0/win-x64/publish/*.exe
+          path: src/bin/Release/net9.0-windows10.0.19041.0/win-x64/publish/*.exe
           if-no-files-found: error
 
   build-macos:
@@ -41,14 +41,14 @@ jobs:
         run: dotnet workload install maui
       - name: Publish macOS
         run: |
-          dotnet publish src/MediaHub/MediaHub.csproj \
+          dotnet publish src/MediaHub.csproj \
             -c Release -f net9.0-maccatalyst \
             -p:CreatePackage=false -p:EnableCodeSigning=false -p:CodesignKey=-
       - name: Package app (pkg preferred, zip fallback)
         shell: bash
         run: |
           set -e
-          APP_PATH=$(ls -d src/MediaHub/bin/Release/net9.0-maccatalyst/*.app | head -1)
+          APP_PATH=$(ls -d src/bin/Release/net9.0-maccatalyst/*.app | head -1)
           echo "Found app bundle: $APP_PATH"
           APP_DIR=$(dirname "$APP_PATH")
           APP_NAME=$(basename "$APP_PATH")

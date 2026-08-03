@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" xmlns:bx="https://boxy-svg.com">
+  <path d="M7 7h10a3 3 0 0 1 3 3v4a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-4a3 3 0 0 1 3-3z" fill="#0077FF"/>
+  <g transform="matrix(1, 0, 0, 1, 0.165134, 0.007107)">
+    <g style="" transform="matrix(1.10164, 0, 0, 1.171147, -1.067555, -1.389682)">
+      <path d="M 12.003 9.385 L 14.241 14.925 L 9.766 14.925 L 12.003 9.385 Z" bx:shape="triangle 9.766 9.385 4.475 5.54 0.5 0 1@3de2c270" style="fill: rgb(255, 255, 255); transform-box: fill-box; transform-origin: 50% 50%;" transform="matrix(-0.999996, -0.002864, -0.017287, -1.000054, -2.05492, 0.050628)"/>
+      <path d="M 8.556 6.38 L 10.15 10.146 L 6.961 10.146 L 8.556 6.38 Z" bx:shape="triangle 6.961 6.38 3.189 3.766 0.5 0 1@f31f6828" style="stroke-width: 1; fill: rgb(0, 119, 255); transform-origin: 8.556px 8.262px;" transform="matrix(-0.999996, -0.002864, -0.017287, -1.000054, 1.371057, 1.746512)"/>
+      <rect x="8.669" y="13.694" width="2.874" height="1.859" style="fill: rgb(0, 119, 255);"/>
+    </g>
+    <g>
+      <rect x="12.751" y="9.636" width="1.016" height="5.148" style="fill: rgb(255, 255, 255);"/>
+      <rect x="14.204" y="6.159" width="1.016" height="3.462" style="fill: rgb(255, 255, 255); stroke-width: 1; transform-box: fill-box; transform-origin: 50% 50%;" transform="matrix(0.72372, 0.690094, -0.690094, 0.72372, -0.149986, 3.284479)"/>
+      <g>
+        <rect x="14.204" y="6.159" width="1.016" height="3.462" style="fill: rgb(255, 255, 255); stroke-width: 1; transform-origin: 14.712px 7.89px;" transform="matrix(-0.689367, 0.724412, -0.724412, -0.689367, -0.091823, 5.341394)"/>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -16,7 +16,7 @@ test-results/
 *.app
 
 # But NOT our .NET MAUI project directory (no longer ends in .App)
-!/src/MediaHub/
+!/src/
 
 # content below from: https://github.com/github/gitignore/blob/main/Global/macOS.gitignore
 # General

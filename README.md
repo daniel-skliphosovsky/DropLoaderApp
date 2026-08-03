@@ -105,8 +105,8 @@ Also, don't be alarmed if the download doesn't start. This is also related to Ti
 ```bash
 git clone https://github.com/daniel-skliphosovsky/MediaHub.git
 cd MediaHub
-dotnet restore src/MediaHub/MediaHub.csproj
-dotnet build src/MediaHub/MediaHub.csproj --configuration Release
+dotnet restore src/MediaHub.csproj
+dotnet build src/MediaHub.csproj --configuration Release
 ```
 
 # Tech Stack
