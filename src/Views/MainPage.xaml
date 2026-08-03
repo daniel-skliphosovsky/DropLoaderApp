@@ -92,7 +92,7 @@
             <Grid x:Name="ContentHost">
                 <VerticalStackLayout Padding="36,36,36,24" Spacing="0"
                                      MaximumWidthRequest="1140"
-                                     HorizontalOptions="Center" VerticalOptions="Center">
+                                     HorizontalOptions="Fill" VerticalOptions="Center">
                     <VerticalStackLayout Spacing="20">
 
                         <Border Style="{StaticResource CardBorder}" Padding="32,26">
@@ -177,7 +177,7 @@
                                             </Grid>
 
                                             <Entry Grid.Column="1"
-                                                   Margin="6,0,14,0"
+                                                   Margin="{OnPlatform WinUI='0,0,14,0', MacCatalyst='7,0,14,0', Default='6,0,14,0'}"
                                                    Text="{Binding Url}"
                                                    Placeholder="{Binding LocUrlPlaceholder}"
                                                    Keyboard="Url"

@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-  <!-- TikTok: music note -->
-  <path d="M9 18V5l12-2v13 M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0z M21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"
-        fill="none" stroke="#FE2C55" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 10.112 15.775 L 10.112 7.593 L 17.665 6.334 L 17.665 14.516 M 10.112 15.775 C 10.112 17.228 8.539 18.137 7.28 17.41 C 6.696 17.073 6.336 16.449 6.336 15.775 C 6.336 14.321 7.909 13.413 9.168 14.14 C 9.752 14.477 10.112 15.1 10.112 15.775 Z M 17.665 14.516 C 17.665 15.97 16.091 16.878 14.833 16.151 C 14.248 15.814 13.889 15.191 13.889 14.516 C 13.889 13.062 15.462 12.154 16.721 12.881 C 17.305 13.218 17.665 13.841 17.665 14.516 Z" fill="none" stroke="#FE2C55" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style=""/>
 </svg>
