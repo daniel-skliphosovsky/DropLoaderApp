@@ -130,7 +130,12 @@ public sealed class TikTokDownloader : IDownloader
             progress?.Report(new DownloadProgress(0, null, 0, Loc.Get(LocKeys.ProgressFetchingMetadata)));
 
             TikTokExplode.Publications.Publication publication = await _tikTok.Publications.GetAsync(url, ct);
-            string baseName = SanitizeFileName($"{publication.Author.Nickname}_{publication.Id}");
+            string title = publication.Description?.Trim() ?? string.Empty;
+            string author = publication.Author?.Nickname ?? string.Empty;
+            string baseName = SanitizeFileName(
+                !string.IsNullOrWhiteSpace(title)
+                    ? (string.IsNullOrWhiteSpace(author) ? title : $"{title} - {author}")
+                    : publication.Id);
 
             if (publication.Video is not null)
             {

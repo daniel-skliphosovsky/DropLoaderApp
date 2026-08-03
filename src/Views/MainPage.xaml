@@ -103,11 +103,11 @@
                                     <Label Text="{Binding LocUrlLabel}" Style="{StaticResource FieldLabel}" />
                                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                                     <Border Style="{StaticResource InputContainer}">
-                                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="3">
+                                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="2">
 
                                             <!-- Platform icon, auto-detected -->
                                             <Grid Grid.Column="0" WidthRequest="34" HeightRequest="34"
-                                                  VerticalOptions="Center" Margin="10,0,0,0">
+                                                  VerticalOptions="Center" Margin="6,0,0,0">
                                                 <!-- Unknown: generic link -->
                                                 <Path Fill="Transparent" IsVisible="False"
                                                       Stroke="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}"

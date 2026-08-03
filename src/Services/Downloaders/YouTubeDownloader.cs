@@ -158,7 +158,10 @@ public sealed class YouTubeDownloader : IDownloader
             if (streamInfo == null)
                 return new DownloadResult(false, null, Loc.Get(LocKeys.ErrNoStream));
 
-            filePath = Path.Combine(outputPath, $"{video.Id}.{streamInfo.Container.Name}");
+            string name = string.IsNullOrWhiteSpace(video.Title)
+                ? video.Id
+                : $"{video.Title} - {video.Author.ChannelTitle}";
+            filePath = Path.Combine(outputPath, $"{SanitizeFileName(name)}.{streamInfo.Container.Name}");
             Progress<double> fileProgress = new Progress<double>(p =>
                 progress?.Report(new DownloadProgress(0, null, p, Loc.Get(LocKeys.ProgressDownloadingFile, video.Title))));
 
@@ -196,5 +199,22 @@ public sealed class YouTubeDownloader : IDownloader
         catch (UnauthorizedAccessException)
         {
         }
+    }
+
+    private static string SanitizeFileName(string name)
+    {
+        // Strip characters invalid on Windows and macOS, plus control
+        // characters, then trim and clamp the length so the file name stays
+        // valid on both platforms.
+        HashSet<char> invalid = Path.GetInvalidFileNameChars().ToHashSet();
+        System.Text.StringBuilder builder = new System.Text.StringBuilder(name.Length);
+        foreach (var c in name)
+            builder.Append(invalid.Contains(c) || char.IsControl(c) ? '_' : c);
+
+        const int maxLength = 120;
+        string sanitized = builder.ToString().Trim().TrimEnd('.', ' ');
+        return sanitized.Length <= maxLength
+            ? sanitized
+            : sanitized[..maxLength].TrimEnd('.', ' ');
     }
 }

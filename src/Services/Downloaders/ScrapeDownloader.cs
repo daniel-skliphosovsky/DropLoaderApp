@@ -95,7 +95,11 @@ public abstract class ScrapeDownloader : IDownloader
             progress?.Report(new DownloadProgress(0, null, 0, Loc.Get(LocKeys.ProgressDownloading)));
 
             string title = ExtractTitle(html)?.Trim() ?? string.Empty;
-            filePath = Path.Combine(outputPath, $"{SanitizeFileName(title.Length > 0 ? title : $"{PlatformName.ToLowerInvariant()}-video")}.mp4");
+            string author = ExtractAuthor(html)?.Trim() ?? string.Empty;
+            string name = title.Length > 0
+                ? (author.Length > 0 ? $"{title} - {author}" : title)
+                : $"{PlatformName.ToLowerInvariant()}-video";
+            filePath = Path.Combine(outputPath, $"{SanitizeFileName(name)}.mp4");
 
             using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, EnsureHttps(best.Value.Url));
             request.Headers.UserAgent.ParseAdd(UserAgent);
