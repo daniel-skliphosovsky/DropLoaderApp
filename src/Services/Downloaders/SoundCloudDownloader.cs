@@ -1,6 +1,8 @@
 using System.Net;
+using System.Net.Sockets;
 using MediaHub.Models;
 using MediaHub.Services.Interfaces;
+using MediaHub.Services.Logging;
 using SoundCloudExplode;
 using SoundCloudExplode.Tracks;
 
@@ -174,10 +176,16 @@ public sealed class SoundCloudDownloader : IDownloader
 
             return new DownloadResult(true, filePath, null);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException ex)
         {
             TryDeleteFile(filePath);
-            return new DownloadResult(false, null, Loc.Get(LocKeys.ErrCancelled));
+            if (ct.IsCancellationRequested)
+                return new DownloadResult(false, null, Loc.Get(LocKeys.ErrCancelled));
+
+            // A timeout surfaces as TaskCanceledException, not a user
+            // cancellation: report it as a network problem.
+            AppLogger.Log(ex);
+            return new DownloadResult(false, null, Loc.Get(LocKeys.ErrNetwork));
         }
         catch (HttpRequestException ex) when (IsNotFound(ex))
         {
@@ -187,13 +195,26 @@ public sealed class SoundCloudDownloader : IDownloader
             TryDeleteFile(filePath);
             return new DownloadResult(false, null, Loc.Get(LocKeys.ErrSoundCloudNotDownloadable));
         }
+        catch (Exception ex) when (IsNetworkError(ex))
+        {
+            // A network error mid-download leaves a partial file behind; clean it up.
+            TryDeleteFile(filePath);
+            AppLogger.Log(ex);
+            return new DownloadResult(false, null, Loc.Get(LocKeys.ErrNetwork));
+        }
         catch (Exception ex)
         {
-            // A network or disk error mid-download leaves a partial file behind; clean it up.
+            // A disk error or any other unexpected failure mid-download leaves
+            // a partial file behind; clean it up and show a generic message.
             TryDeleteFile(filePath);
-            return new DownloadResult(false, null, Loc.Get(LocKeys.ErrPlatformPrefix, PlatformName, ex.Message));
+            AppLogger.Log(ex);
+            return new DownloadResult(false, null, Loc.Get(LocKeys.ErrPlatformUnavailable, PlatformName));
         }
     }
+
+    private static bool IsNetworkError(Exception ex) =>
+        ex is HttpRequestException or WebException or SocketException ||
+        ex.InnerException is HttpRequestException or WebException or SocketException;
 
     /// <summary>
     /// Resolves a track with the cached client id. A 401 means the cached id

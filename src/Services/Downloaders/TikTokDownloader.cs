@@ -1,7 +1,10 @@
+using System.Net;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Text;
 using MediaHub.Models;
 using MediaHub.Services.Interfaces;
+using MediaHub.Services.Logging;
 using TikTokExplode;
 using TikTokExplode.Exceptions;
 
@@ -170,25 +173,49 @@ public sealed class TikTokDownloader : IDownloader
 
             return new DownloadResult(false, null, Loc.Get(LocKeys.ErrNoContent));
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException ex)
         {
             TryDeleteFile(filePath);
-            return new DownloadResult(false, null, Loc.Get(LocKeys.ErrCancelled));
+            if (ct.IsCancellationRequested)
+                return new DownloadResult(false, null, Loc.Get(LocKeys.ErrCancelled));
+
+            // A timeout surfaces as TaskCanceledException, not a user
+            // cancellation: report it as a network problem.
+            AppLogger.Log(ex);
+            return new DownloadResult(false, null, Loc.Get(LocKeys.ErrNetwork));
         }
         catch (TikTokExplodeException ex)
         {
-            // Clean, library-level error (invalid link, private publication, API failure).
+            // Library-level error (invalid link, private publication, API
+            // failure); network-level failures inside it map to the friendly
+            // network message instead of the raw library text.
             TryDeleteFile(filePath);
-            return new DownloadResult(false, null, ex.Message);
+            AppLogger.Log(ex);
+            return IsNetworkError(ex)
+                ? new DownloadResult(false, null, Loc.Get(LocKeys.ErrNetwork))
+                : new DownloadResult(false, null, Loc.Get(LocKeys.ErrPlatformUnavailable, PlatformName));
+        }
+        catch (Exception ex) when (IsNetworkError(ex))
+        {
+            // A network error mid-download leaves a partial file or image
+            // directory behind; clean it up.
+            TryDeleteFile(filePath);
+            AppLogger.Log(ex);
+            return new DownloadResult(false, null, Loc.Get(LocKeys.ErrNetwork));
         }
         catch (Exception ex)
         {
-            // A network or disk error mid-download leaves a partial file or
-            // image directory behind; clean it up.
+            // A disk error or any other unexpected failure mid-download leaves
+            // a partial file or image directory behind; clean it up.
             TryDeleteFile(filePath);
-            return new DownloadResult(false, null, Loc.Get(LocKeys.ErrPlatformPrefix, PlatformName, ex.Message));
+            AppLogger.Log(ex);
+            return new DownloadResult(false, null, Loc.Get(LocKeys.ErrPlatformUnavailable, PlatformName));
         }
     }
+
+    private static bool IsNetworkError(Exception ex) =>
+        ex is HttpRequestException or WebException or SocketException ||
+        ex.InnerException is HttpRequestException or WebException or SocketException;
 
     private static void TryDeleteFile(string? path)
     {

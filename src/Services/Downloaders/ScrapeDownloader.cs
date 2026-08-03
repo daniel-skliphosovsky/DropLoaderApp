@@ -1,7 +1,9 @@
 using System.Net;
+using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using MediaHub.Models;
 using MediaHub.Services.Interfaces;
+using MediaHub.Services.Logging;
 
 namespace MediaHub.Services.Downloaders;
 
@@ -139,17 +141,60 @@ public abstract class ScrapeDownloader : IDownloader
 
             return new DownloadResult(true, filePath, null);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException ex)
         {
             TryDeleteFile(filePath);
-            return new DownloadResult(false, null, Loc.Get(LocKeys.ErrCancelled));
+            if (ct.IsCancellationRequested)
+                return new DownloadResult(false, null, Loc.Get(LocKeys.ErrCancelled));
+
+            // A timeout surfaces as TaskCanceledException, not a user
+            // cancellation: report it as a network problem.
+            AppLogger.Log(ex);
+            return new DownloadResult(false, null, Loc.Get(LocKeys.ErrNetwork));
         }
-        catch (Exception ex)
+        catch (HttpRequestException ex)
+        {
+            TryDeleteFile(filePath);
+            AppLogger.Log(ex);
+
+            // OkDownloader rewrites page 404/403/5xx responses into localized
+            // hints ("video not found", "no stream"); those messages are safe
+            // to show. Any other HTTP failure is a transport or server problem.
+            if (IsLocalizedPageError(ex))
+                return new DownloadResult(false, null, ex.Message);
+
+            return ex.StatusCode is null
+                ? new DownloadResult(false, null, Loc.Get(LocKeys.ErrNetwork))
+                : new DownloadResult(false, null, Loc.Get(LocKeys.ErrPlatformUnavailable, PlatformName));
+        }
+        catch (Exception ex) when (IsNetworkError(ex))
         {
             // A network error mid-download leaves a partial file behind; clean it up.
             TryDeleteFile(filePath);
-            return new DownloadResult(false, null, Loc.Get(LocKeys.ErrPlatformPrefix, PlatformName, ex.Message));
+            AppLogger.Log(ex);
+            return new DownloadResult(false, null, Loc.Get(LocKeys.ErrNetwork));
         }
+        catch (Exception ex)
+        {
+            // A disk error or any other unexpected failure mid-download leaves
+            // a partial file behind; clean it up and show a generic message.
+            TryDeleteFile(filePath);
+            AppLogger.Log(ex);
+            return new DownloadResult(false, null, Loc.Get(LocKeys.ErrPlatformUnavailable, PlatformName));
+        }
+    }
+
+    private static bool IsNetworkError(Exception ex) =>
+        ex is HttpRequestException or WebException or SocketException ||
+        ex.InnerException is HttpRequestException or WebException or SocketException;
+
+    private static bool IsLocalizedPageError(HttpRequestException ex)
+    {
+        if (ex.StatusCode is null)
+            return false;
+
+        return string.Equals(ex.Message, Loc.Get(LocKeys.ErrVideoNotFound), StringComparison.Ordinal)
+            || string.Equals(ex.Message, Loc.Get(LocKeys.ErrOkNoStream), StringComparison.Ordinal);
     }
 
     protected virtual async Task<string> FetchPageAsync(string url, CancellationToken ct)

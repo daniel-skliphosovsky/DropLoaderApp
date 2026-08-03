@@ -283,8 +283,9 @@ public partial class MainViewModel : ObservableObject
     {
         lock (_previewLock)
         {
+            // Cancel but do not dispose: the old source may still be awaited
+            // by an in-flight preview request. The GC reclaims it.
             _previewCts?.Cancel();
-            _previewCts?.Dispose();
             _previewCts = new CancellationTokenSource();
         }
 
@@ -373,8 +374,9 @@ public partial class MainViewModel : ObservableObject
     {
         lock (_previewLock)
         {
+            // Cancel but do not dispose (see SchedulePreview); the running
+            // request unwinds on its own and the GC reclaims the source.
             _previewCts?.Cancel();
-            _previewCts?.Dispose();
             _previewCts = null;
         }
 
@@ -421,8 +423,11 @@ public partial class MainViewModel : ObservableObject
 
         lock (_ctsLock)
         {
+            // Cancel the previous download but do not dispose its source yet:
+            // its operations may still be unwinding and reading the token, so
+            // disposing would throw ObjectDisposedException. The GC reclaims
+            // it; only this method's finally disposes a source it still owns.
             _cts?.Cancel();
-            _cts?.Dispose();
             _cts = cts;
         }
 

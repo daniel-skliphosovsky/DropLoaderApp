@@ -204,6 +204,12 @@
   <data name="Err.PlatformPrefix" xml:space="preserve">
     <value>{0}: {1}</value>
   </data>
+  <data name="Err.Network" xml:space="preserve">
+    <value>Не удалось подключиться к серверу. Проверьте интернет-соединение.</value>
+  </data>
+  <data name="Err.PlatformUnavailable" xml:space="preserve">
+    <value>Не удалось скачать с {0}. Попробуйте ещё раз.</value>
+  </data>
   <data name="Err.ScrapeNoStream" xml:space="preserve">
     <value>не удалось извлечь ссылку на видео (страница может требовать вход или иметь региональные ограничения)</value>
   </data>

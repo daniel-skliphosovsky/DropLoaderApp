@@ -76,6 +76,8 @@ public static class LocKeys
     public const string ErrCancelled = "Err.Cancelled";
     public const string ErrSoundCloudNotDownloadable = "Err.SoundCloudNotDownloadable";
     public const string ErrPlatformPrefix = "Err.PlatformPrefix";
+    public const string ErrNetwork = "Err.Network";
+    public const string ErrPlatformUnavailable = "Err.PlatformUnavailable";
     public const string ErrScrapeNoStream = "Err.ScrapeNoStream";
     public const string ErrVkNoStream = "Err.VkNoStream";
     public const string ErrVideoNotFound = "Err.VideoNotFound";
