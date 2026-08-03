@@ -91,7 +91,7 @@
         <ScrollView Grid.Row="1" SizeChanged="OnScrollViewSizeChanged">
             <Grid x:Name="ContentHost">
                 <VerticalStackLayout Padding="36,36,36,24" Spacing="0"
-                                     WidthRequest="1140"
+                                     MaximumWidthRequest="1140"
                                      HorizontalOptions="Center" VerticalOptions="Center">
                     <VerticalStackLayout Spacing="20">
 

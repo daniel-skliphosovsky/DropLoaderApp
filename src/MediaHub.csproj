@@ -45,9 +45,11 @@
   </ItemGroup>
 
   <!-- Platform logos, kept as editable SVG files so they can be tweaked by
-       hand and re-rasterized by Resizetizer on the next build. -->
+       hand and re-rasterized by Resizetizer on the next build. BaseSize is
+       raised well above the 41px render size so the generated PNGs stay crisp
+       at Windows DPI scales (1.0/1.25/1.5) instead of upscaling a small base. -->
   <ItemGroup>
-    <MauiImage Include="Resources\Logos\*.svg" />
+    <MauiImage Include="Resources\Logos\*.svg" BaseSize="128,128" />
   </ItemGroup>
 
   <!-- App Icon and Splash Screen -->

@@ -1,4 +1,5 @@
 ﻿using MediaHub.Services.Logging;
+using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Storage;
 
@@ -10,8 +11,10 @@ public partial class App : Application
 
     public App()
     {
-        // The design is dark-first; the header toggle can still flip to light.
-        UserAppTheme = AppTheme.Dark;
+        // Follow the OS theme at startup (Unspecified defaults to dark, the
+        // design's headline); the header toggle still flips UserAppTheme and
+        // overrides whatever was picked here.
+        UserAppTheme = AppInfo.RequestedTheme == AppTheme.Light ? AppTheme.Light : AppTheme.Dark;
         InitializeComponent();
 
         // Russian is the default UI language; the header toggle switches to
@@ -25,16 +28,26 @@ public partial class App : Application
     {
         // Fixed medium window: min == max == actual size locks resizing on
         // every platform; MediaHubWindow's platform partials additionally strip
-        // the minimize/fullscreen chrome on macOS and Windows.
-        return new MediaHubWindow(new AppShell())
-        {
-            Width = 1280,
-            Height = 800,
-            MinimumWidth = 1280,
-            MinimumHeight = 800,
-            MaximumWidth = 1280,
-            MaximumHeight = 800
-        };
+        // the minimize/fullscreen chrome on macOS and Windows. Windows runs in
+        // a smaller fixed window because its DPI scaling makes 1280x800 feel
+        // oversized; macOS keeps the ideal 1280x800.
+        var window = new MediaHubWindow(new AppShell());
+#if WINDOWS
+        window.Width = 1024;
+        window.Height = 680;
+        window.MinimumWidth = 1024;
+        window.MinimumHeight = 680;
+        window.MaximumWidth = 1024;
+        window.MaximumHeight = 680;
+#else
+        window.Width = 1280;
+        window.Height = 800;
+        window.MinimumWidth = 1280;
+        window.MinimumHeight = 800;
+        window.MaximumWidth = 1280;
+        window.MaximumHeight = 800;
+#endif
+        return window;
     }
 
     private static void InstallErrorHandlers()

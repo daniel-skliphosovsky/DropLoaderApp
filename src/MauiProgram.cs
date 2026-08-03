@@ -28,7 +28,23 @@ public static class MauiProgram
         // native border/underline the platform adds on top of it.
 #if WINDOWS
         Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("MediaHubBorderlessEntry", (handler, _) =>
-            handler.PlatformView.BorderThickness = new Microsoft.UI.Xaml.Thickness(0));
+        {
+            if (handler.PlatformView is not Microsoft.UI.Xaml.Controls.TextBox textBox)
+                return;
+
+            // The styled container draws the outline, so drop the native border.
+            textBox.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
+
+            // The default WinUI TextBox template still paints the focus
+            // underline with the system accent color (brown for this user).
+            // Zero it locally so only the styled container shows through and
+            // no system accent leaks in; the background stays transparent and
+            // the padding is untouched.
+            textBox.Resources["TextControlBorderBrushFocused"] =
+                new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+            textBox.Resources["TextControlBorderThemeThicknessFocused"] =
+                new Microsoft.UI.Xaml.Thickness(0);
+        });
 #elif MACCATALYST
         Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("MediaHubBorderlessEntry", (handler, _) =>
             handler.PlatformView.BorderStyle = UIKit.UITextBorderStyle.None);
