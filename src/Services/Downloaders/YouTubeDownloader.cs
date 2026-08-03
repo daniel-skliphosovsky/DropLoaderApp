@@ -161,7 +161,10 @@ public sealed class YouTubeDownloader : IDownloader
             string name = string.IsNullOrWhiteSpace(video.Title)
                 ? video.Id
                 : $"{video.Title} - {video.Author.ChannelTitle}";
-            filePath = Path.Combine(outputPath, $"{SanitizeFileName(name)}.{streamInfo.Container.Name}");
+            string sanitized = SanitizeFileName(name);
+            if (string.IsNullOrWhiteSpace(sanitized))
+                sanitized = video.Id;
+            filePath = Path.Combine(outputPath, $"{sanitized}.{streamInfo.Container.Name}");
             Progress<double> fileProgress = new Progress<double>(p =>
                 progress?.Report(new DownloadProgress(0, null, p, Loc.Get(LocKeys.ProgressDownloadingFile, video.Title))));
 

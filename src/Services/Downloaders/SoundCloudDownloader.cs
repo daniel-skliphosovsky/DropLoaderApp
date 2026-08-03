@@ -147,8 +147,11 @@ public sealed class SoundCloudDownloader : IDownloader
             string trackTitle = track.Title ?? string.Empty;
             string name = !string.IsNullOrWhiteSpace(trackTitle)
                 ? (string.IsNullOrWhiteSpace(artist) ? trackTitle : $"{artist} - {trackTitle}")
-                : "track";
-            filePath = Path.Combine(outputPath, $"{SanitizeFileName(name)}.mp3");
+                : track.Id.ToString();
+            string sanitized = SanitizeFileName(name);
+            if (string.IsNullOrWhiteSpace(sanitized))
+                sanitized = track.Id.ToString();
+            filePath = Path.Combine(outputPath, $"{sanitized}.mp3");
 
             using HttpResponseMessage response = await _http.GetAsync(streamUrl, HttpCompletionOption.ResponseHeadersRead, ct);
             response.EnsureSuccessStatusCode();

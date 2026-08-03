@@ -99,7 +99,18 @@ public abstract class ScrapeDownloader : IDownloader
             string name = title.Length > 0
                 ? (author.Length > 0 ? $"{title} - {author}" : title)
                 : $"{PlatformName.ToLowerInvariant()}-video";
-            filePath = Path.Combine(outputPath, $"{SanitizeFileName(name)}.mp4");
+            string sanitized = SanitizeFileName(name);
+            if (string.IsNullOrWhiteSpace(sanitized))
+            {
+                string fallback = Uri.TryCreate(ResolvePageUrl(url), UriKind.Absolute, out Uri? uri)
+                    ? uri.Segments.LastOrDefault()?.Trim('/') ?? string.Empty
+                    : string.Empty;
+                sanitized = string.IsNullOrWhiteSpace(fallback)
+                    ? PlatformName.ToLowerInvariant()
+                    : SanitizeFileName(fallback);
+            }
+
+            filePath = Path.Combine(outputPath, $"{sanitized}.mp4");
 
             using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, EnsureHttps(best.Value.Url));
             request.Headers.UserAgent.ParseAdd(UserAgent);

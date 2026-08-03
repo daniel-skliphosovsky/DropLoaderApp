@@ -136,6 +136,8 @@ public sealed class TikTokDownloader : IDownloader
                 !string.IsNullOrWhiteSpace(title)
                     ? (string.IsNullOrWhiteSpace(author) ? title : $"{title} - {author}")
                     : publication.Id);
+            if (string.IsNullOrWhiteSpace(baseName))
+                baseName = publication.Id;
 
             if (publication.Video is not null)
             {
