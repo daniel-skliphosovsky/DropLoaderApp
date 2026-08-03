@@ -13,7 +13,7 @@
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <ApplicationTitle>MediaHub</ApplicationTitle>
     <ApplicationId>com.danielskliphosovsky.mediahub</ApplicationId>
-    <ApplicationDisplayVersion>4.2.1</ApplicationDisplayVersion>
+    <ApplicationDisplayVersion>4.3.0</ApplicationDisplayVersion>
     <ApplicationVersion>4</ApplicationVersion>
 
     <!-- macOS -->

@@ -19,7 +19,7 @@ Thank you for your interest in contributing to MediaHub!
 
 When reporting a bug, include:
 
-- Version: The version of MediaHub you are using (e.g., v4.2.1)
+- Version: The version of MediaHub you are using (e.g., v4.3.0)
 - Platform: Windows or macOS
 - Steps to reproduce: Clear, numbered steps that lead to the bug
 - Expected behavior: What should happen

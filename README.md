@@ -11,7 +11,7 @@ MediaHub downloads media from popular platforms. Paste a link from TikTok, YouTu
 
 - TikTok videos and image galleries
 - YouTube videos (best available quality)
-- SoundCloud tracks
+- SoundCloud tracks, playlists, and albums
 - VK videos
 - OK.ru videos
 
@@ -19,12 +19,12 @@ MediaHub downloads media from popular platforms. Paste a link from TikTok, YouTu
 
 - Automatic platform detection from URL (short links, www./m. prefixes, any case)
 - Light and dark theme with one-click switching
-- Platform badge that updates live while you type the link
+- Platform badge that updates live while you type the link (updated VK, SoundCloud, OK.ru logos)
 - Progress bar with percentage and byte counts, cancel support
 - Link preview
 - Responsive resizable window (opens at 900x620, up to 1160x760)
 - Material Design 3 interface, app icon and splash screen
-- Playlists saved in subfolders
+- Playlists and albums saved in subfolders
 - Localization: Russian and English
 - Works without authorization
 
