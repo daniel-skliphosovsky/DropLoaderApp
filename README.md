@@ -1,106 +1,57 @@
 # MediaHub
 
-An application that helps you to download media from popular platforms.
-
-Built with .NET MAUI for macOS and Windows. Paste a link from TikTok, YouTube, SoundCloud, VK or OK.ru, pick a folder, and MediaHub takes care of the rest — it detects the platform automatically, downloads the media, and reports progress with the option to cancel at any time.
-
-**v4.2.1** fixes the OK.ru download quality (new CDN vkuser.net, broken 200KB mp4), enlarges platform icons and adds network-only retries for the TikTok preview. **v4.2.0** fixed the SVG platform icons and the OK.ru downloader (metadata, error mapping), removed the Dailymotion and Vimeo downloaders, and added fault tolerance with partial file cleanup and better logging on failed downloads.
-
-[![CI](https://img.shields.io/github/actions/workflow/status/daniel-skliphosovsky/MediaHub/ci.yml?style=for-the-badge&label=CI&logo=github)](https://github.com/daniel-skliphosovsky/MediaHub/actions)
-[![Release](https://img.shields.io/github/actions/workflow/status/daniel-skliphosovsky/MediaHub/release.yml?style=for-the-badge&label=Release&logo=github)](https://github.com/daniel-skliphosovsky/MediaHub/actions)
+![CI](https://img.shields.io/github/actions/workflow/status/daniel-skliphosovsky/MediaHub/ci.yml?style=for-the-badge&label=CI&logo=github)
+[![Release](https://img.shields.io/github/actions/workflow/status/daniel-skliphosovsky/MediaHub/release.yml?style=for-the-badge&label=Release&logo=github)](https://github.com/daniel-skliphosovsky/MediaHub/releases)
 [![License](https://img.shields.io/badge/License-MIT-6C5CE7?style=for-the-badge)](https://github.com/daniel-skliphosovsky/MediaHub/blob/main/LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-Windows%2FmacOS-0078D6?style=for-the-badge)](https://github.com/daniel-skliphosovsky/MediaHub/releases)
 
-# Screenshots
+MediaHub downloads media from popular platforms. Paste a link from TikTok, YouTube, SoundCloud, VK, or OK.ru, select a folder, and MediaHub handles the rest — it detects the platform automatically, downloads the media, and reports progress with cancel support.
 
-#### Downloading Page
-
-| | |
-|---|---|
-| <img src="images/MacOS/DownloadingPage_LightTheme.png" width="300" alt="Light Theme Page"> | <img src="images/MacOS/DownloadingPage_DarkTheme.png" width="300" alt="Dark Theme Page"> |
-| <p align="center">Light Theme</p> | <p align="center">Dark Theme</p> |
-| <img src="images/Windows/DownloadingPage_LightTheme.jpg" width="300" alt="Light Theme Page"> | <img src="images/Windows/DownloadingPage_DarkTheme.jpg" width="300" alt="Dark Theme Page"> |
-
-#### Downloading Process
-
-| | |
-|---|---|
-| <img src="images/MacOS/DownloadingContext_LightTheme.png" width="300" alt="Light Theme Context"> | <img src="images/MacOS/DownloadingContext_DarkTheme.png" width="300" alt="Dark Theme Context"> |
-| <p align="center">Light Theme</p> | <p align="center">Dark Theme</p> |
-| <img src="images/Windows/DownloadingContext_LightTheme.jpg" width="300" alt="Light Theme Context"> | <img src="images/Windows/DownloadingContext_DarkTheme.jpg" width="300" alt="Dark Theme Context"> |
-
-#### Possible downloading completions
-
-| | |
-|---|---|
-| <img src="images/MacOS/DownloadingCanceled.png" width="300" alt="Downloading Canceled"> | <img src="images/MacOS/DownloadingFinished.png" width="300" alt="Downloading Finished"> |
-| <p align="center">Downloading Canceled</p> | <p align="center">Downloading Finished</p> |
-| <img src="images/Windows/DownloadingCanceled.jpg" width="300" alt="Downloading Canceled"> | <img src="images/Windows/DownloadingFinished.jpg" width="300" alt="Downloading Finished"> |
-
-#### Possible Errors
-
-| | |
-|---|---|
-| <img src="images/MacOS/ErrorType_EmptyFields.png" width="300" alt="Empty Fields Error"> | <img src="images/MacOS/ErrorType_IncorrectLink.png" width="300" alt="Incorrect Link Error"> |
-| <p align="center">Empty Fields</p> | <p align="center">Incorrect Links</p> |
-| <img src="images/Windows/ErrorType_EmptyFields.jpg" width="300" alt="Empty Fields Error"> | <img src="images/Windows/ErrorType_IncorrectLink.jpg" width="300" alt="Incorrect Link Error"> |
-
-# Features
+## Platforms
 
 - TikTok videos and image galleries
 - YouTube videos (best available quality)
 - SoundCloud tracks
 - VK videos
 - OK.ru videos
-- Automatic platform detection from the URL (short links, www./m. prefixes, any case)
-- Light and Dark theme with one-click switching
+
+## Features
+
+- Automatic platform detection from URL (short links, www./m. prefixes, any case)
+- Light and dark theme with one-click switching
 - Platform badge that updates live while you type the link
 - Progress bar with percentage and byte counts, cancel support
 - Link preview
 - Responsive resizable window (opens at 900x620, up to 1160x760)
 - Material Design 3 interface, app icon and splash screen
+- Playlists saved in subfolders
+- Localization: Russian and English
+- Works without authorization
 
-# Usage
+## Screenshots
 
-1. Open App
-2. Paste the media link into the link field (TikTok, YouTube, SoundCloud, VK, OK.ru)
-3. Select the path where the file will be saved
-4. Click the Download Button to start downloading
-5. Track the progress, cancel anytime if needed
+![Main window](docs/screenshots/main.png)
 
-# Possible Problems
+<!-- 
+Required screenshots:
+- docs/screenshots/main.png — main window with preview and download controls
+- docs/screenshots/downloading.png — download progress with cancel option
+- docs/screenshots/playlist.png — playlist saved in subfolder
+- docs/screenshots/dark_theme.png — dark theme interface
+- docs/screenshots/localization.png — language switcher (RU/EN)
+-->
 
-**Soundcloud**: Some tracks may be unavailable and you may get a "This track is not available" error -> Solution: try to find another link to this track
+## Installation
 
-**TikTok**: If the publication you provided a link to is private (or does not exist) then the program will download another random video (This is related to TikTok API). Therefore, sometimes after downloading you may find a completely different video / photo.
-Also, don't be alarmed if the download doesn't start. This is also related to TikTok API -> Solution: just wait a bit (usually up to 10 seconds) and the download will start
+### Releases
 
-**YouTube**: Due to changes in YouTube policy, audio track can be in .webm extension
+Download the latest version from GitHub releases:
 
-**VK**: Only public videos can be downloaded. Private or region-restricted videos return an error, and some pages may require a retry when the first attempt fails with a network error
+[![Latest Release](https://img.shields.io/badge/Download_Latest_Release-0066CC?style=for-the-badge&logo=github)](https://github.com/daniel-skliphosovsky/MediaHub/releases)
 
-# Install
+Find the most recent version at the top of the releases page and follow platform-specific instructions for Windows (.exe) and macOS (.pkg).
 
-### Getting Started
-
-1. **Go to Releases**
-   Download the latest version from our GitHub releases page:
-
-   [![Latest Release](https://img.shields.io/badge/Download_Latest_Release-0066CC?style=for-the-badge&logo=github)](https://github.com/daniel-skliphosovsky/MediaHub/releases)
-
-2. **Find the latest release**
-   Look for the most recent version at the top of the releases page
-
-3. **Follow platform-specific instructions**
-   Complete installation guides for both MacOS and Windows are available in the release description
-
-### Platform Support
-
-| Platform | Installation Method |
-|----------|---------------------|
-| Windows  | `.exe` (standard installer) |
-| MacOS    | `.pkg` (macOS installer package) |
-
-# Build from Source
+### Build from Source
 
 ```bash
 git clone https://github.com/daniel-skliphosovsky/MediaHub.git
@@ -109,7 +60,11 @@ dotnet restore src/MediaHub.csproj
 dotnet build src/MediaHub.csproj --configuration Release
 ```
 
-# Tech Stack
+**Requirements:**
+- .NET SDK 9.0
+- Windows 10+ or macOS 11+
+
+## Tech Stack
 
 - .NET MAUI
 - CommunityToolkit.Mvvm
@@ -120,11 +75,11 @@ dotnet build src/MediaHub.csproj --configuration Release
 - Microsoft.Maui.Controls
 - TikTokExplode (self-contained reference library)
 
-# Links
+## Links
 
 - [Releases](https://github.com/daniel-skliphosovsky/MediaHub/releases)
 - [Contributing](CONTRIBUTING.md)
 
-# Support
+## Support
 
-For bug reports and feature requests, please use the GitHub issue tracker.
+For bug reports and feature requests, use the GitHub issue tracker.
