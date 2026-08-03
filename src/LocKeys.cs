@@ -82,6 +82,7 @@ public static class LocKeys
     public const string ErrVkNoStream = "Err.VkNoStream";
     public const string ErrVideoNotFound = "Err.VideoNotFound";
     public const string ErrOkNoStream = "Err.OkNoStream";
+    public const string ErrUnknown = "Err.Unknown";
 
     // Platform names
     public const string PlatformOk = "Platform.Ok";
@@ -116,7 +117,6 @@ public static class LocKeys
 
     // Info popup
     public const string InfoNoInfo = "Info.NoInfo";
-    public const string InfoLoadError = "Info.LoadError";
 
     // Progress phases
     public const string ProgressFetching = "Progress.Fetching";

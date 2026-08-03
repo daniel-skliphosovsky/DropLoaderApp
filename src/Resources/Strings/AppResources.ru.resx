@@ -165,9 +165,6 @@
   <data name="Info.NoInfo" xml:space="preserve">
     <value>Дополнительная информация для этого ресурса недоступна</value>
   </data>
-  <data name="Info.LoadError" xml:space="preserve">
-    <value>Не удалось загрузить информацию: {0}</value>
-  </data>
   <data name="Progress.Fetching" xml:space="preserve">
     <value>Получение данных...</value>
   </data>
@@ -221,6 +218,9 @@
   </data>
   <data name="Err.OkNoStream" xml:space="preserve">
     <value>не удалось извлечь ссылку на видео. Видео может быть приватным или недоступным в вашем регионе.</value>
+  </data>
+  <data name="Err.Unknown" xml:space="preserve">
+    <value>Что-то пошло не так. Попробуйте ещё раз.</value>
   </data>
   <data name="Platform.Ok" xml:space="preserve">
     <value>OK.ru</value>

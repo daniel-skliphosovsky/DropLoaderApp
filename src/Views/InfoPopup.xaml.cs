@@ -3,6 +3,7 @@ using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Mvvm.Input;
 using MediaHub.Models;
 using MediaHub.Services.Interfaces;
+using MediaHub.Services.Logging;
 using Microsoft.Maui.ApplicationModel;
 
 namespace MediaHub.Views;
@@ -93,9 +94,10 @@ public partial class InfoPopup : Popup
         }
         catch (Exception ex)
         {
+            AppLogger.Log(ex);
             await MainThread.InvokeOnMainThreadAsync(() =>
             {
-                StatusMessage = Loc.Get(LocKeys.InfoLoadError, ex.Message);
+                StatusMessage = Loc.Get(LocKeys.ErrUnknown);
                 IsLoading = false;
             });
         }

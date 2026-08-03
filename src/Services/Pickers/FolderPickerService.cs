@@ -37,7 +37,7 @@ public sealed class FolderPickerService : IFolderPickerService
         catch (Exception ex)
         {
             AppLogger.Log(ex);
-            await _dialog.ShowErrorAsync(ex.Message, Loc.Get(LocKeys.DialogPickFolderError));
+            await _dialog.ShowErrorAsync(Loc.Get(LocKeys.DialogPickFolderError), Loc.Get(LocKeys.DialogError));
             return null;
         }
     }

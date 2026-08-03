@@ -165,9 +165,6 @@
   <data name="Info.NoInfo" xml:space="preserve">
     <value>No additional information available for this resource</value>
   </data>
-  <data name="Info.LoadError" xml:space="preserve">
-    <value>Could not load information: {0}</value>
-  </data>
   <data name="Progress.Fetching" xml:space="preserve">
     <value>Fetching...</value>
   </data>
@@ -221,6 +218,9 @@
   </data>
   <data name="Err.OkNoStream" xml:space="preserve">
     <value>could not extract a video link. The video may be private or unavailable in your region.</value>
+  </data>
+  <data name="Err.Unknown" xml:space="preserve">
+    <value>Something went wrong. Please try again.</value>
   </data>
   <data name="Platform.Ok" xml:space="preserve">
     <value>OK.ru</value>
