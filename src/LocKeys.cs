@@ -54,8 +54,6 @@ public static class LocKeys
     // Dialogs
     public const string DialogError = "Dialog.Error";
     public const string DialogOk = "Dialog.Ok";
-    public const string DialogYes = "Dialog.Yes";
-    public const string DialogNo = "Dialog.No";
     public const string DialogSuccess = "Dialog.Success";
     public const string DialogNoFolderTitle = "Dialog.NoFolderTitle";
     public const string DialogNoFolderMessage = "Dialog.NoFolderMessage";

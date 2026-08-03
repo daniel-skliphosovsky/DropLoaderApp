@@ -2,7 +2,6 @@ using System.Diagnostics;
 using MediaHub.Models;
 using MediaHub.Services.Interfaces;
 using YoutubeExplode;
-using YoutubeExplode.Common;
 using YoutubeExplode.Videos.Streams;
 
 namespace MediaHub.Services.Downloaders;
@@ -34,10 +33,10 @@ public sealed class YouTubeDownloader : IDownloader
     /// </summary>
     public async Task<IReadOnlyList<PlaylistItem>> GetPlaylistItemsAsync(string url, CancellationToken ct = default)
     {
-        if (!TryGetPlaylistId(url, out var playlistId) || playlistId is null)
+        if (!TryGetPlaylistId(url, out string? playlistId) || playlistId is null)
             return [];
 
-        var items = new List<PlaylistItem>();
+        List<PlaylistItem> items = new List<PlaylistItem>();
         await foreach (var video in _client.Playlists.GetVideosAsync(playlistId, ct))
             items.Add(new PlaylistItem($"https://www.youtube.com/watch?v={video.Id.Value}", video.Title));
 
@@ -50,10 +49,10 @@ public sealed class YouTubeDownloader : IDownloader
     /// </summary>
     public async Task<string?> GetPlaylistTitleAsync(string url, CancellationToken ct = default)
     {
-        if (!TryGetPlaylistId(url, out var playlistId) || playlistId is null)
+        if (!TryGetPlaylistId(url, out string? playlistId) || playlistId is null)
             return null;
 
-        var playlist = await _client.Playlists.GetAsync(playlistId, ct);
+        YoutubeExplode.Playlists.Playlist playlist = await _client.Playlists.GetAsync(playlistId, ct);
         return playlist.Title;
     }
 
@@ -61,14 +60,14 @@ public sealed class YouTubeDownloader : IDownloader
     {
         playlistId = null;
 
-        var value = string.IsNullOrWhiteSpace(url) ? string.Empty : url.Trim();
-        if (!Uri.TryCreate(value, UriKind.Absolute, out var uri) &&
+        string value = string.IsNullOrWhiteSpace(url) ? string.Empty : url.Trim();
+        if (!Uri.TryCreate(value, UriKind.Absolute, out Uri? uri) &&
             !Uri.TryCreate("https://" + value, UriKind.Absolute, out uri))
             return false;
 
         foreach (var pair in uri.Query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries))
         {
-            var kv = pair.Split('=', 2);
+            string[] kv = pair.Split('=', 2);
             if (kv.Length == 2 && kv[0].Equals("list", StringComparison.OrdinalIgnoreCase) && kv[1].Length > 0)
             {
                 playlistId = kv[1];
@@ -81,17 +80,16 @@ public sealed class YouTubeDownloader : IDownloader
 
     public async Task<MediaPreview?> GetPreviewAsync(string url, CancellationToken ct = default)
     {
-        var video = await _client.Videos.GetAsync(url, ct);
+        YoutubeExplode.Videos.Video video = await _client.Videos.GetAsync(url, ct);
 
-        var thumbnail = video.Thumbnails.TryGetWithHighestResolution();
         string? quality = null;
 
         try
         {
             // Stream resolution is a nice-to-have; if it fails we still have
             // the rest of the metadata, so it must not break the preview.
-            var manifest = await _client.Videos.Streams.GetManifestAsync(video.Id, ct);
-            var best = manifest.GetMuxedStreams()
+            StreamManifest manifest = await _client.Videos.Streams.GetManifestAsync(video.Id, ct);
+            MuxedStreamInfo? best = manifest.GetMuxedStreams()
                 .Where(s => s.Container == Container.Mp4)
                 .MaxBy(s => s.VideoQuality);
 
@@ -111,17 +109,15 @@ public sealed class YouTubeDownloader : IDownloader
             Title = video.Title,
             Author = video.Author.ChannelTitle,
             Description = video.Description,
-            ThumbnailUrl = thumbnail?.Url,
             Duration = video.Duration,
-            QualityText = quality,
-            Platform = PlatformName
+            QualityText = quality
         };
     }
 
     public async Task<IReadOnlyList<ResourceDetail>> GetDetailsAsync(string url, CancellationToken ct = default)
     {
-        var video = await _client.Videos.GetAsync(url, ct);
-        var details = new List<ResourceDetail>();
+        YoutubeExplode.Videos.Video video = await _client.Videos.GetAsync(url, ct);
+        List<ResourceDetail> details = new List<ResourceDetail>();
         ResourceDetail.AddIfPresent(details, Loc.Get(LocKeys.DetailsTitle), video.Title);
         ResourceDetail.AddIfPresent(details, Loc.Get(LocKeys.DetailsAuthor), video.Author.ChannelTitle);
         ResourceDetail.AddIfPresent(details, Loc.Get(LocKeys.DetailsDuration),
@@ -147,10 +143,10 @@ public sealed class YouTubeDownloader : IDownloader
         {
             progress?.Report(new DownloadProgress(0, null, 0, Loc.Get(LocKeys.ProgressFetching)));
 
-            var video = await _client.Videos.GetAsync(url, ct);
-            var manifest = await _client.Videos.Streams.GetManifestAsync(video.Id, ct);
+            YoutubeExplode.Videos.Video video = await _client.Videos.GetAsync(url, ct);
+            StreamManifest manifest = await _client.Videos.Streams.GetManifestAsync(video.Id, ct);
 
-            var streamInfo = manifest.GetMuxedStreams()
+            IStreamInfo? streamInfo = manifest.GetMuxedStreams()
                 .Where(s => s.Container == Container.Mp4)
                 .MaxBy(s => s.VideoQuality) as IStreamInfo
                 ?? manifest.GetAudioOnlyStreams().FirstOrDefault();
@@ -159,7 +155,7 @@ public sealed class YouTubeDownloader : IDownloader
                 return new DownloadResult(false, null, Loc.Get(LocKeys.ErrNoStream));
 
             filePath = Path.Combine(outputPath, $"{video.Id}.{streamInfo.Container.Name}");
-            var fileProgress = new Progress<double>(p =>
+            Progress<double> fileProgress = new Progress<double>(p =>
                 progress?.Report(new DownloadProgress(0, null, p, Loc.Get(LocKeys.ProgressDownloadingFile, video.Title))));
 
             await _client.Videos.Streams.DownloadAsync(streamInfo, filePath, fileProgress, ct);

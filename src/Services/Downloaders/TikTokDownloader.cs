@@ -30,34 +30,18 @@ public sealed class TikTokDownloader : IDownloader
 
     public async Task<MediaPreview?> GetPreviewAsync(string url, CancellationToken ct = default)
     {
-        for (var attempt = 0; ; attempt++)
+        for (int attempt = 0; ; attempt++)
         {
             ct.ThrowIfCancellationRequested();
             try
             {
-                var publication = await _tikTok.Publications.GetAsync(url, ct);
+                TikTokExplode.Publications.Publication publication = await _tikTok.Publications.GetAsync(url, ct);
 
-                // Video posts have no cover of their own in the public model, so fall
-                // back to the soundtrack artwork, then the author avatar, and finally
-                // the first photo for image posts.
-                string? thumbnail = null;
-                if (publication.Video is not null)
-                {
-                    thumbnail = publication.Soundtrack?.LargeCoverUrl
-                        ?? publication.Soundtrack?.MediumCoverUrl
-                        ?? publication.Soundtrack?.ThumbCoverUrl
-                        ?? publication.Author?.MediumAvatarUrl;
-                }
-                else if (publication.Images is { Count: > 0 })
-                {
-                    thumbnail = publication.Images[0].Url;
-                }
-
-                var description = publication.Description?.Trim();
+                string? description = publication.Description?.Trim();
                 if (description is { Length: > 100 })
                     description = description[..100] + "...";
 
-                var quality = publication.Video is not null
+                string? quality = publication.Video is not null
                     ? Loc.Get(LocKeys.QualityVideo)
                     : publication.Images is { Count: > 0 } images ? Loc.Get(LocKeys.QualityImages, images.Count) : null;
 
@@ -65,12 +49,10 @@ public sealed class TikTokDownloader : IDownloader
                 {
                     Title = description ?? string.Empty,
                     Author = publication.Author?.Nickname ?? string.Empty,
-                    ThumbnailUrl = thumbnail,
                     Duration = publication.Video is { Duration: > 0 } video
                         ? TimeSpan.FromMilliseconds(video.Duration)
                         : null,
-                    QualityText = quality,
-                    Platform = PlatformName
+                    QualityText = quality
                 };
             }
             catch (Exception ex) when (attempt < PreviewMaxAttempts - 1 && IsTransient(ex, ct))
@@ -99,8 +81,8 @@ public sealed class TikTokDownloader : IDownloader
 
     public async Task<IReadOnlyList<ResourceDetail>> GetDetailsAsync(string url, CancellationToken ct = default)
     {
-        var publication = await _tikTok.Publications.GetAsync(url, ct);
-        var details = new List<ResourceDetail>();
+        TikTokExplode.Publications.Publication publication = await _tikTok.Publications.GetAsync(url, ct);
+        List<ResourceDetail> details = new List<ResourceDetail>();
         ResourceDetail.AddIfPresent(details, Loc.Get(LocKeys.DetailsDescription), publication.Description);
         ResourceDetail.AddIfPresent(details, Loc.Get(LocKeys.DetailsAuthor), publication.Author?.Nickname);
         ResourceDetail.AddIfPresent(details, Loc.Get(LocKeys.DetailsAuthorId), publication.Author?.UserId);
@@ -147,14 +129,14 @@ public sealed class TikTokDownloader : IDownloader
         {
             progress?.Report(new DownloadProgress(0, null, 0, Loc.Get(LocKeys.ProgressFetchingMetadata)));
 
-            var publication = await _tikTok.Publications.GetAsync(url, ct);
-            var baseName = SanitizeFileName($"{publication.Author.Nickname}_{publication.Id}");
+            TikTokExplode.Publications.Publication publication = await _tikTok.Publications.GetAsync(url, ct);
+            string baseName = SanitizeFileName($"{publication.Author.Nickname}_{publication.Id}");
 
             if (publication.Video is not null)
             {
                 progress?.Report(new DownloadProgress(0, null, 0, Loc.Get(LocKeys.ProgressDownloadingVideo)));
 
-                var downloadProgress = new Progress<double>(p =>
+                Progress<double> downloadProgress = new Progress<double>(p =>
                     progress?.Report(new DownloadProgress(0, null, p, Loc.Get(LocKeys.ProgressDownloadingVideo))));
 
                 // The library appends the .mp4 extension itself, so the
@@ -169,10 +151,10 @@ public sealed class TikTokDownloader : IDownloader
             {
                 progress?.Report(new DownloadProgress(0, null, 0, Loc.Get(LocKeys.ProgressDownloadingImages)));
 
-                var downloadProgress = new Progress<double>(p =>
+                Progress<double> downloadProgress = new Progress<double>(p =>
                     progress?.Report(new DownloadProgress(0, null, p, Loc.Get(LocKeys.ProgressDownloadingImages))));
 
-                var dirPath = Path.Combine(outputPath, baseName);
+                string dirPath = Path.Combine(outputPath, baseName);
                 filePath = dirPath;
                 await _tikTok.DownloadImagesAsync(publication.Images, dirPath, baseName, downloadProgress, ct);
 
@@ -226,14 +208,14 @@ public sealed class TikTokDownloader : IDownloader
         // Strip characters invalid on Windows and macOS, plus control
         // characters, then trim and clamp the length so the file name
         // stays valid everywhere.
-        var invalid = Path.GetInvalidFileNameChars().ToHashSet();
+        HashSet<char> invalid = Path.GetInvalidFileNameChars().ToHashSet();
 
-        var builder = new StringBuilder(fileName.Length);
+        StringBuilder builder = new StringBuilder(fileName.Length);
         foreach (var c in fileName)
             builder.Append(invalid.Contains(c) || char.IsControl(c) ? '_' : c);
 
         const int maxLength = 120;
-        var sanitized = builder.ToString().Trim().TrimEnd('.', ' ');
+        string sanitized = builder.ToString().Trim().TrimEnd('.', ' ');
         return sanitized.Length <= maxLength
             ? sanitized
             : sanitized[..maxLength].TrimEnd('.', ' ');

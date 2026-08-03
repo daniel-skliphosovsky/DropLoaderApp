@@ -9,6 +9,7 @@
     <SingleProject>true</SingleProject>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AnalysisLevel>latest</AnalysisLevel>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <ApplicationTitle>MediaHub</ApplicationTitle>
     <ApplicationId>com.danielskliphosovsky.mediahub</ApplicationId>

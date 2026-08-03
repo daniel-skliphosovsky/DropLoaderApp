@@ -14,7 +14,7 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
-        var builder = MauiApp.CreateBuilder();
+        MauiAppBuilder builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
             .UseMauiCommunityToolkit()
@@ -43,7 +43,7 @@ public static class MauiProgram
         // own clean HttpClient below.
         builder.Services.AddSingleton(_ =>
         {
-            var http = new HttpClient(new ForcedUserAgentHandler())
+            HttpClient http = new HttpClient(new ForcedUserAgentHandler())
             {
                 Timeout = TimeSpan.FromMinutes(5)
             };

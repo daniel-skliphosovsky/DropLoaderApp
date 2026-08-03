@@ -26,7 +26,7 @@ public static class AppLogger
 
         try
         {
-            var entry =
+            string entry =
                 $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {exception.GetType().FullName}: {exception.Message}" +
                 Environment.NewLine +
                 exception.StackTrace +
@@ -35,7 +35,7 @@ public static class AppLogger
 
             lock (Sync)
             {
-                var directory = Path.GetDirectoryName(LogFilePath);
+                string? directory = Path.GetDirectoryName(LogFilePath);
                 if (!string.IsNullOrEmpty(directory))
                     Directory.CreateDirectory(directory);
                 File.AppendAllText(LogFilePath, entry);

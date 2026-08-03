@@ -19,8 +19,8 @@ internal static class UrlHelpers
 
         // Media links never contain legit whitespace; dropping it also
         // tolerates loose newlines or spaces around the pasted URL.
-        var value = new string(url.Where(c => !char.IsWhiteSpace(c)).ToArray());
-        if (!Uri.TryCreate(value, UriKind.Absolute, out var uri) &&
+        string value = new string(url.Where(c => !char.IsWhiteSpace(c)).ToArray());
+        if (!Uri.TryCreate(value, UriKind.Absolute, out Uri? uri) &&
             !Uri.TryCreate("https://" + value, UriKind.Absolute, out uri))
             return null;
 
@@ -39,13 +39,13 @@ internal static class UrlHelpers
     /// </summary>
     public static bool UrlBelongsTo(string url, params string[] domains)
     {
-        var host = GetHost(url);
+        string? host = GetHost(url);
         if (host is null)
             return false;
 
         foreach (var domain in domains)
         {
-            var d = domain.ToLowerInvariant();
+            string d = domain.ToLowerInvariant();
             if (host == d || host.EndsWith("." + d, StringComparison.Ordinal))
                 return true;
         }
@@ -61,16 +61,16 @@ internal static class UrlHelpers
     /// </summary>
     public static bool IsSoundCloudSetUrl(string url)
     {
-        var value = string.IsNullOrWhiteSpace(url) ? string.Empty : url.Trim();
-        if (!Uri.TryCreate(value, UriKind.Absolute, out var uri) &&
+        string value = string.IsNullOrWhiteSpace(url) ? string.Empty : url.Trim();
+        if (!Uri.TryCreate(value, UriKind.Absolute, out Uri? uri) &&
             !Uri.TryCreate("https://" + value, UriKind.Absolute, out uri))
             return false;
 
-        var host = uri.Host.ToLowerInvariant();
+        string host = uri.Host.ToLowerInvariant();
         if (host != "soundcloud.com" && !host.EndsWith(".soundcloud.com", StringComparison.Ordinal))
             return false;
 
-        var segments = uri.AbsolutePath.Trim('/').Split('/', StringSplitOptions.RemoveEmptyEntries);
+        string[] segments = uri.AbsolutePath.Trim('/').Split('/', StringSplitOptions.RemoveEmptyEntries);
         return segments.Length >= 3 &&
                (segments[1].Equals("sets", StringComparison.OrdinalIgnoreCase) ||
                 segments[1].Equals("albums", StringComparison.OrdinalIgnoreCase));
@@ -87,7 +87,7 @@ internal static class UrlHelpers
 
         foreach (var pair in query.TrimStart('?').Split('&', StringSplitOptions.RemoveEmptyEntries))
         {
-            var eq = pair.IndexOf('=');
+            int eq = pair.IndexOf('=');
             if (eq > 0 && pair.Length > eq + 1 && pair[..eq] == name)
                 return true;
         }
@@ -105,13 +105,13 @@ internal static class UrlHelpers
     /// </summary>
     public static bool LooksLikeContentUrl(string url)
     {
-        var value = string.IsNullOrWhiteSpace(url) ? string.Empty : url.Trim();
-        if (!Uri.TryCreate(value, UriKind.Absolute, out var uri) &&
+        string value = string.IsNullOrWhiteSpace(url) ? string.Empty : url.Trim();
+        if (!Uri.TryCreate(value, UriKind.Absolute, out Uri? uri) &&
             !Uri.TryCreate("https://" + value, UriKind.Absolute, out uri))
             return false;
 
-        var host = uri.Host.ToLowerInvariant();
-        var path = uri.AbsolutePath.Trim('/');
+        string host = uri.Host.ToLowerInvariant();
+        string path = uri.AbsolutePath.Trim('/');
 
         // YouTube: youtu.be short links carry the id in the path; watch/shorts/
         // embed/live pages and playlists (list=...) are real resources.

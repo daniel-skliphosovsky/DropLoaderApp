@@ -82,7 +82,7 @@ public sealed class OkDownloader : ScrapeDownloader
         }
 
         // Fallback: mobile pages embed the movie JSON directly in data-video.
-        var dataVideo = DataVideoRegex.Match(html);
+        Match dataVideo = DataVideoRegex.Match(html);
         if (dataVideo.Success)
             return WebUtility.HtmlDecode(dataVideo.Groups["json"].Value);
 
@@ -93,10 +93,10 @@ public sealed class OkDownloader : ScrapeDownloader
 
     protected override IEnumerable<(string Quality, string Url)> ExtractStreams(string html)
     {
-        var streams = new List<(string, string)>();
+        List<(string, string)> streams = new List<(string, string)>();
         try
         {
-            using var doc = JsonDocument.Parse(html);
+            using JsonDocument doc = JsonDocument.Parse(html);
             WalkStreams(doc.RootElement, null, streams);
         }
         catch (JsonException)
@@ -115,13 +115,13 @@ public sealed class OkDownloader : ScrapeDownloader
     {
         if (element.ValueKind == JsonValueKind.Object)
         {
-            if (element.TryGetProperty("url", out var urlEl) &&
+            if (element.TryGetProperty("url", out JsonElement urlEl) &&
                 urlEl.ValueKind == JsonValueKind.String &&
                 IsVideoUrl(urlEl.GetString() ?? string.Empty))
             {
-                var quality = element.TryGetProperty("name", out var nameEl) && nameEl.ValueKind == JsonValueKind.String
+                string? quality = element.TryGetProperty("name", out JsonElement nameEl) && nameEl.ValueKind == JsonValueKind.String
                     ? nameEl.GetString()
-                    : element.TryGetProperty("quality", out var qEl) && qEl.ValueKind == JsonValueKind.String
+                    : element.TryGetProperty("quality", out JsonElement qEl) && qEl.ValueKind == JsonValueKind.String
                         ? qEl.GetString()
                         : parentKey;
                 streams.Add((quality ?? string.Empty, urlEl.GetString()!));
@@ -145,7 +145,7 @@ public sealed class OkDownloader : ScrapeDownloader
     /// </summary>
     protected override int ParseQuality(string quality)
     {
-        if (QualityRank.TryGetValue(quality.Trim(), out var rank))
+        if (QualityRank.TryGetValue(quality.Trim(), out int rank))
             return rank;
         return base.ParseQuality(quality);
     }
@@ -162,16 +162,13 @@ public sealed class OkDownloader : ScrapeDownloader
         return FindAuthorName(html);
     }
 
-    protected override string? ExtractThumbnail(string html)
-        => FindString(html, "pic") ?? FindString(html, "image");
-
     protected override long? ExtractDurationSeconds(string html) => FindNumber(html, "duration");
 
     private static string? FindAuthorName(string json)
     {
         try
         {
-            using var doc = JsonDocument.Parse(json);
+            using JsonDocument doc = JsonDocument.Parse(json);
             return FindAuthorName(doc.RootElement);
         }
         catch (JsonException)
@@ -187,7 +184,7 @@ public sealed class OkDownloader : ScrapeDownloader
             foreach (var prop in element.EnumerateObject())
             {
                 if (prop.Name == "author" && prop.Value.ValueKind == JsonValueKind.Object &&
-                    prop.Value.TryGetProperty("name", out var name) && name.ValueKind == JsonValueKind.String)
+                    prop.Value.TryGetProperty("name", out JsonElement name) && name.ValueKind == JsonValueKind.String)
                     return name.GetString();
                 if (FindAuthorName(prop.Value) is { } found)
                     return found;
@@ -207,7 +204,7 @@ public sealed class OkDownloader : ScrapeDownloader
     {
         try
         {
-            using var doc = JsonDocument.Parse(json);
+            using JsonDocument doc = JsonDocument.Parse(json);
             return FindString(doc.RootElement, property);
         }
         catch (JsonException)
@@ -220,7 +217,7 @@ public sealed class OkDownloader : ScrapeDownloader
     {
         try
         {
-            using var doc = JsonDocument.Parse(json);
+            using JsonDocument doc = JsonDocument.Parse(json);
             return FindNumber(doc.RootElement, property);
         }
         catch (JsonException)
@@ -258,7 +255,7 @@ public sealed class OkDownloader : ScrapeDownloader
             foreach (var prop in element.EnumerateObject())
             {
                 if (prop.Name == property && prop.Value.ValueKind == JsonValueKind.Number &&
-                    prop.Value.TryGetInt64(out var value))
+                    prop.Value.TryGetInt64(out long value))
                     return value;
                 if (FindNumber(prop.Value, property) is { } found)
                     return found;
@@ -277,11 +274,11 @@ public sealed class OkDownloader : ScrapeDownloader
     private static bool IsVideoUrl(string url)
     {
         if (!url.StartsWith("http", StringComparison.OrdinalIgnoreCase) ||
-            !Uri.TryCreate(url, UriKind.Absolute, out var uri))
+            !Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
             return false;
 
-        var host = uri.Host.ToLowerInvariant();
-        var path = uri.AbsolutePath.ToLowerInvariant();
+        string host = uri.Host.ToLowerInvariant();
+        string path = uri.AbsolutePath.ToLowerInvariant();
 
         // Some payloads put plain image/text URLs next to the streams (the
         // video collage sprite, the login endpoint, subtitle tracks). A path
@@ -311,12 +308,12 @@ public sealed class OkDownloader : ScrapeDownloader
     {
         try
         {
-            using var doc = JsonDocument.Parse(dataOptionsJson);
-            var root = doc.RootElement;
+            using JsonDocument doc = JsonDocument.Parse(dataOptionsJson);
+            JsonElement root = doc.RootElement;
             if (root.ValueKind == JsonValueKind.Object &&
-                root.TryGetProperty("flashvars", out var flashvars) &&
+                root.TryGetProperty("flashvars", out JsonElement flashvars) &&
                 flashvars.ValueKind == JsonValueKind.Object &&
-                flashvars.TryGetProperty("metadata", out var metadata))
+                flashvars.TryGetProperty("metadata", out JsonElement metadata))
             {
                 return metadata.ValueKind == JsonValueKind.String
                     ? metadata.GetString()

@@ -75,7 +75,7 @@ public partial class InfoPopup : Popup
     {
         try
         {
-            var details = await _downloader.GetDetailsAsync(_url, ct);
+            IReadOnlyList<ResourceDetail> details = await _downloader.GetDetailsAsync(_url, ct);
             await MainThread.InvokeOnMainThreadAsync(() =>
             {
                 foreach (var detail in details)

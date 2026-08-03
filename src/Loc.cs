@@ -28,7 +28,7 @@ public static class Loc
     /// </summary>
     public static void SetLanguage(string code)
     {
-        var culture = new CultureInfo(code);
+        CultureInfo culture = new CultureInfo(code);
         CultureInfo.CurrentCulture = culture;
         CultureInfo.CurrentUICulture = culture;
         CultureInfo.DefaultThreadCurrentCulture = culture;
@@ -40,7 +40,7 @@ public static class Loc
 
     public static string Get(string key, params object?[] args)
     {
-        var format = Get(key);
+        string format = Get(key);
         return args.Length == 0 ? format : string.Format(CultureInfo.CurrentUICulture, format, args);
     }
 

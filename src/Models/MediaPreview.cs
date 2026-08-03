@@ -15,10 +15,8 @@ public sealed class MediaPreview
     /// </summary>
     public string Description { get; init; } = string.Empty;
 
-    public string? ThumbnailUrl { get; init; }
     public TimeSpan? Duration { get; init; }
     public string? QualityText { get; init; }
-    public string Platform { get; init; } = string.Empty;
 
     /// <summary>
     /// "12:34" or "1:02:03"; empty when the duration is unknown.
@@ -31,7 +29,7 @@ public sealed class MediaPreview
     /// </summary>
     public static string FormatDuration(TimeSpan duration)
     {
-        var total = (int)duration.TotalSeconds;
+        int total = (int)duration.TotalSeconds;
         return total >= 3600
             ? $"{total / 3600}:{total % 3600 / 60:00}:{total % 60:00}"
             : $"{total / 60}:{total % 60:00}";

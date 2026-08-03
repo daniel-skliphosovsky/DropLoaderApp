@@ -17,7 +17,7 @@ public sealed class FolderPickerService : IFolderPickerService
     {
         try
         {
-            var result = await FolderPicker.Default.PickAsync();
+            FolderPickerResult result = await FolderPicker.Default.PickAsync();
             if (result.IsSuccessful && result.Folder is not null)
                 return result.Folder.Path;
 

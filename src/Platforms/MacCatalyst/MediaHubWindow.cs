@@ -10,7 +10,7 @@ public partial class MediaHubWindow
         if (Handler?.PlatformView is not UIWindow uiWindow)
             return;
 
-        var scene = uiWindow.WindowScene;
+        UIWindowScene? scene = uiWindow.WindowScene;
         if (scene?.SizeRestrictions is not { } restrictions)
             return;
 
@@ -35,7 +35,7 @@ public partial class MediaHubWindow
         // title text unreadable. The UIKit override propagates to the
         // titlebar on Catalyst (AppKit types themselves are not exposed in
         // this workload).
-        var isDark = Application.Current?.UserAppTheme == AppTheme.Dark;
+        bool isDark = Application.Current?.UserAppTheme == AppTheme.Dark;
         uiWindow.OverrideUserInterfaceStyle = isDark
             ? UIUserInterfaceStyle.Dark
             : UIUserInterfaceStyle.Light;

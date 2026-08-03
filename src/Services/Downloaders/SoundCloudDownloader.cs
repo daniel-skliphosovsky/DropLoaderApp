@@ -28,7 +28,7 @@ public sealed class SoundCloudDownloader : IDownloader
 
     public async Task<MediaPreview?> GetPreviewAsync(string url, CancellationToken ct = default)
     {
-        var track = await GetTrackAsync(url, ct);
+        Track? track = await GetTrackAsync(url, ct);
         if (track is null)
             return null;
 
@@ -37,20 +37,18 @@ public sealed class SoundCloudDownloader : IDownloader
             Title = track.Title ?? string.Empty,
             Author = track.User?.Username ?? string.Empty,
             Description = track.Description ?? string.Empty,
-            ThumbnailUrl = track.ArtworkUrl?.ToString(),
             Duration = track.Duration is { } milliseconds ? TimeSpan.FromMilliseconds(milliseconds) : null,
-            QualityText = Loc.Get(LocKeys.QualityAudio),
-            Platform = PlatformName
+            QualityText = Loc.Get(LocKeys.QualityAudio)
         };
     }
 
     public async Task<IReadOnlyList<ResourceDetail>> GetDetailsAsync(string url, CancellationToken ct = default)
     {
-        var track = await GetTrackAsync(url, ct);
+        Track? track = await GetTrackAsync(url, ct);
         if (track is null)
             return [];
 
-        var details = new List<ResourceDetail>();
+        List<ResourceDetail> details = new List<ResourceDetail>();
         ResourceDetail.AddIfPresent(details, Loc.Get(LocKeys.DetailsTitle), track.Title);
         ResourceDetail.AddIfPresent(details, Loc.Get(LocKeys.DetailsAuthor), track.User?.Username);
         if (track.Duration is { } milliseconds)
@@ -81,12 +79,12 @@ public sealed class SoundCloudDownloader : IDownloader
     /// </summary>
     public async Task<IReadOnlyList<PlaylistItem>> GetPlaylistItemsAsync(string url, CancellationToken ct = default)
     {
-        for (var attempt = 0; attempt < 2; attempt++)
+        for (int attempt = 0; attempt < 2; attempt++)
         {
-            var client = new SoundCloudClient(await ResolveClientIdAsync(ct), _http);
+            SoundCloudClient client = new SoundCloudClient(await ResolveClientIdAsync(ct), _http);
             try
             {
-                var items = new List<PlaylistItem>();
+                List<PlaylistItem> items = new List<PlaylistItem>();
                 await foreach (var track in client.Playlists.GetTracksAsync(url, ct))
                     items.Add(new PlaylistItem(track.PermalinkUrl?.ToString() ?? url, track.Title ?? "track"));
                 return items;
@@ -106,12 +104,12 @@ public sealed class SoundCloudDownloader : IDownloader
     /// </summary>
     public async Task<string?> GetPlaylistTitleAsync(string url, CancellationToken ct = default)
     {
-        for (var attempt = 0; attempt < 2; attempt++)
+        for (int attempt = 0; attempt < 2; attempt++)
         {
-            var client = new SoundCloudClient(await ResolveClientIdAsync(ct), _http);
+            SoundCloudClient client = new SoundCloudClient(await ResolveClientIdAsync(ct), _http);
             try
             {
-                var playlist = await client.Playlists.GetAsync(url, populateAllTracks: false, ct);
+                SoundCloudExplode.Playlists.Playlist playlist = await client.Playlists.GetAsync(url, populateAllTracks: false, ct);
                 return playlist.Title;
             }
             catch (HttpRequestException ex) when (attempt == 0 && ex.StatusCode == HttpStatusCode.Unauthorized)
@@ -133,7 +131,7 @@ public sealed class SoundCloudDownloader : IDownloader
         {
             progress?.Report(new DownloadProgress(0, null, 0, Loc.Get(LocKeys.ProgressFetching)));
 
-            var track = await GetTrackAsync(url, ct);
+            Track? track = await GetTrackAsync(url, ct);
             if (track == null)
                 return new DownloadResult(false, null, Loc.Get(LocKeys.ErrTrackNotFound));
 
@@ -141,20 +139,20 @@ public sealed class SoundCloudDownloader : IDownloader
             // for many tracks that still expose a working download URL, so it
             // must never block the attempt. Only a real failure below (no
             // stream URL or an HTTP error) produces the fallback message.
-            var streamUrl = await GetDownloadUrlAsync(track, ct);
+            string? streamUrl = await GetDownloadUrlAsync(track, ct);
             if (string.IsNullOrEmpty(streamUrl))
                 return new DownloadResult(false, null, Loc.Get(LocKeys.ErrSoundCloudNotDownloadable));
 
             filePath = Path.Combine(outputPath, $"{SanitizeFileName(track.Title ?? "track")}.mp3");
 
-            using var response = await _http.GetAsync(streamUrl, HttpCompletionOption.ResponseHeadersRead, ct);
+            using HttpResponseMessage response = await _http.GetAsync(streamUrl, HttpCompletionOption.ResponseHeadersRead, ct);
             response.EnsureSuccessStatusCode();
 
-            var totalBytes = response.Content.Headers.ContentLength;
-            await using var stream = await response.Content.ReadAsStreamAsync(ct);
-            await using var fileStream = File.Create(filePath);
+            long? totalBytes = response.Content.Headers.ContentLength;
+            await using Stream stream = await response.Content.ReadAsStreamAsync(ct);
+            await using FileStream fileStream = File.Create(filePath);
 
-            var buffer = new byte[81920];
+            byte[] buffer = new byte[81920];
             long totalRead = 0;
             int read;
 
@@ -196,9 +194,9 @@ public sealed class SoundCloudDownloader : IDownloader
     /// </summary>
     private async Task<Track?> GetTrackAsync(string url, CancellationToken ct)
     {
-        for (var attempt = 0; attempt < 2; attempt++)
+        for (int attempt = 0; attempt < 2; attempt++)
         {
-            var client = new SoundCloudClient(await ResolveClientIdAsync(ct), _http);
+            SoundCloudClient client = new SoundCloudClient(await ResolveClientIdAsync(ct), _http);
             try
             {
                 return await client.Tracks.GetAsync(url, ct);
@@ -214,9 +212,9 @@ public sealed class SoundCloudDownloader : IDownloader
 
     private async Task<string?> GetDownloadUrlAsync(Track track, CancellationToken ct)
     {
-        for (var attempt = 0; attempt < 2; attempt++)
+        for (int attempt = 0; attempt < 2; attempt++)
         {
-            var client = new SoundCloudClient(await ResolveClientIdAsync(ct), _http);
+            SoundCloudClient client = new SoundCloudClient(await ResolveClientIdAsync(ct), _http);
             try
             {
                 return await client.Tracks.GetDownloadUrlAsync(track, ct);
@@ -255,8 +253,8 @@ public sealed class SoundCloudDownloader : IDownloader
         {
             // Scrape the client id the same way SoundCloudExplode does, via a
             // throwaway client so any failure stays local and we can fall back.
-            var probe = new SoundCloudClient(_http);
-            var id = await probe.GetClientIdAsync(ct);
+            SoundCloudClient probe = new SoundCloudClient(_http);
+            string id = await probe.GetClientIdAsync(ct);
             return string.IsNullOrWhiteSpace(id) ? null : id;
         }
         catch
@@ -290,13 +288,13 @@ public sealed class SoundCloudDownloader : IDownloader
         // Strip characters invalid on Windows and macOS, plus control
         // characters, then trim and clamp the length so the file name stays
         // valid on both platforms.
-        var invalid = Path.GetInvalidFileNameChars().ToHashSet();
-        var builder = new System.Text.StringBuilder(name.Length);
+        HashSet<char> invalid = Path.GetInvalidFileNameChars().ToHashSet();
+        System.Text.StringBuilder builder = new System.Text.StringBuilder(name.Length);
         foreach (var c in name)
             builder.Append(invalid.Contains(c) || char.IsControl(c) ? '_' : c);
 
         const int maxLength = 120;
-        var sanitized = builder.ToString().Trim().TrimEnd('.', ' ');
+        string sanitized = builder.ToString().Trim().TrimEnd('.', ' ');
         return sanitized.Length <= maxLength
             ? sanitized
             : sanitized[..maxLength].TrimEnd('.', ' ');

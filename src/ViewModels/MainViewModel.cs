@@ -292,23 +292,23 @@ public partial class MainViewModel : ObservableObject
         PreviewError = null;
         IsPreviewLoading = false;
 
-        var downloader = _currentDownloader;
+        IDownloader? downloader = _currentDownloader;
         if (downloader is null || string.IsNullOrWhiteSpace(Url))
             return;
 
-        var cts = _previewCts;
+        CancellationTokenSource cts = _previewCts;
         _ = LoadPreviewAfterDebounceAsync(Url, downloader, cts);
     }
 
     private async Task LoadPreviewAfterDebounceAsync(string url, IDownloader downloader, CancellationTokenSource cts)
     {
-        var ct = cts.Token;
+        CancellationToken ct = cts.Token;
         try
         {
             await Task.Delay(650, ct);
             SetPreviewLoading(true);
 
-            var preview = await downloader.GetPreviewAsync(url, ct);
+            MediaPreview? preview = await downloader.GetPreviewAsync(url, ct);
             if (ct.IsCancellationRequested)
                 return;
 
@@ -387,7 +387,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task PickFolderAsync()
     {
-        var path = await _folderPicker.PickFolderAsync();
+        string? path = await _folderPicker.PickFolderAsync();
         if (!string.IsNullOrEmpty(path))
         {
             OutputPath = path;
@@ -404,7 +404,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        var downloader = _currentDownloader;
+        IDownloader? downloader = _currentDownloader;
         if (downloader is null)
         {
             // The button is normally disabled for unsupported links, but the
@@ -414,7 +414,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        var cts = new CancellationTokenSource();
+        CancellationTokenSource cts = new CancellationTokenSource();
 
         // A download supersedes any in-flight preview request.
         CancelPreview();
@@ -465,7 +465,7 @@ public partial class MainViewModel : ObservableObject
             }
             // Progress<T> is created on the UI thread, so its callbacks are
             // marshalled back to the UI context automatically.
-            var progress = new Progress<DownloadProgress>(p =>
+            Progress<DownloadProgress> progress = new Progress<DownloadProgress>(p =>
             {
                 if (p.Percentage is { } percent)
                 {
@@ -487,14 +487,14 @@ public partial class MainViewModel : ObservableObject
             // in sequence through the shared single-video download path. The
             // items land in a subfolder named after the playlist (when its
             // title can be resolved) inside the chosen save folder.
-            var targets = new List<(string Title, string Url)>();
-            var outputDir = OutputPath;
+            List<(string Title, string Url)> targets = new List<(string Title, string Url)>();
+            string outputDir = OutputPath;
             if (downloader.IsPlaylistUrl(Url))
             {
-                var items = await downloader.GetPlaylistItemsAsync(Url, cts.Token);
+                IReadOnlyList<PlaylistItem> items = await downloader.GetPlaylistItemsAsync(Url, cts.Token);
                 targets.AddRange(items.Select(i => (i.Title, i.Url)));
 
-                var playlistTitle = await downloader.GetPlaylistTitleAsync(Url, cts.Token);
+                string? playlistTitle = await downloader.GetPlaylistTitleAsync(Url, cts.Token);
                 if (targets.Count > 1 && !string.IsNullOrWhiteSpace(playlistTitle))
                 {
                     outputDir = Path.Combine(OutputPath, SanitizeFolderName(playlistTitle));
@@ -513,8 +513,8 @@ public partial class MainViewModel : ObservableObject
             }
             else
             {
-                var failedCount = 0;
-                for (var i = 0; i < targets.Count; i++)
+                int failedCount = 0;
+                for (int i = 0; i < targets.Count; i++)
                 {
                     cts.Token.ThrowIfCancellationRequested();
 
@@ -524,7 +524,7 @@ public partial class MainViewModel : ObservableObject
                         DownloadFileName = targets[i].Title;
                     }
 
-                    var result = await downloader.DownloadAsync(targets[i].Url, outputDir, progress, cts.Token);
+                    DownloadResult result = await downloader.DownloadAsync(targets[i].Url, outputDir, progress, cts.Token);
 
                     if (result.Success)
                     {
@@ -613,7 +613,7 @@ public partial class MainViewModel : ObservableObject
         if (!string.IsNullOrWhiteSpace(Preview?.Title))
             return Preview.Title;
 
-        var segment = Url.TrimEnd('/').Split('/').LastOrDefault();
+        string? segment = Url.TrimEnd('/').Split('/').LastOrDefault();
         if (!string.IsNullOrWhiteSpace(segment))
             return segment;
 
@@ -642,7 +642,7 @@ public partial class MainViewModel : ObservableObject
     /// </summary>
     private void UpdateSpeed(DownloadProgress p)
     {
-        var now = DateTime.UtcNow;
+        DateTime now = DateTime.UtcNow;
 
         if (_lastSpeedAt == default)
         {
@@ -651,7 +651,7 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        var elapsed = (now - _lastSpeedAt).TotalSeconds;
+        double elapsed = (now - _lastSpeedAt).TotalSeconds;
         if (elapsed < 0.5 || p.BytesReceived == 0 || p.BytesReceived < _lastBytes)
             return;
 
@@ -668,7 +668,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void OpenInfo()
     {
-        var downloader = _currentDownloader;
+        IDownloader? downloader = _currentDownloader;
         if (downloader is null || string.IsNullOrWhiteSpace(Url))
             return;
 
@@ -685,12 +685,12 @@ public partial class MainViewModel : ObservableObject
 
     private static string SanitizeFolderName(string name)
     {
-        var invalid = Path.GetInvalidFileNameChars().ToHashSet();
-        var builder = new System.Text.StringBuilder(name.Length);
+        HashSet<char> invalid = Path.GetInvalidFileNameChars().ToHashSet();
+        System.Text.StringBuilder builder = new System.Text.StringBuilder(name.Length);
         foreach (var c in name)
             builder.Append(invalid.Contains(c) || char.IsControl(c) ? '_' : c);
 
-        var sanitized = builder.ToString().Trim().TrimEnd('.', ' ');
+        string sanitized = builder.ToString().Trim().TrimEnd('.', ' ');
         return string.IsNullOrWhiteSpace(sanitized) ? "playlist" : sanitized;
     }
 
@@ -698,7 +698,7 @@ public partial class MainViewModel : ObservableObject
     {
         string[] units = ["B", "KB", "MB", "GB"];
         double size = bytes;
-        var unit = 0;
+        int unit = 0;
         while (size >= 1024 && unit < units.Length - 1)
         {
             size /= 1024;

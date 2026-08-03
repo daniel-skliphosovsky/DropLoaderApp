@@ -46,10 +46,6 @@ public sealed class VkDownloader : ScrapeDownloader
         @"""description""\s*:\s*""(?<text>[^""]+)""",
         RegexOptions.Compiled);
 
-    private static readonly Regex ThumbnailRegex = new(
-        @"""jpg""\s*:\s*""(?<url>https?:\\?/\\?/[^""]+)""",
-        RegexOptions.Compiled);
-
     private const string ApiEndpoint = "https://vk.com/al_video.php";
     private const string VideoIdPattern = @"\/video(?<oid>-?\d+)_(?<vid>\d+)";
 
@@ -87,19 +83,19 @@ public sealed class VkDownloader : ScrapeDownloader
         if (videoId is null)
             return string.Empty;
 
-        var content = new FormUrlEncodedContent(new Dictionary<string, string>
+        FormUrlEncodedContent content = new FormUrlEncodedContent(new Dictionary<string, string>
         {
             ["act"] = "show",
             ["video"] = videoId,
             ["al"] = "1"
         });
 
-        using var request = new HttpRequestMessage(HttpMethod.Post, ApiEndpoint) { Content = content };
+        using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, ApiEndpoint) { Content = content };
         request.Headers.UserAgent.ParseAdd(UserAgent);
         request.Headers.Referrer = new Uri("https://vk.com/");
         request.Headers.TryAddWithoutValidation("X-Requested-With", "XMLHttpRequest");
 
-        using var response = await Http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
+        using HttpResponseMessage response = await Http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
         response.EnsureSuccessStatusCode();
 
         byte[] bytes = await response.Content.ReadAsByteArrayAsync(ct);
@@ -111,7 +107,7 @@ public sealed class VkDownloader : ScrapeDownloader
             // wrapped in a "payload" property; some responses are a bare array.
             // Flatten all parts (the trailing opts object included) so the
             // extractors can parse one string; the first entry is the video title.
-            using var document = JsonDocument.Parse(payload);
+            using JsonDocument document = JsonDocument.Parse(payload);
             JsonElement root = document.RootElement;
 
             JsonElement payloadArr = root.ValueKind == JsonValueKind.Array
@@ -122,7 +118,7 @@ public sealed class VkDownloader : ScrapeDownloader
                 && payloadArr.GetArrayLength() > 1
                 && payloadArr[1].ValueKind == JsonValueKind.Array)
             {
-                var builder = new StringBuilder();
+                StringBuilder builder = new StringBuilder();
                 foreach (JsonElement part in payloadArr[1].EnumerateArray())
                 {
                     switch (part.ValueKind)
@@ -154,10 +150,10 @@ public sealed class VkDownloader : ScrapeDownloader
 
     protected override IEnumerable<(string Quality, string Url)> ExtractStreams(string html)
     {
-        var streams = new List<(string, string)>();
+        List<(string, string)> streams = new List<(string, string)>();
         foreach (Match match in StreamRegex.Matches(html))
         {
-            var streamUrl = Unescape(match.Groups["url"].Value);
+            string streamUrl = Unescape(match.Groups["url"].Value);
             if (streamUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase))
                 streams.Add((match.Groups["quality"].Value + "p", streamUrl));
         }
@@ -166,7 +162,7 @@ public sealed class VkDownloader : ScrapeDownloader
         // some pages (especially vkvideo.ru), but when present they carry the
         // direct mp4, used only when embedded sources are absent. Only trust
         // them when they point at an actual media file, not at a page.
-        var ogUrl = GetMetaProperty(html, "og:video") ?? GetMetaProperty(html, "og:video:url");
+        string? ogUrl = GetMetaProperty(html, "og:video") ?? GetMetaProperty(html, "og:video:url");
         if (IsMediaUrl(ogUrl))
             streams.Add(("best", ogUrl!));
 
@@ -182,7 +178,7 @@ public sealed class VkDownloader : ScrapeDownloader
 
     protected override string? ExtractAuthor(string html)
     {
-        var match = AuthorRegex.Match(html);
+        Match match = AuthorRegex.Match(html);
         if (match.Success)
             return CleanHtmlText(match.Groups["author"].Value);
 
@@ -211,7 +207,7 @@ public sealed class VkDownloader : ScrapeDownloader
         string? best = null;
         foreach (Match match in DescriptionRegex.Matches(html))
         {
-            var text = CleanHtmlText(match.Groups["text"].Value);
+            string text = CleanHtmlText(match.Groups["text"].Value);
             if (text.Length > 0 && (best is null || text.Length > best.Length))
                 best = text;
         }
@@ -220,15 +216,15 @@ public sealed class VkDownloader : ScrapeDownloader
 
     protected override IReadOnlyList<ResourceDetail> BuildDetails(string html)
     {
-        var details = base.BuildDetails(html).ToList();
+        List<ResourceDetail> details = base.BuildDetails(html).ToList();
 
         // Counts repeat once per recommended video in the payload; the video
         // itself is the most popular entry, so keep the largest value.
-        var views = MaxCount(ViewsRegex, html);
+        ulong views = MaxCount(ViewsRegex, html);
         if (views > 0)
             details.Add(new ResourceDetail(Loc.Get(LocKeys.DetailsViews), views.ToString("N0")));
 
-        var likes = MaxCount(LikesNestedRegex, html);
+        ulong likes = MaxCount(LikesNestedRegex, html);
         if (likes == 0)
             likes = MaxCount(LikesFlatRegex, html);
         if (likes > 0)
@@ -248,12 +244,6 @@ public sealed class VkDownloader : ScrapeDownloader
         return best;
     }
 
-    protected override string? ExtractThumbnail(string html)
-    {
-        var match = ThumbnailRegex.Match(html);
-        return match.Success ? Unescape(match.Groups["url"].Value) : null;
-    }
-
     protected override void ApplyDownloadHeaders(HttpRequestMessage request, string url)
     {
         // The okcdn CDN only serves the mp4 when the request looks like it
@@ -263,7 +253,7 @@ public sealed class VkDownloader : ScrapeDownloader
 
     private static string? ExtractVideoId(string url)
     {
-        var match = Regex.Match(url, VideoIdPattern);
+        Match match = Regex.Match(url, VideoIdPattern);
         return match.Success ? match.Groups["oid"].Value + "_" + match.Groups["vid"].Value : null;
     }
 
@@ -271,12 +261,12 @@ public sealed class VkDownloader : ScrapeDownloader
     {
         if (string.IsNullOrWhiteSpace(url) ||
             !url.StartsWith("http", StringComparison.OrdinalIgnoreCase) ||
-            !Uri.TryCreate(url, UriKind.Absolute, out var uri) ||
+            !Uri.TryCreate(url, UriKind.Absolute, out Uri? uri) ||
             uri.Scheme is not ("http" or "https"))
             return false;
 
-        var host = uri.Host.ToLowerInvariant();
-        var lower = uri.AbsolutePath.ToLowerInvariant();
+        string host = uri.Host.ToLowerInvariant();
+        string lower = uri.AbsolutePath.ToLowerInvariant();
         return lower.EndsWith(".mp4") ||
                lower.EndsWith(".m3u8") ||
                lower.EndsWith(".webm") ||
@@ -287,7 +277,7 @@ public sealed class VkDownloader : ScrapeDownloader
 
     private static string Unescape(string url)
     {
-        var value = url
+        string value = url
             .Replace("\\/", "/")
             .Replace("\\u0026", "&")
             .Replace("\\x26", "&");
@@ -310,7 +300,7 @@ public sealed class VkDownloader : ScrapeDownloader
     /// </summary>
     private static string CleanHtmlText(string value)
     {
-        var text = DecodeUnicode(value);
+        string text = DecodeUnicode(value);
         text = WebUtility.HtmlDecode(text);
         text = Regex.Replace(text, @"<\s*br\s*/?>", "\n", RegexOptions.IgnoreCase);
         text = Regex.Replace(text, @"<[^>]+>", string.Empty);

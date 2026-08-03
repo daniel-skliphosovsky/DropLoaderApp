@@ -65,7 +65,7 @@ public partial class App : Application
             {
                 try
                 {
-                    var page = Current?.Windows.FirstOrDefault()?.Page;
+                    Page? page = Current?.Windows.FirstOrDefault()?.Page;
                     if (page is not null)
                     {
                         _ = page.DisplayAlert(
