@@ -20,7 +20,7 @@
 
                     <!-- GitHub repo button (replaces the old logo) -->
                     <Border WidthRequest="72" HeightRequest="72"
-                            BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark={StaticResource SurfaceVariantDark}}"
+                            BackgroundColor="{AppThemeBinding Light=#FAFAFA, Dark={StaticResource SurfaceVariantDark}}"
                             StrokeThickness="0" StrokeShape="RoundRectangle 20"
                             VerticalOptions="Center"
                             SemanticProperties.Description="{Binding LocGithubHint}">
@@ -106,7 +106,7 @@
                                         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="2">
 
                                             <!-- Platform icon, auto-detected -->
-                                            <Grid Grid.Column="0" WidthRequest="34" HeightRequest="34"
+                                            <Grid Grid.Column="0" WidthRequest="41" HeightRequest="41"
                                                   VerticalOptions="Center" Margin="6,0,0,0">
                                                 <!-- Unknown: generic link -->
                                                 <Path Fill="Transparent" IsVisible="False"
@@ -177,6 +177,7 @@
                                             </Grid>
 
                                             <Entry Grid.Column="1"
+                                                   Margin="6,0,14,0"
                                                    Text="{Binding Url}"
                                                    Placeholder="{Binding LocUrlPlaceholder}"
                                                    Keyboard="Url"
