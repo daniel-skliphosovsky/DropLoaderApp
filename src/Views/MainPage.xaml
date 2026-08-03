@@ -107,7 +107,7 @@
 
                                             <!-- Platform icon, auto-detected -->
                                             <Grid Grid.Column="0" WidthRequest="41" HeightRequest="41"
-                                                  VerticalOptions="Center" Margin="6,0,0,0">
+                                                  VerticalOptions="Center" Margin="11,0,0,0">
                                                 <!-- Unknown: generic link -->
                                                 <Path Fill="Transparent" IsVisible="False"
                                                       Stroke="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}"
