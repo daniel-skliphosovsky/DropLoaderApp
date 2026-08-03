@@ -14,6 +14,18 @@ MediaHub downloads media from TikTok, YouTube, SoundCloud, VK, and OK.ru. Paste 
 - VK
 - OK.ru
 
+## Screenshots
+
+![Main window](screenshots/screenshot-1.png)
+
+![Download in progress](screenshots/screenshot-2.png)
+
+![Download finished](screenshots/screenshot-3.png)
+
+![Error: no network](screenshots/screenshot-4.png)
+
+![Error: invalid link](screenshots/screenshot-5.png)
+
 ## Install
 
 ### Windows
