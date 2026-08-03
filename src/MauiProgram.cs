@@ -35,14 +35,22 @@ public static class MauiProgram
             // The styled container draws the outline, so drop the native border.
             textBox.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
 
-            // The default WinUI TextBox template still paints the focus
-            // underline with the system accent color (brown for this user).
-            // Zero it locally so only the styled container shows through and
-            // no system accent leaks in; the background stays transparent and
-            // the padding is untouched.
+            // The default WinUI TextBox template still paints an underline
+            // for the Focused (accent color), PointerOver (gray) and
+            // Disabled (gray) states. Zero them all locally so only the
+            // styled container shows through; the background stays
+            // transparent and the padding is untouched.
             textBox.Resources["TextControlBorderBrushFocused"] =
                 new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
             textBox.Resources["TextControlBorderThemeThicknessFocused"] =
+                new Microsoft.UI.Xaml.Thickness(0);
+            textBox.Resources["TextControlBorderBrushPointerOver"] =
+                new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+            textBox.Resources["TextControlBorderThemeThicknessPointerOver"] =
+                new Microsoft.UI.Xaml.Thickness(0);
+            textBox.Resources["TextControlBorderBrushDisabled"] =
+                new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+            textBox.Resources["TextControlBorderThemeThicknessDisabled"] =
                 new Microsoft.UI.Xaml.Thickness(0);
         });
 #elif MACCATALYST
