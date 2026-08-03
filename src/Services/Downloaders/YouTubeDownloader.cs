@@ -146,6 +146,10 @@ public sealed class YouTubeDownloader : IDownloader
             YoutubeExplode.Videos.Video video = await _client.Videos.GetAsync(url, ct);
             StreamManifest manifest = await _client.Videos.Streams.GetManifestAsync(video.Id, ct);
 
+            // Pick the highest-quality progressive (muxed) MP4 stream. YouTube
+            // caps muxed streams at ~720p: 1080p and above exist only as
+            // separate DASH video+audio streams that need ffmpeg muxing,
+            // which is intentionally not implemented here.
             IStreamInfo? streamInfo = manifest.GetMuxedStreams()
                 .Where(s => s.Container == Container.Mp4)
                 .MaxBy(s => s.VideoQuality) as IStreamInfo

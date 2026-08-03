@@ -171,7 +171,7 @@ public sealed class SoundCloudDownloader : IDownloader
             TryDeleteFile(filePath);
             return new DownloadResult(false, null, Loc.Get(LocKeys.ErrCancelled));
         }
-        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        catch (HttpRequestException ex) when (IsNotFound(ex))
         {
             // SoundCloud answers 404 both for tracks with downloads disabled
             // and for expired stream URLs; no raw request dump, just a clear
@@ -209,6 +209,16 @@ public sealed class SoundCloudDownloader : IDownloader
 
         return null;
     }
+
+    /// <summary>
+    /// True when the request failed with a 404. SoundCloudExplode can surface
+    /// the status only inside the message (StatusCode is null), so a "404" in
+    /// the text counts too: both mean the track is not available for download
+    /// and must map to the friendly localized message instead of a raw dump.
+    /// </summary>
+    private static bool IsNotFound(HttpRequestException ex) =>
+        ex.StatusCode == HttpStatusCode.NotFound ||
+        (ex.StatusCode is null && ex.Message.Contains("404", StringComparison.Ordinal));
 
     private async Task<string?> GetDownloadUrlAsync(Track track, CancellationToken ct)
     {

@@ -20,7 +20,7 @@
 
                     <!-- GitHub repo button (replaces the old logo) -->
                     <Border WidthRequest="72" HeightRequest="72"
-                            BackgroundColor="{AppThemeBinding Light={StaticResource SurfaceVariantLight}, Dark={StaticResource SurfaceVariantDark}}"
+                            BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark={StaticResource SurfaceVariantDark}}"
                             StrokeThickness="0" StrokeShape="RoundRectangle 20"
                             VerticalOptions="Center"
                             SemanticProperties.Description="{Binding LocGithubHint}">
@@ -103,16 +103,18 @@
                                     <Label Text="{Binding LocUrlLabel}" Style="{StaticResource FieldLabel}" />
                                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                                     <Border Style="{StaticResource InputContainer}">
-                                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="6">
+                                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="3">
 
                                             <!-- Platform icon, auto-detected -->
                                             <Grid Grid.Column="0" WidthRequest="34" HeightRequest="34"
-                                                  VerticalOptions="Center" Margin="14,0,0,0">
+                                                  VerticalOptions="Center" Margin="10,0,0,0">
                                                 <!-- Unknown: generic link -->
                                                 <Path Fill="Transparent" IsVisible="False"
                                                       Stroke="{AppThemeBinding Light={StaticResource OnSurfaceVariantLight}, Dark={StaticResource OnSurfaceVariantDark}}"
                                                       StrokeThickness="2" StrokeLineCap="Round" StrokeLineJoin="Round"
                                                       Aspect="Uniform"
+                                                      WidthRequest="24" HeightRequest="24"
+                                                      VerticalOptions="Center" HorizontalOptions="Center"
                                                       Data="{StaticResource IconLinkPath}">
                                                     <Path.Triggers>
                                                         <DataTrigger TargetType="Path" Binding="{Binding PlatformKey}" Value="unknown">
