@@ -54,6 +54,29 @@ internal static class UrlHelpers
     }
 
     /// <summary>
+    /// True when the SoundCloud URL points to a set or album (a playlist of
+    /// multiple tracks) rather than a single track. Set/album links carry a
+    /// "/sets/" or "/albums/" path segment; on.soundcloud.com short links
+    /// are treated as single tracks.
+    /// </summary>
+    public static bool IsSoundCloudSetUrl(string url)
+    {
+        var value = string.IsNullOrWhiteSpace(url) ? string.Empty : url.Trim();
+        if (!Uri.TryCreate(value, UriKind.Absolute, out var uri) &&
+            !Uri.TryCreate("https://" + value, UriKind.Absolute, out uri))
+            return false;
+
+        var host = uri.Host.ToLowerInvariant();
+        if (host != "soundcloud.com" && !host.EndsWith(".soundcloud.com", StringComparison.Ordinal))
+            return false;
+
+        var segments = uri.AbsolutePath.Trim('/').Split('/', StringSplitOptions.RemoveEmptyEntries);
+        return segments.Length >= 3 &&
+               (segments[1].Equals("sets", StringComparison.OrdinalIgnoreCase) ||
+                segments[1].Equals("albums", StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
     /// True when the URL query contains the given parameter with a non-empty
     /// value (e.g. "v=abc" but not a bare "v" or "v=").
     /// </summary>

@@ -68,6 +68,61 @@ public sealed class SoundCloudDownloader : IDownloader
         return details;
     }
 
+    /// <summary>
+    /// A SoundCloud set/album URL (path carries a "/sets/" or "/albums/"
+    /// segment) is a playlist of multiple tracks.
+    /// </summary>
+    public bool IsPlaylistUrl(string url) => UrlHelpers.IsSoundCloudSetUrl(url);
+
+    /// <summary>
+    /// Enumerates the tracks of the set/album at the given URL, each as its
+    /// own permalink URL so the shared single-track download path can be
+    /// reused for every item.
+    /// </summary>
+    public async Task<IReadOnlyList<PlaylistItem>> GetPlaylistItemsAsync(string url, CancellationToken ct = default)
+    {
+        for (var attempt = 0; attempt < 2; attempt++)
+        {
+            var client = new SoundCloudClient(await ResolveClientIdAsync(ct), _http);
+            try
+            {
+                var items = new List<PlaylistItem>();
+                await foreach (var track in client.Playlists.GetTracksAsync(url, ct))
+                    items.Add(new PlaylistItem(track.PermalinkUrl?.ToString() ?? url, track.Title ?? "track"));
+                return items;
+            }
+            catch (HttpRequestException ex) when (attempt == 0 && ex.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                _clientId = null;
+            }
+        }
+
+        return [];
+    }
+
+    /// <summary>
+    /// The set/album title, used as the name of the subfolder the tracks are
+    /// saved into.
+    /// </summary>
+    public async Task<string?> GetPlaylistTitleAsync(string url, CancellationToken ct = default)
+    {
+        for (var attempt = 0; attempt < 2; attempt++)
+        {
+            var client = new SoundCloudClient(await ResolveClientIdAsync(ct), _http);
+            try
+            {
+                var playlist = await client.Playlists.GetAsync(url, populateAllTracks: false, ct);
+                return playlist.Title;
+            }
+            catch (HttpRequestException ex) when (attempt == 0 && ex.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                _clientId = null;
+            }
+        }
+
+        return null;
+    }
+
     public async Task<DownloadResult> DownloadAsync(
         string url, string outputPath,
         IProgress<DownloadProgress>? progress = null,
@@ -82,11 +137,10 @@ public sealed class SoundCloudDownloader : IDownloader
             if (track == null)
                 return new DownloadResult(false, null, Loc.Get(LocKeys.ErrTrackNotFound));
 
-            // A track can exist but have downloads disabled by its author.
-            // Surface that as a friendly message instead of a raw HTTP error.
-            if (track.Downloadable == false)
-                return new DownloadResult(false, null, Loc.Get(LocKeys.ErrSoundCloudNotDownloadable));
-
+            // The Downloadable flag is not a reliable gate: it reports false
+            // for many tracks that still expose a working download URL, so it
+            // must never block the attempt. Only a real failure below (no
+            // stream URL or an HTTP error) produces the fallback message.
             var streamUrl = await GetDownloadUrlAsync(track, ct);
             if (string.IsNullOrEmpty(streamUrl))
                 return new DownloadResult(false, null, Loc.Get(LocKeys.ErrSoundCloudNotDownloadable));

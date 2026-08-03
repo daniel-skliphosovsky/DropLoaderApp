@@ -44,6 +44,19 @@ public sealed class YouTubeDownloader : IDownloader
         return items;
     }
 
+    /// <summary>
+    /// The playlist title, used as the name of the subfolder the videos are
+    /// saved into.
+    /// </summary>
+    public async Task<string?> GetPlaylistTitleAsync(string url, CancellationToken ct = default)
+    {
+        if (!TryGetPlaylistId(url, out var playlistId) || playlistId is null)
+            return null;
+
+        var playlist = await _client.Playlists.GetAsync(playlistId, ct);
+        return playlist.Title;
+    }
+
     private static bool TryGetPlaylistId(string url, out string? playlistId)
     {
         playlistId = null;

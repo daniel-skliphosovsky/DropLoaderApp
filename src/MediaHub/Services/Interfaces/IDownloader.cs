@@ -31,6 +31,14 @@ public interface IDownloader
         => Task.FromResult<IReadOnlyList<PlaylistItem>>([]);
 
     /// <summary>
+    /// The display name of the playlist/set at the given URL, used as the
+    /// name of the subfolder the items are saved into. Returns null for
+    /// single items or when the title cannot be resolved.
+    /// </summary>
+    Task<string?> GetPlaylistTitleAsync(string url, CancellationToken ct = default)
+        => Task.FromResult<string?>(null);
+
+    /// <summary>
     /// Full metadata rows for the resource (author, stats, dates, description),
     /// shown in the preview card's "Information" section. Defaults to nothing
     /// extra; platforms that expose more metadata override it.

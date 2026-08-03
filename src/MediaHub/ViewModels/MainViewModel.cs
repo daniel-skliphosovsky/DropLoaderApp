@@ -484,12 +484,22 @@ public partial class MainViewModel : ObservableObject
             });
 
             // Playlist URLs expand into one target per item, each downloaded
-            // in sequence through the shared single-video download path.
+            // in sequence through the shared single-video download path. The
+            // items land in a subfolder named after the playlist (when its
+            // title can be resolved) inside the chosen save folder.
             var targets = new List<(string Title, string Url)>();
+            var outputDir = OutputPath;
             if (downloader.IsPlaylistUrl(Url))
             {
                 var items = await downloader.GetPlaylistItemsAsync(Url, cts.Token);
                 targets.AddRange(items.Select(i => (i.Title, i.Url)));
+
+                var playlistTitle = await downloader.GetPlaylistTitleAsync(Url, cts.Token);
+                if (targets.Count > 1 && !string.IsNullOrWhiteSpace(playlistTitle))
+                {
+                    outputDir = Path.Combine(OutputPath, SanitizeFolderName(playlistTitle));
+                    Directory.CreateDirectory(outputDir);
+                }
             }
             else
             {
@@ -514,7 +524,7 @@ public partial class MainViewModel : ObservableObject
                         DownloadFileName = targets[i].Title;
                     }
 
-                    var result = await downloader.DownloadAsync(targets[i].Url, OutputPath, progress, cts.Token);
+                    var result = await downloader.DownloadAsync(targets[i].Url, outputDir, progress, cts.Token);
 
                     if (result.Success)
                     {
@@ -671,6 +681,17 @@ public partial class MainViewModel : ObservableObject
             // Shell may be unavailable (e.g. during shutdown); the popup
             // simply does not appear in that case.
         }
+    }
+
+    private static string SanitizeFolderName(string name)
+    {
+        var invalid = Path.GetInvalidFileNameChars().ToHashSet();
+        var builder = new System.Text.StringBuilder(name.Length);
+        foreach (var c in name)
+            builder.Append(invalid.Contains(c) || char.IsControl(c) ? '_' : c);
+
+        var sanitized = builder.ToString().Trim().TrimEnd('.', ' ');
+        return string.IsNullOrWhiteSpace(sanitized) ? "playlist" : sanitized;
     }
 
     private static string FormatBytes(long bytes)
