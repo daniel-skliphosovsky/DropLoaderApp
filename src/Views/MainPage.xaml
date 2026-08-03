@@ -103,7 +103,7 @@
                                     <Label Text="{Binding LocUrlLabel}" Style="{StaticResource FieldLabel}" />
                                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                                     <Border Style="{StaticResource InputContainer}">
-                                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="2">
+                                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{OnPlatform WinUI='0', MacCatalyst='2', Default='2'}">
 
                                             <!-- Platform icon, auto-detected -->
                                             <Grid Grid.Column="0" WidthRequest="41" HeightRequest="41"
